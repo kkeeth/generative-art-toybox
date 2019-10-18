@@ -8,42 +8,6 @@ function setup() {
 function draw() {
 
 /**
- * draw cube
- *
-  background(0);
-
-  this.ambientLight(128, 128, 128);
-  this.directionalLight(128, 128, 128, 0, 0, -1);
-
-  push();
-  rotateX(millis() / 1000);
-  rotateY(millis() / 1000);
-  rotateZ(millis() / 1000);
-  //noStroke();
-  box(100);
-  pop();
-*/
-
-/**
- * draw sphere
- *
-  push();
-  sphere();
-  pop();
-  stroke('#008080');
-  strokeWeight(1);
-*/
-
-/**
- * draw square
- *
-  background(244);
-  fill(255,0,0, 127);
-  noStroke();
-  rect(10, 10, 50, 50); // x, y, width, height
-*/
-
-/**
  * draw rectangle
  *
   background(244);
