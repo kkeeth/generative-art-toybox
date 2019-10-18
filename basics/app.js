@@ -7,14 +7,6 @@ function setup() {
 
 function draw() {
 /**
- * draw circle
- *
-  background(220)
-
-  ellipse(50, 50, 80, 80);
- */
-
-/**
  * draw various pattern's fan shapes
   background(220)
   arc(0, -150, 80, 80, 0, PI); // radian
