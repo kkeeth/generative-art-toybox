@@ -6,33 +6,6 @@ function setup() {
 }
 
 function draw() {
-
-/**
- * draw rectangle
- *
-  background(244);
-  fill(0, 0, 255, 127);
-  noStroke();
-  push();
-  translate(0, -10);
-  rotate(radians(30));
-  scale(1.5, 3);
-  rect(10, 10, 50, 50); // x, y, width, height, r
-  pop();
- */
-
-/**
- * draw torus
- *
-  background(200);
-  push();
-  rotateZ(frameCount * 0.01);
-  rotateX(frameCount * 0.01);
-  rotateY(frameCount * 0.01);
-  torus(70, 20);
-  pop();
- */
-
 /**
  * draw circle
  *
