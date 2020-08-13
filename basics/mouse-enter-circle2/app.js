@@ -1,4 +1,6 @@
-let isNoMove = true
+let isNoMove = true;
+let r = 50;
+
 function setup() {
   createCanvas(640, 480);
   smooth();
@@ -20,10 +22,15 @@ function draw() {
     else {
       fill('#fff')
     }
-    ellipse(mouseX, mouseY, 50, 50)
+    ellipse(mouseX, mouseY, r, r)
   }
 }
 
 function mouseMoved() {
   isNoMove = false
+}
+
+function mousePressed() {
+  r += 10;
+  return;
 }
