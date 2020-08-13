@@ -1,6 +1,6 @@
 let x, y, r = 30;
 let angle = 0;
-let slider;
+let slider, button;
 
 function setup() {
   createCanvas(600, 480);
@@ -10,6 +10,10 @@ function setup() {
 
   slider = createSlider(0, 100, 30);
   slider.position(10, 20);
+
+  button = createButton("Clear");
+  button.position(10, 40);
+  button.mousePressed(() => background("skyblue"));
 }
 
 function draw() {
