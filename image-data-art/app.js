@@ -1,3 +1,8 @@
+/**
+ * The following videos were used for reference
+ * https://www.youtube.com/watch?v=me04ZrTJqWA&pp=ugMICgJqYRABGAE%3D
+ */
+
 let img;
 let cnv;
 
