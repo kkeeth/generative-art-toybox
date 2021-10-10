@@ -11,7 +11,7 @@ function setup() {
 
 function draw() {
   ellipse(pX, pY, 1)
-
+  stroke(pY % 360, 100, 100)
 
   mX = random(-1, 1)
   mY = random(-1, 1)
