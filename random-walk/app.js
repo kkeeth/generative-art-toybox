@@ -9,12 +9,11 @@ function setup() {
 }
 
 function draw() {
-  background(220)
   ellipse(pX, pY, 1)
 
   mX = random(-1, 1)
   mY = random(-1, 1)
 
-  pX = pX + mX
-  pY = pY + mY
+  pX = pX + 3 * mX
+  pY = pY + 3 * mY
 }
