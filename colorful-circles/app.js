@@ -8,7 +8,6 @@ function setup() {
 }
 
 function draw() {
-  if (frameCount > 1) return
   background(220)
 
   for (let i = cWidth; i < width; i += cWidth * 3.5) {
@@ -20,4 +19,6 @@ function draw() {
       ellipse(i + cWidth / 2, j, cWidth, cHeight)
     }
   }
+
+  noLoop()
 }
