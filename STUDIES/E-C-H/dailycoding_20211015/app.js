@@ -52,7 +52,7 @@ function draw() {
 
       let sw = int(random(6));
       if (sw == 0) {
-        rect(0, 0, r, r);
+        rect(0, 0, r/2, r/2);
       }
 
       if (sw == 1) {
@@ -83,7 +83,7 @@ function draw() {
         for (let sx = -r / 2 + sg / 2; sx <= r / 2 - sg / 2; sx += sg) {
           for (let sy = -r / 2 + sg / 2; sy <= r / 2 - sg / 2; sy += sg) {
             if (dsw == 0) {
-              rect(sx, sy, sg / 1.5, sg / 1.5);
+              // rect(sx, sy, sg / 1.5, sg / 1.5);
             }
 
             if (dsw == 1) {
