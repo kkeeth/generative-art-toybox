@@ -1,5 +1,4 @@
-# dailycoding -20211015 / graphic
+# Bubble Circles
 
-Transcription of E.C.H's code
-
-URL: https://openprocessing.org/sketch/1308804
+Plz see `Open Processinng` →
+https://openprocessing.org/sketch/1407238
