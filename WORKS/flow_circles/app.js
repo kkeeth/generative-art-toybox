@@ -8,7 +8,7 @@ function setup() {
 }
 
 function draw() {
-  background(200)
+  background(240)
 
   let middle = color(50, 255, 100, 0.4 * 255);
   let from = color(255, 0, 0, 0.4 * 255);
@@ -17,15 +17,16 @@ function draw() {
 
   beginShape()
   for (let x = 0; x < width; x += cWidth) {
-    let y = noise(xoff) * height
+    const y1 = noise(xoff) * height
+    const y2 = noise(xoff * 1.2) * height
+    const y3 = noise(xoff * 2) * height
     fill(from)
-    ellipse(x, y - 100, cWidth, cHeight)
+    ellipse(x, y1 - 100, cWidth, cHeight)
     fill(to)
-    ellipse(x, y + 100, cWidth, cHeight)
+    ellipse(x, y2 + 100, cWidth, cHeight)
     stroke(240)
     fill(middle)
-    vertex(x, y)
-
+    vertex(x, y3)
 
     xoff += inc
   }
