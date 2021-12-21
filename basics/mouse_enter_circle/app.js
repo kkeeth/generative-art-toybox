@@ -4,7 +4,6 @@ let r = 50;
 function setup() {
   createCanvas(640, 480);
   smooth();
-  ellipse(320, 240, 50, 50);
 }
 
 function draw() {
