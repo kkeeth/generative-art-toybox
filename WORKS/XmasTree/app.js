@@ -35,31 +35,31 @@ function draw() {
   // decorations
   push()
   fill(60, 0, 255)
-  ellipse(w / 2 - 20, -60, 20, 20)
+  ellipse(center - 20, -60, 20, 20)
   fill(255, 40, 0)
-  ellipse(w / 2 + 20, -40, 20, 20)
+  ellipse(center + 20, -40, 20, 20)
   fill(60, 0, 255)
-  ellipse(w / 2 + 40, 0, 20, 20)
+  ellipse(center + 40, 0, 20, 20)
   fill(255, 40, 0)
-  ellipse(w / 2, 10, 20, 20)
+  ellipse(center, 10, 20, 20)
   fill(60, 0, 255)
-  ellipse(w / 2 - 40, 30, 20, 20)
+  ellipse(center - 40, 30, 20, 20)
   fill(255, 40, 0)
-  ellipse(w / 2 -20, 45, 20, 20)
+  ellipse(center -20, 45, 20, 20)
   fill(60, 0, 255)
-  ellipse(w / 2 + 20, 60, 20, 20)
+  ellipse(center + 20, 60, 20, 20)
   fill(255, 40, 0)
-  ellipse(w / 2 + 60, 90, 20, 20)
+  ellipse(center + 60, 90, 20, 20)
   fill(60, 0, 255)
-  ellipse(w / 2 - 30, 90, 20, 20)
+  ellipse(center - 30, 90, 20, 20)
   pop()
 
   // trunk
   fill(165, 82, 42)
-  rect(w / 2 - 20, 120, 40, 120)
+  rect(center - 20, 120, 40, 120)
 
   // star
-  translate(w / 2, -130)
+  translate(center, -130)
   star(0, 0, 20, 50, 5)
 }
 
