@@ -41,7 +41,7 @@ function draw() {
   fill(60, 0, 255)
   ellipse(center + 40, 0, 20, 20)
   fill(255, 40, 0)
-  ellipse(center, 10, 20, 20)
+  ellipse(center - 10, -10, 20, 20)
   fill(60, 0, 255)
   ellipse(center - 40, 30, 20, 20)
   fill(255, 40, 0)
