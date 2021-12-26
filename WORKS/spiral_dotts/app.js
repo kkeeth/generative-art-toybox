@@ -26,5 +26,5 @@ function draw() {
     stroke(q, i % 255, i % 200)
     point(x, i / 0.5, z)
   }
-  t += .05
+  t -= 0.05
 }
