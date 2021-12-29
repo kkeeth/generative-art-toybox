@@ -4,11 +4,10 @@ const points = new Array(num);
 function setup() {
   createCanvas(640, 420, WEBGL);
   pixelDensity(displayDensity());
-  
+
   for (let i = 0; i < num; i++) {
     points[i] = new Point();
   }
-  console.log(points)
 }
 
 

@@ -8,7 +8,6 @@ function setup() {
 
 function draw() {
   background(255);
-  translate(0, 30, 0);
   rotateY(frameCount * 0.02);
 
   for (let dTheta = 0; dTheta <= 180; dTheta += 10) {
@@ -32,7 +31,7 @@ function drawCircle(z, r) {
     // y-coordinate
     const y = r * sin(phi);
 
-    stroke(0);
+    stroke("#008080");
     strokeWeight(4);
     point(x, y, z);
   }
