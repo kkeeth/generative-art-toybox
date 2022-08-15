@@ -131,8 +131,8 @@ const randomDrawCircles = () => {
 
 const bootJetArly = (i) => {
   drawingContext.shadowBlur = 3
-  const baseHeight = height / 2 + coreOuterCircleRadius
-  const endHeight = height - 200
+  const baseHeight = height / 2 + height / 6
+  const endHeight = height - 160
 
   fill(color(44, 169, 225, (i / width) * 255))
 
