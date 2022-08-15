@@ -81,6 +81,6 @@ const randomDrawCircles = () => {
   }
 }
 
-mouseClicked = () => {
-  draw()
+mousePressed = () => {
+  redraw()
 }
