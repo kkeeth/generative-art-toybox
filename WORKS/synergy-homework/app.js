@@ -131,7 +131,6 @@ const randomDrawCircles = () => {
 
 const bootJetArly = (i) => {
   drawingContext.shadowBlur = 3
-  const opacitySpan = 255 / frameCount
   const baseHeight = height / 2 + coreOuterCircleRadius
   const endHeight = height - 200
 
