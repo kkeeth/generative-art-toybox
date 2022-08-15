@@ -2,7 +2,6 @@ const ITEMS = 30
 const coreOuterCircleRadius = 100
 const coreInnerCircleRadius = 60
 const cols = ['#0D62A3', '#FCD577', '#CB3B2A', '#006e54', '#000']
-const angles = [30, 45, 60, 75, 90, 135, 180]
 
 let drawJetFlg = false
 let sabHeight = 0
