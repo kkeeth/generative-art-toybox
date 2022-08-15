@@ -1,6 +1,6 @@
 const ITEMS = 50
 const cols = ['#0D62A3', '#FCD577', '#CB3B2A', '#006e54', '#000']
-const angles = [30, 45, 60, 75, 90, 135, 210, 225, 240, 255, 270, 315]
+const angles = [30, 60, 90, 120, 150, 210, 240, 270, 300, 330]
 
 setup = () => {
   createCanvas(windowWidth, windowHeight)
