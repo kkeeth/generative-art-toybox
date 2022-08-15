@@ -4,6 +4,11 @@ const coreInnerCircleRadius = 60
 const cols = ['#0D62A3', '#FCD577', '#CB3B2A', '#006e54', '#000']
 const angles = [30, 45, 60, 75, 90, 135, 180]
 
+let drawJetFlg = false
+let sabHeight = 0
+let coreCircleYPos = 0
+let jetXPosition = 0
+
 setup = () => {
   createCanvas(windowWidth, windowHeight)
   background(120)
@@ -22,8 +27,10 @@ draw = () => {
   pop()
 
   push()
-  let sabHeight = height / 8 + frameCount * 16
-  let coreCircleYPos = height / 2 + frameCount * 2
+  if (!drawJetFlg) {
+    sabHeight = height / 8 + frameCount * 16
+    coreCircleYPos = height / 2 + frameCount * 2
+  }
 
   /**
    * draw my core image
@@ -44,13 +51,24 @@ draw = () => {
   fill(50)
   rect(0, 0, width, sabHeight)
   if (sabHeight > height / 2 - coreOuterCircleRadius / 2) {
+    drawJetFlg = true
     noLoop()
-    bootJetArly()
+    const id = setInterval(() => {
+      bootJetArly(jetXPosition)
+      jetXPosition += width / 8
 
-    sabHeight = height / 8
-    frameCount = 0
-    coreCircleYPos = height / 2
-    loop()
+      if (jetXPosition > width) {
+        jetXPosition = 0
+        sabHeight = height / 8
+        frameCount = 0
+        coreCircleYPos = height / 2
+
+        loop()
+
+        clearInterval(id)
+        drawJetFlg = false
+      }
+    }, 100)
   }
 
   pop()
@@ -111,25 +129,33 @@ const randomDrawCircles = () => {
   }
 }
 
-const bootJetArly = () => {
-  drawingContext.shadowBlur = 10
+const bootJetArly = (i) => {
+  drawingContext.shadowBlur = 3
   const opacitySpan = 255 / frameCount
   const baseHeight = height / 2 + coreOuterCircleRadius
   const endHeight = height - 200
 
-  for (let i = 0; i < width; i += width / 8) {
-    push()
-    fill(color(44, 169, 225, 255 - opacitySpan * 5))
-    triangle(
-      i,
-      baseHeight,
-      i,
-      endHeight,
-      i + width / 8,
-      (endHeight + baseHeight) / 2
-    )
-    pop()
-  }
+  fill(color(44, 169, 225, (i / width) * 255))
+
+  // remove previous triangle
+  triangle(
+    i - width / 8,
+    baseHeight,
+    i - width / 8,
+    endHeight,
+    i,
+    (endHeight + baseHeight) / 2
+  )
+
+  // draw new triangle
+  triangle(
+    i,
+    baseHeight,
+    i,
+    endHeight,
+    i + width / 8,
+    (endHeight + baseHeight) / 2
+  )
   drawingContext.shadowBlur = 30
 }
 
