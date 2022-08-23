@@ -1,7 +1,7 @@
 let t = 0
 
 function setup() {
-  createCanvas(windowWidth, W = windowHeight, WEBGL)
+  createCanvas(windowWidth, (W = windowHeight), WEBGL)
 }
 
 function draw() {
@@ -12,8 +12,6 @@ function draw() {
 
   for (let i = 0; i < W; i += 2) {
     // logarithmic spiral
-    // x = r * cos(variable)
-    // y = r * sin(variable)
     v = i / 12
     x = 220 * cos(i)
     z = 220 * sin(i)
@@ -21,8 +19,8 @@ function draw() {
 
     // SPIRAL DOTS
     // increase the size of the dots as you go up
-    // strokeWeight(int((W - i) / 40))
-		strokeWeight(20)
+    strokeWeight(int((W - i) / 40))
+    strokeWeight(20)
     stroke(q, i % 255, i % 200)
     point(x, i / 0.5, z)
   }
