@@ -1,10 +1,10 @@
-const colors = ["#248888", "#E6E6E6", "#E7475E", "#F0D879"]
+const colors = ['#248888', '#E6E6E6', '#E7475E', '#F0D879']
 const baseWidth = 20
 const lines = []
 const velocity = 1
 
 function setup() {
-  createCanvas(700, 600)
+  createCanvas(windowWidth, windowHeight)
   strokeWeight(baseWidth)
   background(200)
 
