@@ -9,7 +9,7 @@
  * URL: https://sites.google.com/site/cinderellajapan/huanocg/huano-qu-xian
  */
 
-const ulim = 0.9
+const ulim = 0.8
 const petals = []
 const petalNumer = 50
 
@@ -33,7 +33,7 @@ function draw() {
 class CherryBlossom {
   constructor() {
     this.petalNumber = 4
-    this.petalSize = random(30, 80)
+    this.petalSize = random(30, 70)
 
     // color settings
     this.r = floor(random(245, 255))
@@ -46,9 +46,9 @@ class CherryBlossom {
     this.xRadius = random(50, 100)
     this.xTheta = random(360)
     this.xaVelocity = random(1, 2)
-    this.yVelocity = this.petalSize / 30
 
     this.vecLocation = createVector(this.xBase, random(height))
+    this.yVelocity = this.petalSize / 30
   }
 
   /**
@@ -74,7 +74,7 @@ class CherryBlossom {
    */
   calculateH(x) {
     if (x < ulim) return 0
-    else ulim - x
+    else return ulim - x
   }
 
   render() {
@@ -82,13 +82,10 @@ class CherryBlossom {
 
     push()
     translate(this.vecLocation.x, this.vecLocation.y)
-    beginShape()
     rotate(radians(this.xTheta))
-    for (
-      let theta = 3.14;
-      theta < (TWO_PI / this.petalNumber) * 3;
-      theta += 0.01
-    ) {
+    beginShape()
+
+    for (let theta = 0; theta < TWO_PI / this.petalNumber; theta += 0.01) {
       // n/pi*x
       const A = (this.petalNumber / PI) * theta
       // mod(floor(n/pi*x),2)
@@ -103,6 +100,7 @@ class CherryBlossom {
 
       vertex(x, y)
     }
+
     endShape(CLOSE)
     pop()
   }
