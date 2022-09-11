@@ -16,7 +16,6 @@ const petalNumer = 50
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL)
   noStroke()
-  // noLoop()
   for (let i = 0; i < petalNumer; i++) {
     petals.push(new CherryBlossom())
   }
@@ -67,7 +66,6 @@ class CherryBlossom {
   }
 
   /**
-   *
    * h(x):=if(x<ulim,0,ulim-x);
    *
    * @param {number} x angle(radians)
