@@ -16,6 +16,7 @@ const petalNumer = 50
 function setup() {
   createCanvas(windowWidth, windowHeight)
   noStroke()
+  // noLoop()
   for (let i = 0; i < petalNumer; i++) {
     petals.push(new CherryBlossom())
   }
@@ -33,7 +34,6 @@ class CherryBlossom {
   constructor() {
     this.petalNumber = 4
     this.petalSize = random(30, 80)
-    this.vecLocation = createVector(random(width), random(height))
 
     // color settings
     this.r = floor(random(245, 255))
@@ -46,7 +46,9 @@ class CherryBlossom {
     this.xRadius = random(50, 100)
     this.xTheta = random(360)
     this.xaVelocity = random(1, 2)
-    this.yVelocity = this.petalSize / 20
+    this.yVelocity = this.petalSize / 30
+
+    this.vecLocation = createVector(this.xBase, random(height))
   }
 
   /**
@@ -68,7 +70,7 @@ class CherryBlossom {
    *
    * h(x):=if(x<ulim,0,ulim-x);
    *
-   * @param {number} x
+   * @param {number} x angle(radians)
    */
   calculateH(x) {
     if (x < ulim) return 0
@@ -81,8 +83,12 @@ class CherryBlossom {
     push()
     translate(this.vecLocation.x, this.vecLocation.y)
     beginShape()
-    // rotate(frameCount / 50)
-    for (let theta = 0; theta < TWO_PI / 4; theta += 0.01) {
+    rotate(radians(this.xTheta))
+    for (
+      let theta = 3.14;
+      theta < (TWO_PI / this.petalNumber) * 3;
+      theta += 0.01
+    ) {
       // n/pi*x
       const A = (this.petalNumber / PI) * theta
       // mod(floor(n/pi*x),2)
