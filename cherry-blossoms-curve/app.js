@@ -14,7 +14,7 @@ const petals = []
 const petalNumer = 50
 
 function setup() {
-  createCanvas(windowWidth, windowHeight)
+  createCanvas(windowWidth, windowHeight, WEBGL)
   noStroke()
   // noLoop()
   for (let i = 0; i < petalNumer; i++) {
@@ -38,8 +38,8 @@ class CherryBlossom {
     // color settings
     this.r = floor(random(245, 255))
     this.g = 219
-    this.b = floor(random(232, 242))
-    this.alpha = random(0.6, 1)
+    this.b = 237
+    this.alpha = random(0.7, 1)
 
     // moving petals
     this.xBase = random(width)
@@ -81,8 +81,10 @@ class CherryBlossom {
     fill(`rgba(${this.r}, ${this.g} , ${this.b}, ${this.alpha})`)
 
     push()
-    translate(this.vecLocation.x, this.vecLocation.y)
-    rotate(radians(this.xTheta))
+    translate(this.vecLocation.x - width / 2, this.vecLocation.y - height / 2)
+    rotateX(radians(this.xTheta))
+    rotateY(radians(this.xTheta))
+    lights()
     beginShape()
 
     for (let theta = 0; theta < TWO_PI / this.petalNumber; theta += 0.01) {
