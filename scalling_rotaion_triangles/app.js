@@ -1,5 +1,6 @@
-let cond = 0
-let scalling = true
+const sizes = [6, 9, 12, 15, 18, 21]
+const maxCond = 13
+let scaling = true
 const colors = [
   '#F94144',
   '#F65A38',
@@ -13,26 +14,72 @@ const colors = [
   '#6AB47C',
   '#43AA8B',
   '#4D908E',
-  '#52838F'
+  '#52838F',
+  '#577590'
 ]
+const triangleNumber = 10
+const triangles = []
 
 function setup() {
   createCanvas(windowWidth, windowHeight)
-  frameRate(7)
+  frameRate(12)
   noStroke()
-  background(80)
+  background(60)
+  // blendMode(DIFFERENCE)
+
+  for (let i = 0; i < triangleNumber; i++) {
+    triangles.push(
+      new ScalingTriangle(
+        Math.round(random(windowWidth)),
+        Math.round(random(windowHeight))
+      )
+    )
+  }
 }
 
 function draw() {
-  translate(windowWidth / 2, windowHeight / 2)
-  fill(color(colors[cond]))
+  for (let i = 0; i < triangleNumber; i++) {
+    triangles[i].update()
+    triangles[i].render()
+  }
+}
 
-  if (scalling) {
-    polarTriangle(cond * 10, 360 - cond * 30, 0)
-  } else {
-    polarTriangle(cond * 10, cond * 30, 0)
+class ScalingTriangle {
+  constructor(xPos, yPos) {
+    this.cond = Math.round(random(colors.length))
+    this.tSize = random(sizes)
+    this.maxSize = this.tSize * maxCond
+    this.xPos = xPos
+    this.yPos = yPos
+
+    this.scaling = random([true, false])
+    this.direction = random([-1, 1])
   }
 
-  if (cond === 12) scalling = !scalling
-  cond = frameCount % 13
+  update() {
+    this.xPos += 10
+    if (this.xPos >= width) this.xPos = 0
+    this.yPos += 10
+    if (this.yPos >= height) this.yPos = 0
+
+    if (this.cond === maxCond) this.scaling = !this.scaling
+    this.cond = frameCount % colors.length
+  }
+
+  render() {
+    push()
+
+    fill(color(colors[this.cond]))
+    translate(this.xPos, this.yPos)
+    if (this.scaling) {
+      polarTriangle(
+        frameCount * 13 * this.direction,
+        this.maxSize - this.cond * this.tSize,
+        0
+      )
+    } else {
+      polarTriangle(frameCount * 13 * this.direction, this.cond * this.tSize, 0)
+    }
+    pop()
+  }
 }
