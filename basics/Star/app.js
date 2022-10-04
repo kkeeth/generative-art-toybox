@@ -1,4 +1,4 @@
-let yPos = xoff = 0;
+let yPos = (xoff = 0);
 function setup() {
   createCanvas(300, 300);
   smooth();
@@ -19,11 +19,11 @@ function draw() {
   textAlign(CENTER, CENTER);
   textFont("Futura");
   fill("#000");
-  text("Hello World", width/2, 100);
+  text("Hello World", width / 2, 100);
   fill(0, 102, 153);
-  text("Hello World", width/2, 150);
+  text("Hello World", width / 2, 150);
   fill(0, 102, 153, 127);
-  text("Hello World", width/2, 200);
+  text("Hello World", width / 2, 200);
 
-  xoff += 0.01
+  xoff += 0.01;
 }
