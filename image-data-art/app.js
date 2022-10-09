@@ -7,16 +7,15 @@ let img;
 let cnv;
 
 function preload() {
-  img = loadImage('assets/kuwahara_yumemi.png');
+  img = loadImage("assets/kuwahara_yumemi.png");
   // img = loadImage('assets/kuwahara_yumemi_gray.png');
 }
 
 function setup() {
   cnv = createCanvas(img.width, img.height);
-  // print(img.width, img.height);
 
-  let newCanvasX = (windowWidth - img.width)/2;
-  let newCanvasY = (windowHeight - img.height)/2;
+  let newCanvasX = (windowWidth - img.width) / 2;
+  let newCanvasY = (windowHeight - img.height) / 2;
   cnv.position(newCanvasX, newCanvasY);
 
   for (let col = 0; col < img.width; col += 2) {
@@ -34,7 +33,16 @@ function setup() {
       strokeWeight(random(3));
       stroke(color(c));
       // curve(x1, y1, x2, y2, x3, y3, x4, y4);
-      curve(xPos, yPos, sin(xPos) * random(60), cos(xPos) * sin(xPos) * 90, 0, 0, cos(yPos) * sin(xPos) * random(140), cos(yPos) * sin(yPos) * 50);
+      curve(
+        xPos,
+        yPos,
+        sin(xPos) * random(60),
+        cos(xPos) * sin(xPos) * 90,
+        0,
+        0,
+        cos(yPos) * sin(xPos) * random(140),
+        cos(yPos) * sin(yPos) * 50,
+      );
       pop();
     }
   }
