@@ -1,29 +1,34 @@
-let yPos = xoff = 0;
 function setup() {
-  createCanvas(300, 300);
-  smooth();
-  // setup() runs once
-  frameRate(30);
+  createCanvas(720, 400)
+  noStroke()
 }
 
 function draw() {
-  // draw() loops forever, until stopped
-  background(204);
-  yPos = noise(xoff) * height;
-  if (yPos < 0) {
-    yPos = height;
+  background(102)
+
+  push()
+  translate(width / 2, height / 2)
+  rotate(frameCount / -50.0)
+  star(0, 0, 27, 70, 5)
+  pop()
+}
+
+function star(x, y, radius1, radius2, npoints) {
+  let angle = TWO_PI / npoints
+  let halfAngle = angle / 2.0
+  beginShape()
+  for (let a = 0; a < TWO_PI; a += angle) {
+    let sx = x + cos(a) * radius2
+    let sy = y + sin(a) * radius2
+    vertex(sx, sy)
+    push()
+    fill(color(255, 200, 0))
+    ellipse(sx, sy, 10, 10)
+    pop()
+
+    sx = x + cos(a + halfAngle) * radius1
+    sy = y + sin(a + halfAngle) * radius1
+    vertex(sx, sy)
   }
-  line(0, yPos, width, yPos);
-
-  textSize(32);
-  textAlign(CENTER, CENTER);
-  textFont("Futura");
-  fill("#000");
-  text("Hello World", width/2, 100);
-  fill(0, 102, 153);
-  text("Hello World", width/2, 150);
-  fill(0, 102, 153, 127);
-  text("Hello World", width/2, 200);
-
-  xoff += 0.01
+  endShape(CLOSE)
 }
