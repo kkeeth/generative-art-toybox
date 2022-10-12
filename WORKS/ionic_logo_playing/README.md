@@ -1,4 +1,3 @@
-# Tornado Rects
+# Ionic Logo Playing
 
-Plz see `Open Processinng` →
-https://openprocessing.org/sketch/1407655
+This directory includes 4 pattern demo.

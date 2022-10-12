@@ -1,7 +1,7 @@
 const size = 5;
 let img;
 let cnv;
-let xoff = 0;
+// let xoff = 0;
 
 function preload() {
   img = loadImage("ionic-without-text.png");
@@ -36,14 +36,14 @@ function draw() {
       //   })
       // ) {
       //   stroke(abs(cos(radians(frameCount + col / size))), 0.8, 0.9);
-      //   stroke(abs(cos(radians(frameCount + row / size))), 0.8, 0.9);
-      //   stroke(abs(cos(xoff / 5)), 0.8, 0.9);
+      //   // stroke(abs(cos(radians(frameCount + row / size))), 0.8, 0.9);
+      //   // stroke(abs(cos(xoff / 5)), 0.8, 0.9);
       // } else {
       //   stroke(color(c));
       // }
       stroke(color(c));
       point(xPos, yPos);
     }
-    xoff += 0.01;
+    // xoff += 0.01;
   }
 }
