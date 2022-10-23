@@ -68,6 +68,44 @@ function switchMode() {
     let rnd = random() < 0.5;
     switch (mode) {
       case "YUMEMI": {
+        const tmpX = random(width);
+
+        // Y
+        if (tmpX < width / 6) {
+          targetPos.x = width / 6;
+          targetPos.y = random(height);
+        }
+        // U
+        else if ((1 / 6) * width <= tmpX && tmpX < (2 / 6) * width) {
+          targetPos.x = cx;
+          targetPos.y = random(height);
+        }
+        // M - first
+        else if ((2 / 6) * width <= tmpX && tmpX < (3 / 6) * width) {
+          targetPos.x = cx;
+          targetPos.y = random(height);
+        }
+        // E
+        else if ((3 / 6) * width <= tmpX && tmpX < (4 / 6) * width) {
+          targetPos.x = cx;
+          targetPos.y = random(height);
+        }
+        // M - second
+        else if ((4 / 6) * width <= tmpX && tmpX < (5 / 6) * width) {
+          targetPos.x = cx;
+          targetPos.y = random(height);
+        }
+        // I
+        else {
+          targetPos.x = (11 / 12) * width;
+          targetPos.y = map(
+            random(height),
+            0,
+            height,
+            height / 3,
+            (2 / 3) * height,
+          );
+        }
         break;
       }
       case "line-V": {
