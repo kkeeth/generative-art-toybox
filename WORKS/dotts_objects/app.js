@@ -67,24 +67,36 @@ function switchMode() {
   for (let { i, targetPos, e } of dotArr) {
     let rnd = random() < 0.5;
     switch (mode) {
+      case "YUMEMI": {
+        break;
+      }
       case "line-V": {
         targetPos.x = random(width);
-        let realYPos = map(targetPos.x, 0, cx, 0, height);
+        const realYPos = map(targetPos.x, 0, cx, 0, height);
 
         targetPos.y = targetPos.x < cx ? realYPos : 2 * height - realYPos;
         break;
       }
       case "line-H": {
-        targetPos.x = random(width);
-        targetPos.y = cy;
-        break;
-      }
-      case "cross-+":
-        {
-          targetPos.x = rnd ? cx : random(width);
-          targetPos.y = rnd ? random(height) : cy;
+        const tmpX = random(width);
+
+        if (tmpX < width / 6) {
+          targetPos.x = width / 6;
+          targetPos.y = random(height);
+        } else if (tmpX > (5 / 6) * width) {
+          targetPos.x = (5 / 6) * width;
+          targetPos.y = random(height);
+        } else {
+          targetPos.x = tmpX;
+          targetPos.y = cy;
         }
         break;
+      }
+      case "cross-+": {
+        targetPos.x = rnd ? cx : random(width);
+        targetPos.y = rnd ? random(height) : cy;
+        break;
+      }
       case "cross-X": {
         let len = random((sqrt(2) * vmin) / 2);
         let a = floor(random(4)) * (P / 2) + P / 4;
