@@ -1,34 +1,44 @@
 let number = 30;
 let dias = [];
 let breadth = 80;
-const shapeTypes = ["triangle", "square", "pentagon", "hexagon", "octagon"];
+const shapeTypes = [
+  "triangle",
+  "square",
+  "pentagon",
+  "hexagon",
+  "octagon",
+  "nonagon",
+];
 
 function setup() {
-  createCanvas(1000, 800);
+  createCanvas(windowWidth, windowHeight);
   noStroke();
   // blendMode(ADD);
 
-  for (let i = 0; i < number; i++) {
-    for (let dx = 0; dx < width; dx += 2 * breadth + 20) {
-      for (let dy = 0; dy < height; dy += 2 * breadth + 20) {
-        dias.push(new Dia(dx, dy, random(shapeTypes)));
-      }
+  for (let dx = 0; dx < 8; dx++) {
+    for (let dy = 0; dy < 4; dy++) {
+      dias.push(
+        new Dia(
+          dx * 2 * breadth + 120,
+          dy * 2 * breadth + 120,
+          random(shapeTypes),
+        ),
+      );
     }
   }
 }
 
 function draw() {
-  background(200);
+  background(220);
 
-  for (let i = 0; i < number; i++) {
-    dias[i].update();
-    dias[i].show();
+  for (obj of dias) {
+    obj.update();
+    obj.show();
   }
 }
 
 class Dia {
   constructor(x, y, type) {
-    console.log(x, y);
     this.x = x;
     this.y = y;
     switch (type) {
@@ -47,11 +57,14 @@ class Dia {
       case "octagon":
         this.ang = 45;
         break;
+      case "nonagon":
+        this.ang = 40;
+        break;
     }
     this.color = color(random(100, 200), random(100, 200), random(100, 200));
     this.diff = 0;
     this.velocity = random(-3, 3);
-    this.size = random(breadth, breadth + 100);
+    this.size = random(breadth, 2 * breadth);
   }
 
   update() {
@@ -61,7 +74,7 @@ class Dia {
   show() {
     for (let i = 0 + this.diff; i < 360 + this.diff; i += this.ang) {
       push();
-      stroke(200);
+      stroke(220);
       fill(this.color);
 
       arc(
@@ -76,7 +89,7 @@ class Dia {
       pop();
 
       push();
-      fill(200);
+      fill(220);
       arc(
         this.x,
         this.y,
