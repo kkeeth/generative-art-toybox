@@ -3,11 +3,9 @@ let cHeight = 30;
 
 function setup() {
   createCanvas(920, 700);
-  frameRate(5);
-}
-
-function draw() {
   background(220);
+  randomSeed(9);
+  //blendMode(DARKEST);
 
   for (let i = cWidth; i < width; i += cWidth * 3.5) {
     for (let j = cHeight; j < height; j += cHeight * 3.5) {
@@ -18,6 +16,4 @@ function draw() {
       ellipse(i + cWidth / 2, j, cWidth, cHeight);
     }
   }
-
-  noLoop();
 }
