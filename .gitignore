@@ -52,3 +52,5 @@ typings/
 # dotenv environment variables file
 .env
 
+**/**/p5*.js
+
