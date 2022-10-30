@@ -12,7 +12,8 @@ function setup() {
 function draw() {
   background(255);
   strokeWeight(3);
-  stroke(0.09, 0.5);
+  drawingContext.shadowColor = "#999";
+  drawingContext.shadowBlur = 50;
 
   push();
 
