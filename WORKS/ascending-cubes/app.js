@@ -1,7 +1,18 @@
 let cubes = [];
 const NUM = 100;
 const SIZE = 30;
-const colors = ["#612503", "#abb2bf", "#ffcfa8", "#ffae6b", "#f56e45"];
+const colors = [
+  // "#612503",
+  // "#abb2bf",
+  // "#ffcfa8",
+  // "#ffae6b",
+  // "#f56e45",
+  "#fb8781",
+  "#fdcecc",
+  "#fffdfd",
+  "#81fa87",
+  "#8781fa",
+];
 
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
