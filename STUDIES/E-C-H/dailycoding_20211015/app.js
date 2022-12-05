@@ -9,13 +9,7 @@ let cp = ["#160D26", "#C50607", "#F78D1B", "#504721", "#452F19"];
 function setup() {
   // WEBGL: キャンバスの中央を中心とする（厳密には3Dモードだが，簡単に中央にできる）
   createCanvas((w = windowHeight), w, WEBGL);
-  // angleMode: 角度のモードを RADIANS か DEGREES モードを指定
   angleMode(DEGREES);
-  // rectMode: 四角の位置の指定
-  // CORNER: デフォルトモード．rect(x座標，y座標, 幅, 高さ)
-  // CORNERS: rect(x座標，y座標, 対角線上のx座標, 対角線上のy座標)
-  // CENTER: rect(四角のx座標中央，四角のy座標中央, 幅, 高さ)
-  // RADIUS: rect(四角のx座標中央，四角のy座標中央, 幅の半分, 高さの半分)
   rectMode(CENTER);
   noLoop();
 
@@ -25,34 +19,26 @@ function setup() {
 
 function draw() {
   background(255);
-  // translate: オブジェクトの移動量を指定．移動は積み上がりなので，前の移動に重ねての移動となる．
-  //            draw() 内だとループ時にリセットされるので，push() と pop() で制御する
-  // translate(左右の移動量, 上下の移動量, 重ねの順番(WEBGL 利用時のみ))
-  // translate(p5.Vector インスタンス)
-  translate(-w, -w);
+  translate(-w / 2, -w / 2);
 
-  for (let x = g / 2; x <= w * 2 - g / 2; x += g) {
-    for (let y = g / 2; y <= w * 2 - g / 2; y += g) {
+  for (let x = g / 2; x <= w - g / 2; x += g) {
+    for (let y = g / 2; y <= w - g / 2; y += g) {
       push();
       translate(x, y, random([-1, 1]));
-      // rotate: 図形を回転させる
-      //         angleMode を考慮するので，角度は RADIANS or DEGREES で入力
-      // rotate(angle)
       rotate(random([0, -90, 90, 180]));
-      // 四角形は 90 度単位で回転させても変化がないので 45 度回転させる
       rotate(random([0, 45]));
 
       let r = random(g / 3, g * 2);
       let vg = random([2, 4, 6, 8, 10]);
       let sg = r / vg;
-      let c = color(cp[int(random(cp.length))]);
+      let c = random(cp);
       let dsw = int(random(2));
       fill(c);
       noStroke();
 
       let sw = int(random(6));
       if (sw == 0) {
-        rect(0, 0, r/2, r/2);
+        rect(0, 0, r / 2, r / 2);
       }
 
       if (sw == 1) {
@@ -83,7 +69,7 @@ function draw() {
         for (let sx = -r / 2 + sg / 2; sx <= r / 2 - sg / 2; sx += sg) {
           for (let sy = -r / 2 + sg / 2; sy <= r / 2 - sg / 2; sy += sg) {
             if (dsw == 0) {
-              // rect(sx, sy, sg / 1.5, sg / 1.5);
+              rect(sx, sy, sg / 1.5, sg / 1.5);
             }
 
             if (dsw == 1) {
@@ -114,7 +100,7 @@ function draw() {
 
   // 楕円オブジェクト
   push();
-  translate(w/2, w/2, 1);
+  translate(w / 2, w / 2, 1);
   strokeWeight(2);
   noFill();
   for (let i = 0; i < 20; i++) {
