@@ -32,7 +32,7 @@ function draw() {
             y - g / 2,
             x + g / 2,
             y - g / 2,
-            x + g / 2,
+            x - g / 2,
             y + g / 2,
           );
         }
@@ -40,8 +40,8 @@ function draw() {
           triangle(
             x - g / 2,
             y - g / 2,
-            x - g / 2,
-            y + g / 2,
+            x + g / 2,
+            y - g / 2,
             x + g / 2,
             y + g / 2,
           );
@@ -60,9 +60,9 @@ function draw() {
           triangle(
             x - g / 2,
             y - g / 2,
-            x - g / 2,
-            y + g / 2,
             x + g / 2,
+            y + g / 2,
+            x - g / 2,
             y + g / 2,
           );
         }
