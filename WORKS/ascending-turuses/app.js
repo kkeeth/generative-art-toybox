@@ -19,7 +19,7 @@ function setup() {
 
 function draw() {
   orbitControl();
-  background(20);
+  background(160);
   noStroke();
   lights();
 
