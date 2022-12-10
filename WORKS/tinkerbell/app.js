@@ -13,7 +13,6 @@ function setup() {
 function draw() {
   background(0, 5);
   push();
-  stroke(0);
   circle(mouseX, mouseY, 20);
   pop();
 
