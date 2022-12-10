@@ -1,14 +1,19 @@
 const colors = ["#612503", "#abb2bf", "#ffcfa8", "#ffae6b", "#f56e45"];
+let g, sg;
 
 function setup() {
   createCanvas(720, 720);
-  background(250);
   noStroke();
+  noLoop();
   rectMode(CENTER);
   angleMode(DEGREES);
 
-  let g = width / 8;
-  let sg = g / 4;
+  g = width / 8;
+  sg = g / 4;
+}
+
+function draw() {
+  background(250);
 
   for (let x = g / 2; x < width; x += g) {
     for (let y = g / 2; y < width; y += g) {
@@ -95,4 +100,8 @@ function setup() {
       line(0, y - g / 2, width, y - g / 2);
     }
   }
+}
+
+function keyPressed() {
+  redraw();
 }
