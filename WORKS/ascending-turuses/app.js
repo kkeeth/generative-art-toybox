@@ -1,23 +1,12 @@
-let cubes = [];
+let items = [];
 const NUM = 100;
 const SIZE = 30;
-const colors = [
-  // "#612503",
-  // "#abb2bf",
-  // "#ffcfa8",
-  // "#ffae6b",
-  // "#f56e45",
-  "#fb8781",
-  "#fdcecc",
-  "#fffdfd",
-  "#81fa87",
-  "#8781fa",
-];
+const colors = ["#612503", "#abb2bf", "#ffcfa8", "#ffae6b", "#f56e45"];
 
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
   for (let i = 0; i < NUM; i++) {
-    cubes.push(
+    items.push(
       new Cube({
         x: random(-width / 2, width / 2),
         y: random(-20, height / 2 + 100),
@@ -30,12 +19,14 @@ function setup() {
 
 function draw() {
   orbitControl();
-  background(10);
+  background(20);
+  noStroke();
+  lights();
 
-  for (cube of cubes) {
+  for (item of items) {
     push();
-    cube.update();
-    cube.draw();
+    item.update();
+    item.draw();
     pop();
   }
 }
@@ -65,6 +56,6 @@ class Cube {
     rotateX(frameCount / this.rotateRate);
     rotateY(frameCount / this.rotateRate);
     rotateZ(frameCount / this.rotateRate);
-    box(cube.size);
+    torus(item.size);
   }
 }
