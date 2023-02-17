@@ -2,3 +2,8 @@ html {
     overflow: hidden;
     position: fixed;
 }
+
+body {
+    margin: 0;
+    padding: 0;
+}
