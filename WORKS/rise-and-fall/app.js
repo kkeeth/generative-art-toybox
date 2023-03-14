@@ -39,10 +39,11 @@ function draw() {
       }
       item.circley -= item.v;
       item.size = map(item.circley, 0, item.limitedy, 2, 10);
+      // item.size = diameter / 2;
 
       push();
       stroke(255);
-      texture(img);
+      // texture(img);
       ellipse(item.x, item.liney + item.circley, item.size, item.size);
       pop();
 
