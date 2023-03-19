@@ -1,22 +1,16 @@
 const NUM = 30;
-const diameter = 60;
+const diameter = 50;
 let lines = [];
-let img;
-
-function preload() {
-  img = loadImage("./bgimage.png");
-}
 
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
-  textureMode(NORMAL);
   rectMode(CORNER);
   noStroke();
   fill(220);
 
   for (let i = 0; i < NUM; i++) {
     lines.push({
-      x: map(i, 0, NUM, diameter / 2, windowWidth),
+      x: map(i, 0, NUM, diameter * 1.5, windowWidth - diameter),
       liney: random(200, height / 2),
       circley: 0,
       miny: random(100, 120),
@@ -29,7 +23,7 @@ function setup() {
 }
 
 function draw() {
-  background(50);
+  background(0);
   translate(-width / 2, -height / 2);
 
   for (let item of lines) {
@@ -39,11 +33,9 @@ function draw() {
       }
       item.circley -= item.v;
       item.size = map(item.circley, 0, item.limitedy, 2, 10);
-      // item.size = diameter / 2;
 
       push();
       stroke(255);
-      // texture(img);
       ellipse(item.x, item.liney + item.circley, item.size, item.size);
       pop();
 
@@ -62,8 +54,8 @@ function draw() {
       item.tempy,
       diameter / 2,
       height - item.tempy,
-      diameter / 2,
-      diameter / 2,
+      diameter,
+      diameter,
       0,
       0,
     );
