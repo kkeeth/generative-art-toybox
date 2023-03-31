@@ -9,7 +9,7 @@ let x,
   t = 0,
   d,
   r,
-  v = 8,
+  v = 300,
   c = 255;
 function setup() {
   createCanvas((W = min(windowHeight, 800)), W);
@@ -28,15 +28,11 @@ function draw() {
       circle(x + t, y + t, 10 * d);
     }
   }
-  t -= v * d;
-  if (t > 500 || t < -500) {
-    v *= -1;
-  }
+  t = v * sin(frameCount / 50);
 }
 
 function keyPressed() {
   if (key === "s") {
-    saveGif("mySketch", 6);
+    saveGif("mySketch", 5);
   }
 }
-
