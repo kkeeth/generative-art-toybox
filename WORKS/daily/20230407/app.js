@@ -9,66 +9,91 @@ let colors = [
   "#f477c3",
 ];
 const c = 50;
+const minDistance = 100;
 let w;
 let items = [];
 let boff = 0;
 
 function setup() {
-  createCanvas((W = windowHeight), W);
-  w = width / 30;
+  createCanvas(windowWidth, windowHeight);
+  w = width / 40;
   noStroke();
-  // blendMode(LIGHTEST);
+  // blendMode(OVERLAY);
 
   for (let i = 0; i < c; i++) {
-    let x = random(w / 2, width - w / 2);
-    let h = random(height);
-    let y = random(h / 2, height - h / 2);
-    items.push(new Flower(x, y, w, h));
+    let tries = 0;
+    let x, y, h;
+    do {
+      x = random(w / 2, width - w / 2);
+      h = random(height / 4, height / 2);
+      y = random(h / 2, height - h / 2);
+      tries++;
+    } while (!isFarEnough(x, y) && tries < 100);
+    items.push(new Flower(x, y, w));
   }
 }
 
 function draw() {
-  background(map(sin(200 + boff), -1, 1, 0, 255));
+  // background(map(sin(200 + boff), -1, 1, 0, 255));
+  background(200);
   for (let i = 0; i < items.length; i++) {
     items[i].update();
     items[i].show();
   }
-  boff += 0.01;
+  boff += 0.1;
 }
 
 class Flower {
-  constructor(x, y, w, h) {
+  constructor(x, y, w) {
     this.x = x;
     this.y = y;
-    this.w = w;
-    this.h = h;
-    this.s = random(0.5, 1.5);
+    this.w = random(w / 2, w * 2);
     this.r = random(QUARTER_PI);
     this.v = random(10);
     this.n = int(random(5, 10));
+    this.size = random(0.5, 2);
     this.color1 = random(colors);
     this.color2 = random(colors);
+    if (this.color1 === this.color2) this.color2 = random(colors);
+    this.rotationSpeed = random(0.005, 0.02);
+    this.rotationDirection = random([1, -1]);
   }
 
   update() {
-    this.r += sin(frameCount * 0.01);
+    this.r = map(
+      sin(frameCount * this.rotationSpeed) * this.rotationDirection,
+      -1,
+      1,
+      0,
+      TAU,
+    );
   }
 
   show() {
     push();
     translate(this.x, this.y);
-    scale(this.s);
+    // scale(this.size);
     rotate(this.r);
-    fill(this.color1);
     for (let i = 0; i < this.n; i++) {
-      ellipse(w * 1.4, 0, w * 2, w * 0.8);
-      // ellipse(w * 0.6, 0.1, w * 0.7, w * 0.3);
+      fill(lerpColor(color(this.color1), color(this.color2), i / this.n));
+      ellipse(1.4 * this.w, 0, 2 * this.w, 0.8 * this.w);
       rotate(TAU / this.n);
     }
     fill(this.color2);
-    circle(0, 0, w * 0.7);
+    circle(0, 0, this.w * 0.8);
     pop();
   }
+}
+
+function isFarEnough(x, y) {
+  for (let i = 0; i < items.length; i++) {
+    let flower = items[i];
+    let d = dist(x, y, flower.x, flower.y);
+    if (d < minDistance) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function keyPressed() {
