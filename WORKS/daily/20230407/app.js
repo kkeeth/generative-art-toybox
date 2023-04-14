@@ -8,7 +8,7 @@ let colors = [
   "#085a9b",
   "#f477c3",
 ];
-const c = 50;
+const c = 40;
 const minDistance = 100;
 let w;
 let items = [];
@@ -18,7 +18,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   w = width / 40;
   noStroke();
-  // blendMode(OVERLAY);
+  blendMode(HARD_LIGHT);
 
   for (let i = 0; i < c; i++) {
     let tries = 0;
@@ -35,7 +35,7 @@ function setup() {
 
 function draw() {
   // background(map(sin(200 + boff), -1, 1, 0, 255));
-  background(200);
+  background(255);
   for (let i = 0; i < items.length; i++) {
     items[i].update();
     items[i].show();
@@ -51,7 +51,7 @@ class Flower {
     this.r = random(QUARTER_PI);
     this.v = random(10);
     this.n = int(random(5, 10));
-    this.size = random(0.5, 2);
+    this.size = random(0.3, 1.2);
     this.color1 = random(colors);
     this.color2 = random(colors);
     if (this.color1 === this.color2) this.color2 = random(colors);
