@@ -8,48 +8,73 @@ const cp = [
   "#085a9b",
   "#f477c3",
 ];
-const numRows = 12;
-const numCols = 12;
-const minDiameter = 16;
-const maxDiameter = 40;
-const waveFrequency = 0.8;
-const waveAmplitude = 7;
-let seed;
+let circleDiameter = 60;
+let numRows = 10;
+let numCircles;
+let spacingY = 20;
+let baseSpeed = circleDiameter / 30;
+let rowSpeeds = [];
+let petals = [];
+let spans = [];
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(800, windowHeight);
   noStroke();
-  d = displayDensity();
-  seed = ~~random(99);
+  frameRate(30);
+  for (let row = 0; row < numRows; row++) {
+    rowSpeeds[row] = random(baseSpeed * 0.5, baseSpeed * 2);
+    petals[row] = ~~random(6, 9);
+    spans[row] = random([0, width / 5, (2 * width) / 5, (3 * width) / 5]);
+  }
+  numCircles = ceil(width / circleDiameter) + 1;
 }
 
 function draw() {
   background(255);
-  randomSeed(seed);
-
-  const cellWidth = width / numCols;
-  const cellHeight = height / numRows;
+  randomSeed(99);
+  let verticalSpacing =
+    (height - numRows * (circleDiameter + spacingY) + spacingY) / 2;
 
   for (let row = 0; row < numRows; row++) {
-    let cond = random();
-    let offsetX = random() < 0.5 ? 1 : -1;
-    for (let col = 0; col < numCols; col++) {
-      const x = col * cellWidth + cellWidth / 2;
-      const y = row * cellHeight + cellHeight / 2;
-      const xOffset =
-        col * waveFrequency + frameCount * 0.03 + row * QUARTER_PI;
-      const diameterX = map(sin(xOffset), -1, 1, minDiameter, maxDiameter);
-      const diameter = diameterX;
-      const yPos = y + waveAmplitude * cos(xOffset);
-      let n = int(random(6, 10));
+    let y =
+      row * (circleDiameter + spacingY) + circleDiameter / 2 + verticalSpacing;
+    let isEvenRow = row % 2 === 0;
+    let rowSpeed = rowSpeeds[row];
+    let offsetX = isEvenRow ? 1 : -1;
+
+    for (let i = 0; i < numCircles; i++) {
+      let x =
+        ((i * circleDiameter + frameCount * offsetX * rowSpeed) %
+          (width + circleDiameter)) -
+        circleDiameter / 2;
+      if (!isEvenRow && x < -circleDiameter / 2) {
+        x += width + circleDiameter;
+      }
+
+      let n = petals[row];
       let r = random(HALF_PI);
+      let fSize = 8;
       let color1 = random(cp);
       let color2 = random(cp);
 
       push();
-      translate(x, yPos);
-      scale(map(row, 0, height, 0.2, 1));
+      translate(x, y);
       rotate(r + (offsetX * frameCount) / 50);
+      if (isEvenRow) {
+        scale(max(norm(x, spans[row], spans[row] + width / 5), 1));
+      }
+      if (!isEvenRow) {
+        scale(
+          map(
+            norm(x, spans[row] + width / 5, spans[row] + (2 * width) / 5),
+            0,
+            1,
+            2,
+            1,
+          ),
+        );
+        // scale(0.8);
+      }
       for (let i = 0; i < n; i++) {
         fill(
           lerpColor(
@@ -58,19 +83,11 @@ function draw() {
             i / n,
           ),
         );
-        if (cond > 0.5) {
-          ellipse(1.4 * diameter, 0, diameter, diameter);
-        } else {
-          ellipse(1.4 * diameter, 0, 2 * diameter, 0.8 * diameter);
-        }
+        ellipse(1.4 * fSize, 0, 2 * fSize, 0.8 * fSize);
         rotate(TAU / n);
       }
       fill(...hexToRgb(random(cp)), 200);
-      if (cond > 0.5) {
-        circle(0, 0, 1.5 * diameter);
-      } else {
-        circle(0, 0, 0.8 * diameter);
-      }
+      circle(0, 0, fSize);
       pop();
     }
   }
@@ -89,6 +106,6 @@ function hexToRgb(hex) {
 
 function keyPressed() {
   if (key === "s") {
-    saveGif("mysketch", 5);
+    saveGif("2023041502", 4);
   }
 }

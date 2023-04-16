@@ -8,10 +8,10 @@ const cp = [
   "#085a9b",
   "#f477c3",
 ];
-const numRows = 10;
+const numRows = 15;
 const numCols = 15;
 const minDiameter = 16;
-const maxDiameter = 50;
+const maxDiameter = 40;
 const waveFrequency = 0.8;
 const waveAmplitude = 7;
 let seed;
@@ -20,10 +20,6 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
   d = displayDensity();
-  // ctx = drawingContext;
-  // lg = ctx.createLinearGradient(0, 0, 0, height);
-  // lg.addColorStop(0, "#7ABAF2");
-  // lg.addColorStop(1, "#A0CCF1");
   seed = ~~random(99);
 }
 
@@ -31,32 +27,29 @@ function draw() {
   background(255);
   randomSeed(seed);
 
-  // push();
-  // fill(255);
-  // noStroke();
-  // ctx.fillStyle = lg;
-  // rect(0, 0, width, height);
-  // pop();
-
   const cellWidth = width / numCols;
   const cellHeight = height / numRows;
 
   for (let row = 0; row < numRows; row++) {
     let cond = random();
+    let offsetX = random() < 0.5 ? 1 : -1;
     for (let col = 0; col < numCols; col++) {
       const x = col * cellWidth + cellWidth / 2;
       const y = row * cellHeight + cellHeight / 2;
       const xOffset =
         col * waveFrequency + frameCount * 0.03 + row * QUARTER_PI;
-      const diameterX = map(cos(xOffset), -1, 1, minDiameter, maxDiameter);
+      const diameterX = map(sin(xOffset), -1, 1, minDiameter, maxDiameter);
       const diameter = diameterX;
+      const yPos = y + waveAmplitude * cos(xOffset);
       let n = int(random(6, 10));
+      let r = random(HALF_PI);
       let color1 = random(cp);
       let color2 = random(cp);
 
       push();
-      translate(x, y);
+      translate(x, yPos);
       scale(map(row, 0, height, 0.2, 1));
+      rotate(r + (offsetX * frameCount) / 50);
       for (let i = 0; i < n; i++) {
         fill(
           lerpColor(
@@ -73,8 +66,11 @@ function draw() {
         rotate(TAU / n);
       }
       fill(...hexToRgb(random(cp)), 200);
-      circle(0, 0, 1.8 * diameter);
-      // circle(0, 0, 0.8 * diameter);
+      if (cond > 0.5) {
+        circle(0, 0, 1.5 * diameter);
+      } else {
+        circle(0, 0, 0.8 * diameter);
+      }
       pop();
     }
   }
