@@ -33,7 +33,7 @@ function draw() {
     }
   }
 
-  angle += 0.1;
+  angle += 0.05;
 }
 
 function keyPressed() {
