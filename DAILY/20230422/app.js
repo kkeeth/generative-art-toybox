@@ -3,6 +3,7 @@ let dotts = [];
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
+  // angleMode(DEGREES);
 
   for (let i = 0; i < 10; i++) {
     dotts.push({
@@ -13,7 +14,7 @@ function setup() {
 }
 
 function draw() {
-  background(30, 4);
+  background(30, 9);
 
   fill(255, 0, 0);
   drawCircles((1 * width) / 8, height / 4, QUARTER_PI);
@@ -45,10 +46,11 @@ function drawCircles(x, y, r) {
   push();
   translate(x, y);
   for (let i = 0; i < dotts.length; i++) {
-    x = i * 30 * cos(frameCount / (i + 3) + r);
-    y = i * 30 * sin(frameCount / (i + 3) + r);
+    let angle = frameCount / (i + 3) + r;
+    x = i * 30 * cos(angle);
+    y = i * 30 * sin(angle);
 
-    circle(x, y, 3);
+    circle(x, y, map(angle % TAU, 0, TAU, 3, 15));
   }
   pop();
 }
