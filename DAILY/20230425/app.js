@@ -69,7 +69,7 @@ function draw() {
   ) {
     prevDisplayTime = new Date();
     prevTimeString = `${
-      displayMinutes === "00"
+      displayMinutes === "00" && displaySeconds === "00"
         ? String(displayHours - 1).padStart(2, "0")
         : displayHours
     }:${
