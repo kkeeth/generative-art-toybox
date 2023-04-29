@@ -1,11 +1,12 @@
 {
-    "github.copilot.inlineSuggest.enable": true,
-    "github.copilot.enable": {
-        "*": false,
-        "rust": true,
-        "javascript": true,
-        "typescript": true,
-        "html": true,
-        "css": true
-    }
+  "github.copilot.inlineSuggest.enable": true,
+  "github.copilot.enable": {
+    "*": false,
+    "rust": true,
+    "javascript": true,
+    "typescript": true,
+    "html": true,
+    "css": true
+  },
+  "vue.features.codeActions.enable": false
 }
