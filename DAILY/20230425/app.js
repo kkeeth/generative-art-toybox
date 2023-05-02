@@ -18,7 +18,7 @@ let seed;
 function setup() {
   createCanvas(800, 400);
   textAlign(CENTER, CENTER);
-  strokeWeight(6);
+  strokeWeight(2);
   strokeCap(ROUND);
   frameRate(30);
 
@@ -41,7 +41,7 @@ function draw() {
   const timeString = `${displayHours}:${displayMinutes}:${displaySeconds}`;
 
   push();
-  translate(50, 100);
+  translate(100, 100);
 
   for (let i = 0; i < timeString.length; i++) {
     if (timeString[i] !== ":") {
@@ -109,30 +109,37 @@ function drawDigit(digit, x, y, animate) {
 
 function drawSegment(x, y, segmentIndex, animate) {
   const segments = [
+    // top horizontal bar
     [
       [0, 0],
       [segmentSize, 0],
     ],
+    // right top vertical bar
     [
       [segmentSize, 0],
       [segmentSize, segmentSize],
     ],
+    // right bottom vertical bar
     [
       [segmentSize, segmentSize],
       [segmentSize, 2 * segmentSize],
     ],
+    // bottom horizontal bar
     [
       [0, 2 * segmentSize],
       [segmentSize, 2 * segmentSize],
     ],
+    // left bottom vertical bar
     [
       [0, segmentSize],
       [0, 2 * segmentSize],
     ],
+    // left top vertical bar
     [
       [0, 0],
       [0, segmentSize],
     ],
+    // middle horizontal bar
     [
       [0, segmentSize],
       [segmentSize, segmentSize],
@@ -152,6 +159,22 @@ function drawSegment(x, y, segmentIndex, animate) {
 
   stroke(random(cp));
   line(x + start[0], y + start[1], x + startX, y + startY);
+  switch (segmentIndex) {
+    case 0:
+    case 3:
+    case 6:
+      line(x + start[0], y + start[1] + 5, x + startX, y + startY + 5);
+      break;
+    case 1:
+    case 2:
+      line(x + start[0] + 5, y + start[1], x + startX + 5, y + startY);
+      // line(x + start[0] - 5, y + start[1], x + startX - 5, y + startY);
+      break;
+    case 4:
+    case 5:
+      line(x + start[0] - 5, y + start[1], x + startX - 5, y + startY);
+      break;
+  }
 }
 
 function drawColon(x, y) {
