@@ -10,11 +10,11 @@ const cp = [
 const span = 10;
 let seed;
 let vmin;
-let base = 250;
+let base = 160;
 let offset;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas((W = windowHeight), W);
   noFill();
 
   seed = random(100);
@@ -31,6 +31,21 @@ function draw() {
     let a = map(i, 0, width, 0, TAU);
     let r = base + sin(noise(i) * TAU * 10 + frameCount / 50) * vmin * 0.3;
     stroke(cp[~~map(r, base - vmin * 0.3, base + vmin * 0.3, cp.length, 0)]);
+    // let r =
+    //   vmin * 0.3 +
+    //   sin(map(i, 0, width, 0, 1) * TAU * 7 + frameCount / 30) * vmin * 0.05;
+    // stroke(
+    //   cp[
+    //     ~~map(
+    //       r,
+    //       vmin * 0.3 - vmin * 0.05,
+    //       vmin * 0.3 + vmin * 0.05,
+    //       cp.length,
+    //       0,
+    //     )
+    //   ],
+    // );
+
     ellipse(
       r * cos(a),
       r * sin(a),
@@ -44,6 +59,6 @@ function draw() {
 
 function keyPressed() {
   if (key == "s") {
-    saveGif("mySketch", 5);
+    saveGif("mySketch", 3);
   }
 }
