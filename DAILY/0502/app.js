@@ -12,37 +12,37 @@ function setup() {
 function draw() {
   background(255);
   orbitControl();
-  translate(0, height / 3, -2100);
+  translate(0, height / 3, -2750);
 
   let baseSize = 50;
   let boxDepth = 100;
-  let numBoxes = 30;
-  let finalHeight = height / 1.5;
+  let numBoxes = 50;
+  let finalHeight = floor(height / 1.5);
 
-  for (let i = numBoxes - 1; i > 3; i--) {
+  for (let i = numBoxes - 1; i > 5; i--) {
     push();
 
     const progress = max(
-      min((frameCount - (numBoxes - i) * 10) / numBoxes, 1),
+      min((frameCount * 2 - (numBoxes - i) * 12) / numBoxes, 1),
       0,
     );
-    const boxHeight = (finalHeight - (numBoxes - i) * 20) * progress;
+    const boxHeight = finalHeight * progress;
 
     push();
-    fill(200, 150, map(i, 0, width, 255, 0), 200);
-    translate(-i * 10 - 100, -boxHeight / 2, i * (boxDepth - 20));
-    box(baseSize, boxHeight, baseSize / 6);
+    fill(50, 100, map(i, 0, width, 120, 0), 200);
+    translate(-i * 10, -boxHeight / 2, i * (boxDepth - 40));
+    box(baseSize, boxHeight, baseSize / 20);
     pop();
 
     push();
-    fill(map(i, 0, width, 255, 0), 200, 200, 150);
-    translate(i * 10 + 100, -boxHeight / 2, i * (boxDepth - 20));
-    box(baseSize, boxHeight, baseSize / 6);
+    fill(map(i, 0, width, 120, 0), 50, 100, 150);
+    translate(i * 10, -boxHeight / 2, i * (boxDepth - 40));
+    box(baseSize, boxHeight, baseSize / 20);
     pop();
 
     pop();
 
-    if (i === numBoxes - 1 && boxHeight === 380) {
+    if (i === 6 && boxHeight === finalHeight) {
       noLoop();
     }
   }
