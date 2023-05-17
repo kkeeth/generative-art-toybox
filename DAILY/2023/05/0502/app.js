@@ -5,13 +5,14 @@ const boxDepth = 50;
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
   rectMode(CENTER);
+  stroke(255);
 
   maxBoxes = height / 10;
 }
 
 function draw() {
-  background(255);
-  orbitControl();
+  background(0);
+  // orbitControl();
   translate(0, height / 3, -2750);
 
   let baseSize = 50;
@@ -29,14 +30,14 @@ function draw() {
     const boxHeight = finalHeight * progress;
 
     push();
-    fill(50, 100, map(i, 0, width, 120, 0), 200);
-    translate(-i * 10, -boxHeight / 2, i * (boxDepth - 40));
+    fill(50, 80, map(i, 0, width, 100, 0), 200);
+    translate(-i * 9, -boxHeight / 2, i * (boxDepth - 40));
     box(baseSize, boxHeight, baseSize / 20);
     pop();
 
     push();
-    fill(map(i, 0, width, 120, 0), 50, 100, 150);
-    translate(i * 10, -boxHeight / 2, i * (boxDepth - 40));
+    fill(map(i, 0, width, 100, 0), 50, 80, 150);
+    translate(i * 9, -boxHeight / 2, i * (boxDepth - 40));
     box(baseSize, boxHeight, baseSize / 20);
     pop();
 
