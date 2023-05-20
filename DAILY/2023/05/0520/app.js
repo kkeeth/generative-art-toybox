@@ -1,4 +1,15 @@
-const colors = ["#123456", "#789abc", "#008080", "#345678", "#9abcde"];
+let colors = [
+  "#123456",
+  "#789abc",
+  "#def012",
+  "#345678",
+  "#9abcde",
+  "#abcdef",
+  "#fedcba",
+  "#567890",
+  "#098765",
+  "#012345",
+];
 let numPoints = 100;
 
 function setup() {
