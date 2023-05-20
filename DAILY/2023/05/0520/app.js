@@ -25,7 +25,8 @@ function setup() {
     let prevY = height / 2 + diffY;
     const initialX = prevX;
     const initialY = prevY;
-    let strokeW = random(20, 40);
+    const initialW = random(20, 40);
+    let strokeW = initialW;
 
     for (let i = 0; i < numPoints; i += 0.7) {
       if (strokeW > 0.1) {
@@ -43,10 +44,10 @@ function setup() {
         prevX = x;
         prevY = y;
 
-        if (strokeW > 0.5) {
-          strokeW *= 0.7;
+        if (strokeW > initialW / 3) {
+          strokeW *= 0.5;
         } else {
-          strokeW *= 0.95;
+          strokeW *= 0.85;
         }
       }
     }
