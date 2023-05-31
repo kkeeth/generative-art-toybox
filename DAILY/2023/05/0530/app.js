@@ -35,7 +35,9 @@ function drawWave(i, d) {
   for (let x = 0; x < width + step; x += step) {
     vertex(
       x,
-      40 * sin(radians(x + d * frameCount) + i * diff) + height / 3 + i * 80,
+      40 * sin(frameCount / 200) * sin(radians(x + d * frameCount) + i * diff) +
+        height / 3 +
+        i * 80,
     );
   }
   vertex(width, height);
