@@ -1,99 +1,49 @@
-let N;
-let s,
-  margin = 1.5;
-let detail = 25;
-let palette1, palette2;
-let cnv;
+const NUM = 100;
+let objs = [];
+let zoff = 3;
 
 function setup() {
-  cnv = createCanvas(500, 500, WEBGL);
-  cnv.position((windowWidth - 500) / 2, (windowHeight - 500) / 2);
-  N = random([4, 6, 8]);
-  s = width / (N + 2 * margin);
-  margin *= s;
-  noStroke();
-  noLoop();
+  createCanvas(windowWidth, windowHeight, WEBGL);
+  smooth();
+  stroke(200);
+
+  for (let i = 0; i < NUM; i++) {
+    objs.push({
+      x: random(-width / 4, width / 4),
+      y: random(-height / 4, height / 4),
+      z: random(-height, height),
+      s: random(10, 20),
+      length: random(50, 120),
+      color: color(random(255), random(255), random(255)),
+    });
+  }
 }
 
 function draw() {
-  translate(-width / 2, -height / 2);
+  background(0);
+  lights();
+  let locX = 1 / 2 - width / 2;
+  let locY = 1 / 2 - height / 2;
+  pointLight(250, 250, 250, locX, locY, 50);
 
-  palette1 = [
-    "#abcd5e",
-    "#14976b",
-    "#2b67af",
-    "#62b6de",
-    "#f589a3",
-    "#ef562f",
-    "#fc8405",
-    "#f9d531",
-  ];
-  palette2 = shuffle(["#050505", "#fffbe6"]);
+  for (let i = 0; i < NUM; i++) {
+    push();
+    fill(objs[i].color);
+    translate(objs[i].x, objs[i].y, (objs[i].z += zoff));
+    rotateX(HALF_PI);
+    noStroke();
+    cylinder(objs[i].s, objs[i].length, 9);
+    // box(objs[i].s, objs[i].s, objs[i].length)
+    pop();
 
-  let backCol = random([0, 1]);
-  background(palette2[backCol]);
-
-  for (let i = 0; i <= N; i++) {
-    let x = i * s + margin;
-    for (let j = 0; j <= N; j++) {
-      let y = j * s + margin;
-      fill(palette2[(i + j) % 2]);
-      ellipse(x, y, s, s, detail * 4);
-    }
-  }
-
-  for (let i = 0; i < N; i++) {
-    for (let j = 0; j < N; j++) {
-      makeTile(i, j);
-    }
-  }
-
-  let dotMode = ~~random(4);
-  for (let i = 0; i <= N; i++) {
-    let x = i * s + margin;
-    for (let j = 0; j <= N; j++) {
-      let y = j * s + margin;
-      if (dotMode == 0) {
-        fill(random(random([palette1, palette2])));
-      } else if (dotMode == 1) {
-        fill(random(palette1));
-      } else if (dotMode == 2) {
-        fill(random(palette2));
-      } else {
-        fill(palette2[1 - ((i + j) % 2)]);
-      }
-      if ((i + j) % 2 == backCol) fill(random(palette1));
-      else fill(palette2[1 - ((i + j) % 2)]);
-      ellipse(x, y, s / 2, s / 2, detail * 4);
+    if (objs[i].z > height) {
+      objs[i].z = -height / 2;
     }
   }
 }
 
-function makeTile(i, j) {
-  let x = i * s + margin;
-  let y = j * s + margin;
-  if (random() < 1 / 2) {
-    fill(random(palette1));
-    square(x, y, s);
-    fill(palette2[(i + j) % 2]);
-    arc(x, y, s, s, 0, PI / 2, PIE, detail);
-    arc(x + s, y + s, s, s, PI, (3 * PI) / 2, PIE, detail);
-    fill(palette2[1 - ((i + j) % 2)]);
-    arc(x + s, y, s, s, PI / 2, PI, PIE, detail);
-    arc(x, y + s, s, s, (3 * PI) / 2, TAU, PIE, detail);
-  } else {
-    if (random() < 1 / 2) {
-      fill(palette2[1 - ((i + j) % 2)]);
-      square(x, y, s);
-      fill(palette2[(i + j) % 2]);
-      arc(x, y, s, s, 0, PI / 2, PIE, detail);
-      arc(x + s, y + s, s, s, PI, (3 * PI) / 2, PIE, detail);
-    } else {
-      fill(palette2[(i + j) % 2]);
-      square(x, y, s);
-      fill(palette2[1 - ((i + j) % 2)]);
-      arc(x + s, y, s, s, PI / 2, PI, PIE, detail);
-      arc(x, y + s, s, s, (3 * PI) / 2, TAU, PIE, detail);
-    }
+function keyPressed() {
+  if (key === "s") {
+    saveGif("mySketch", 5);
   }
 }
