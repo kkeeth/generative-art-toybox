@@ -46,6 +46,7 @@ function draw() {
       example2_draw();
       break;
     case "3":
+      image(capture, 0, 0, width, (width * capture.height) / capture.width);
       break;
     case "4":
       break;
