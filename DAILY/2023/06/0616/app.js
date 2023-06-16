@@ -1,26 +1,27 @@
 const step = 64;
 const strings = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 let mySlider;
+let myCheckbox;
 let seed;
-let upperMode = true;
 
 function setup() {
   createCanvas((W = 720), W);
   textSize(step / 2);
   textAlign(TOP, TOP);
   colorMode(HSB, W);
-  frameRate(2);
   seed = random(1000);
 
-  // mySlider = createSlider(0, 25, 0, 1);
-  // mySlider.position(100, 20);
+  mySlider = createSlider(0, 25, 0, 1);
+  myCheckbox = createCheckbox("UPPER", true);
+  mySlider.position(100, 20);
+  myCheckbox.position(100, 40);
 }
 
 function draw() {
   background(0);
   randomSeed(seed);
-  // let value = mySlider.value();
-  let value = (frameCount - 1) % 26;
+  let value = mySlider.value();
+  let upperMode = myCheckbox.checked();
 
   for (let x = 0; x < W; x += step) {
     for (let y = 0; y < W; y += step) {
@@ -78,8 +79,5 @@ function keyPressed() {
   }
   if (key === "s") {
     saveGif("mySketch", 8.5);
-  }
-  if (key === "m") {
-    upperMode = !upperMode;
   }
 }
