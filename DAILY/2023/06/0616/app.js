@@ -11,7 +11,7 @@ function setup() {
   colorMode(HSB, W);
   seed = random(1000);
 
-  mySlider = createSlider(0, 25, 0, 1);
+  mySlider = createSlider(0, 25, ~~random(strings.length - 1), 1);
   myCheckbox = createCheckbox("UPPER CASE", true);
   mySlider.position(50, 20);
   myCheckbox.position(50, 40);
