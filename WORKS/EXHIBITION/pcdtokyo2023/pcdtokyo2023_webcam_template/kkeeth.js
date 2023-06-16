@@ -1,3 +1,6 @@
+// 外部ライブラリ　handsfree.js を利用しています．
+// index.html で CDN 経由から利用していますのでご確認お願いします．
+
 // グローバル変数を定義するときは、変数名の頭に"作者名_"を追加
 const kkeeth_mode = ["blossoms", "snowflakes", "flowers", "dotts"];
 const kkeeth_cp = [
@@ -12,8 +15,7 @@ const kkeeth_cp = [
 ];
 const kkeeth_targetIndex = 21; //[4, 8, 12, 16, 20];
 const kkeeth_ulim = 0.8;
-const kkeeth_petals = [];
-const kkeeth_num = 100;
+const kkeeth_num = 200;
 
 let kkeeth_seed;
 let kkeeth_handsfree;
@@ -21,8 +23,8 @@ let kkeeth_capture = 0;
 let kkeeth_bc = 255;
 let kkeeth_selectedMode = kkeeth_mode[0];
 let kkeeth_hands;
+let kkeeth_petals = [];
 let kkeeth_items = [];
-let kkeeth_closedFlags = [];
 let kkeeth_flowers = [];
 let kkeeth_xoff = 0.0;
 let kkeeth_boff = 0.0;
@@ -57,28 +59,27 @@ function kkeeth_setup() {
     };
   }
 
-  for (let i = 0; i < kkeeth_targetIndex.length; i++) {
-    kkeeth_closedFlags[i] = false;
+  if (!kkeeth_handsfree) {
+    kkeeth_handsfree = new Handsfree({
+      showDebug: false,
+      face: false,
+      pose: false,
+      hands: {
+        enabled: true,
+        // The maximum number of hands to detect [0 - 4]
+        maxNumHands: 2,
+
+        // Minimum confidence [0 - 1] for a hand to be considered detected
+        minDetectionConfidence: 0.5,
+
+        // Minimum confidence [0 - 1] for the landmark tracker to be considered detected
+        // Higher values are more robust at the expense of higher latency
+        minTrackingConfidence: 0.5,
+      },
+    });
+    kkeeth_handsfree.enablePlugins("browser");
+    kkeeth_handsfree.start();
   }
-  kkeeth_handsfree = new Handsfree({
-    showDebug: false,
-    face: false,
-    pose: false,
-    hands: {
-      enabled: true,
-      // The maximum number of hands to detect [0 - 4]
-      maxNumHands: 2,
-
-      // Minimum confidence [0 - 1] for a hand to be considered detected
-      minDetectionConfidence: 0.5,
-
-      // Minimum confidence [0 - 1] for the landmark tracker to be considered detected
-      // Higher values are more robust at the expense of higher latency
-      minTrackingConfidence: 0.5,
-    },
-  });
-  kkeeth_handsfree.enablePlugins("browser");
-  kkeeth_handsfree.start();
 
   // init
   const handsDoms = document.querySelectorAll(
@@ -92,12 +93,13 @@ function kkeeth_setup() {
 function kkeeth_draw() {
   push();
   background(kkeeth_bc);
+  // translate(-width / 2, -height / 2);
 
   if (kkeeth_selectedMode !== "dotts") {
     push();
-    translate(camImg.width, 0);
+    translate(width, 0);
     scale(-1, 1);
-    image(capture, 0, 0, camImg.width, camImg.height);
+    image(capture, 0, 0, width, height);
     pop();
   }
 
@@ -110,6 +112,11 @@ function kkeeth_draw() {
       petal.render();
     }
   } else if (kkeeth_selectedMode === "snowflakes") {
+    push();
+
+    drawingContext.shadowBlur = 10;
+    drawingContext.shadowColor = color(255);
+
     for (let i = 0; i < kkeeth_num; i++) {
       fill(255, kkeeth_items[i].op);
       ellipse(
@@ -119,6 +126,12 @@ function kkeeth_draw() {
         kkeeth_items[i].size,
       );
 
+      if (kkeeth_items[i].x > width) {
+        kkeeth_items[i].x = 0;
+      }
+      if (kkeeth_items[i].x < 0) {
+        kkeeth_items[i].x = width;
+      }
       if (kkeeth_items[i].y > height) {
         kkeeth_items[i].y = 0;
         kkeeth_items[i].x = random(width);
@@ -137,6 +150,7 @@ function kkeeth_draw() {
           (hand_0[kkeeth_targetIndex].x * 2 - 1) * kkeeth_items[i].vx;
       }
     }
+    pop();
   } else if (kkeeth_selectedMode === "flowers") {
     for (let item of kkeeth_flowers) {
       item.update();
@@ -148,14 +162,16 @@ function kkeeth_draw() {
 
     if (camImg) {
       camImg.loadPixels();
-      for (let y = 0; y < camImg.height; y += step) {
-        for (let x = 0; x < camImg.width; x += step) {
+      for (let y = step / 2; y < camImg.height; y += step) {
+        for (let x = step / 2; x < camImg.width; x += step) {
           let r = camImg.pixels[(y * camImg.width + x) * 4];
-          let dir = map(r, 0, 255, step, 3);
+          let dir = map(r, 0, 255, step, 4);
+          let dx = map(x, 0, camImg.width, 0, width);
+          let dy = map(y, 0, camImg.height, 0, height);
 
           let pixel = camImg.get(x, y);
           fill(pixel);
-          circle(x, y, dir);
+          circle(dx, dy, dir);
         }
       }
     }
@@ -212,8 +228,8 @@ class CherryBlossom {
    */
   update() {
     this.vecLocation.x = this.xBase + this.xRadius * sin(radians(this.xTheta));
-    if (this.vecLocation.x > width) this.xBase = -this.petalSize;
-    else if (this.vecLocation.x < 0) this.xBase = width + this.petalSize;
+    if (this.vecLocation.x > width) this.xBase = -this.petalSize * 1.5;
+    else if (this.vecLocation.x < 0) this.xBase = width + this.petalSize * 1.5;
 
     if (
       kkeeth_hands?.multiHandLandmarks[0] ||
@@ -244,12 +260,11 @@ class CherryBlossom {
     fill(`rgba(${this.r}, ${this.g} , ${this.b}, ${this.alpha})`);
 
     push();
+    drawingContext.shadowBlur = 3;
+    drawingContext.shadowColor = color(this.r, this.g, this.b);
+
     translate(this.vecLocation.x, this.vecLocation.y);
-    // translate(this.vecLocation.x - width / 2, this.vecLocation.y - height / 2);
     rotate(radians(this.xTheta));
-    // rotateX(radians(this.xTheta));
-    // rotateY(radians(this.xTheta));
-    // lights();
     beginShape();
 
     for (let theta = 0; theta < TWO_PI / this.petalNumber; theta += 0.01) {
@@ -303,7 +318,6 @@ class Flower {
     push();
     translate(this.x, this.y);
     rotate(this.r);
-    console.log(this.w);
     for (let i = 0; i < this.n; i++) {
       fill(lerpColor(color(this.color1), color(this.color2), i / this.n));
       ellipse(1.4 * this.w, 0, 2 * this.w, 0.8 * this.w);
@@ -320,5 +334,7 @@ function windowResized() {
 }
 
 function changeMode() {
-  kkeeth_selectedMode = random(kkeeth_mode);
+  let cond = random(kkeeth_mode);
+  if (cond === kkeeth_selectedMode) changeMode();
+  else kkeeth_selectedMode = cond;
 }
