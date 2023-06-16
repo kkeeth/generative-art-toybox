@@ -12,9 +12,9 @@ function setup() {
   seed = random(1000);
 
   mySlider = createSlider(0, 25, 0, 1);
-  myCheckbox = createCheckbox("UPPER", true);
-  mySlider.position(100, 20);
-  myCheckbox.position(100, 40);
+  myCheckbox = createCheckbox("UPPER CASE", true);
+  mySlider.position(50, 20);
+  myCheckbox.position(50, 40);
 }
 
 function draw() {
