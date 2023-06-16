@@ -2,13 +2,14 @@ const step = 64;
 const strings = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 let mySlider;
 let seed;
+let upperMode = true;
 
 function setup() {
   createCanvas((W = 720), W);
   textSize(step / 2);
   textAlign(TOP, TOP);
   colorMode(HSB, W);
-  frameRate(3);
+  frameRate(2);
   seed = random(1000);
 
   // mySlider = createSlider(0, 25, 0, 1);
@@ -23,7 +24,11 @@ function draw() {
 
   for (let x = 0; x < W; x += step) {
     for (let y = 0; y < W; y += step) {
-      drawBlock(x, y, strings[value]);
+      if (upperMode) {
+        drawBlock(x, y, strings[value]);
+      } else {
+        drawBlock(x, y, strings.toLocaleLowerCase()[value]);
+      }
     }
   }
 
@@ -34,7 +39,11 @@ function draw() {
   fill(W);
   textAlign(CENTER, CENTER);
   textSize(step * 2);
-  text(strings[value], W / 2, W / 2);
+  if (upperMode) {
+    text(strings[value], W / 2, W / 2);
+  } else {
+    text(strings.toLowerCase()[value], W / 2, W / 2);
+  }
   pop();
 }
 
@@ -69,5 +78,8 @@ function keyPressed() {
   }
   if (key === "s") {
     saveGif("mySketch", 8.5);
+  }
+  if (key === "m") {
+    upperMode = !upperMode;
   }
 }
