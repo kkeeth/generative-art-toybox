@@ -93,7 +93,6 @@ function kkeeth_setup() {
 function kkeeth_draw() {
   push();
   background(kkeeth_bc);
-  // translate(-width / 2, -height / 2);
 
   if (kkeeth_selectedMode !== "dotts") {
     push();
@@ -112,8 +111,6 @@ function kkeeth_draw() {
       petal.render();
     }
   } else if (kkeeth_selectedMode === "snowflakes") {
-    push();
-
     drawingContext.shadowBlur = 10;
     drawingContext.shadowColor = color(255);
 
@@ -150,7 +147,6 @@ function kkeeth_draw() {
           (hand_0[kkeeth_targetIndex].x * 2 - 1) * kkeeth_items[i].vx;
       }
     }
-    pop();
   } else if (kkeeth_selectedMode === "flowers") {
     for (let item of kkeeth_flowers) {
       item.update();
