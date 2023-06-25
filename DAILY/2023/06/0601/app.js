@@ -15,7 +15,7 @@ function setup() {
 
   // y-coordinate axis
   stroke(cp[0]);
-  for (let i = 0; i <= 4000; i++) {
+  for (let i = 0; i <= 5000; i++) {
     push();
     if (random() < 0.1) {
       point(
@@ -77,7 +77,7 @@ function setup() {
 }
 
 function keyPressed() {
-  if (key === "s") {
-    saveGif("mySketch", 5);
+  if (key === "c") {
+    saveCanvas("mySketch", "png");
   }
 }
