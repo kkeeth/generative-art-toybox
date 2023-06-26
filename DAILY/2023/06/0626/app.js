@@ -69,7 +69,4 @@ function keyPressed() {
   if (key === "c") {
     saveCanvas("mySketch", "png");
   }
-  if (key === "s") {
-    saveGif("mySketch", 8.5);
-  }
 }
