@@ -1,77 +1,103 @@
 let g;
-let movingPoint = 1;
-let movingTarget = { x: 0, y: 0 };
-let points = [];
-let corners = [];
+let items = [];
+const N = 10;
+const cp = ["#160D26", "#C50607", "#F78D1B", "#504721", "#452F19"];
 
 function setup() {
   createCanvas((W = windowHeight - 200), W);
   noStroke();
 
   g = W / 20;
-  points = [
-    { x: g, y: g },
-    { x: W - g, y: W - g },
-    { x: g, y: W - g },
-  ];
-  corners = [
-    { x: g, y: g },
-    { x: W - g, y: g },
-    { x: W - g, y: W - g },
-    { x: g, y: W - g },
-  ];
 
-  selectTarget();
+  for (let i = 0; i < N; i++) {
+    items.push(new Triangle(g * int(random(1, 9)), int(random(2, 5))));
+  }
 }
 
 function draw() {
   background(255);
 
-  push();
-  stroke("orange");
-  for (let x = 0; x < W; x += g) {
-    for (let y = 0; y < W; y += g) {
-      line(x, 0, x, W);
-      line(0, y, W, y);
-    }
+  // push();
+  // stroke("orange");
+  // for (let x = 0; x < W; x += g) {
+  //   for (let y = 0; y < W; y += g) {
+  //     line(x, 0, x, W);
+  //     line(0, y, W, y);
+  //   }
+  // }
+  // pop();
+
+  for (let item of items) {
+    item.update();
+    item.show();
   }
-  pop();
-
-  let diffX = movingTarget.x - points[movingPoint].x;
-  let diffY = movingTarget.y - points[movingPoint].y;
-  points[movingPoint].x += diffX / 20;
-  points[movingPoint].y += diffY / 20;
-
-  // If the point has reached its target, select a new one
-  if (
-    dist(
-      points[movingPoint].x,
-      points[movingPoint].y,
-      movingTarget.x,
-      movingTarget.y,
-    ) < 0.1
-  ) {
-    selectTarget();
-  }
-
-  fill("orange");
-  triangle(
-    points[0].x,
-    points[0].y,
-    points[1].x,
-    points[1].y,
-    points[2].x,
-    points[2].y,
-  );
 }
 
-function selectTarget() {
-  movingPoint--;
-  if (movingPoint < 0) movingPoint = points.length - 1;
-  const nextTarget = corners.filter((corner) => {
-    return !points.some(
-      (point) => dist(corner.x, corner.y, point.x, point.y) < 0.1,
+class Triangle {
+  constructor(g, s) {
+    this.points = [
+      { x: g, y: g },
+      { x: g * s, y: g * s },
+      { x: g, y: g * s },
+    ];
+    this.corners = [
+      { x: g, y: g },
+      { x: g * s, y: g },
+      { x: g * s, y: g * s },
+      { x: g, y: g * s },
+    ];
+    this.movingPoint = int(random(this.corners.length));
+    this.movingTarget = { x: 0, y: 0 };
+    this.color = random(cp);
+
+    this.selectTarget();
+  }
+
+  update() {
+    let diffX = this.movingTarget.x - this.points[this.movingPoint].x;
+    let diffY = this.movingTarget.y - this.points[this.movingPoint].y;
+    this.points[this.movingPoint].x += diffX / 10;
+    this.points[this.movingPoint].y += diffY / 10;
+
+    // If the point has reached its target, select a new one
+    if (
+      dist(
+        this.points[this.movingPoint].x,
+        this.points[this.movingPoint].y,
+        this.movingTarget.x,
+        this.movingTarget.y,
+      ) < 0.1
+    ) {
+      this.selectTarget();
+    }
+  }
+
+  show() {
+    fill(this.color);
+    triangle(
+      this.points[0].x,
+      this.points[0].y,
+      this.points[1].x,
+      this.points[1].y,
+      this.points[2].x,
+      this.points[2].y,
     );
-  });
-  movingTarget = nextTarget[0];
+  }
+
+  selectTarget() {
+    this.movingPoint--;
+    if (this.movingPoint < 0) this.movingPoint = this.points.length - 1;
+    const nextTarget = this.corners.filter((corner) => {
+      return !this.points.some(
+        (point) => dist(corner.x, corner.y, point.x, point.y) < 0.1,
+      );
+    });
+    this.movingTarget = nextTarget[0];
+  }
+}
+
+function keyPressed() {
+  if (key === "s") {
+    saveGif("mySketch", 5);
+  }
 }
