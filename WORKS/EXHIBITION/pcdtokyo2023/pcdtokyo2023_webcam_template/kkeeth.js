@@ -30,7 +30,6 @@ let kkeeth_xoff = 0.0;
 let kkeeth_boff = 0.0;
 
 function kkeeth_setup() {
-  cnv = createCanvas(windowWidth, windowHeight);
   pixelDensity(1);
   changeMode();
   kkeeth_seed = ~~random(99);
@@ -80,14 +79,6 @@ function kkeeth_setup() {
     kkeeth_handsfree.enablePlugins("browser");
     kkeeth_handsfree.start();
   }
-
-  // init
-  const handsDoms = document.querySelectorAll(
-    ".handsfree-canvas, .handsfree-video, .handsfree-pointer",
-  );
-  handsDoms.forEach((dom) => {
-    dom.remove();
-  });
 }
 
 function kkeeth_draw() {
@@ -158,8 +149,8 @@ function kkeeth_draw() {
 
     if (camImg) {
       camImg.loadPixels();
-      for (let y = step / 2; y < camImg.height; y += step) {
-        for (let x = step / 2; x < camImg.width; x += step) {
+      for (let y = step; y < camImg.height; y += step) {
+        for (let x = step; x < camImg.width; x += step) {
           let r = camImg.pixels[(y * camImg.width + x) * 4];
           let dir = map(r, 0, 255, step, 4);
           let dx = map(x, 0, camImg.width, 0, width);
