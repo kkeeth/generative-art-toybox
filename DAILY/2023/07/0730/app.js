@@ -9,6 +9,8 @@ const cp = [
   "#4e59a4",
   "#085a9b",
   "#f477c3",
+  "#a0d8ef",
+  "#90ee90",
 ];
 
 function setup() {
@@ -16,11 +18,9 @@ function setup() {
   noStroke();
   angleMode(DEGREES);
 
-  drawWaves(100, "skyblue", "lightgreen");
-
-  for (let i = 0; i < height - thick; i += 200) {
+  for (let i = 100; i < height - thick; i += 180) {
     push();
-    translate(-910, 0);
+    translate(-width + 180, 0);
     let tmpColor1 = random(cp);
     let tmpColor2 = random(cp);
     while (tmpColor1 === tmpColor2) {
@@ -33,11 +33,10 @@ function setup() {
 
 function drawWaves(h, color1, color2) {
   drawCrossWavePlus(10, h, color1, color2);
-  drawCrossWaveMinus(180, 0, color1, color2);
-  drawCrossWavePlus(180, 0, color1, color2);
-  drawCrossWaveMinus(180, 0, color1, color2);
-  drawCrossWavePlus(180, 0, color1, color2);
-  drawCrossWaveMinus(180, 0, color1, color2);
+  for (let i = 180; i < width; i += 180) {
+    drawCrossWaveMinus(180, 0, color1, color2);
+    drawCrossWavePlus(180, 0, color1, color2);
+  }
 }
 
 function drawCrossWavePlus(x, y, color1, color2) {
