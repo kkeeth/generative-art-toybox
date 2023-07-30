@@ -29,10 +29,10 @@ function setup() {
   for (let i = 0; i < NUM; i++) {
     let a = random(TAU);
     let r = random(W / 2);
-    if (r < 5 && random() < 0.6) r = random(W / 4, W / 2);
-    if (r < 10 && random() < 0.5) r = random(W / 4, W / 2);
-    if (r < 20 && random() < 0.4) r = random(W / 4, W / 2);
-    if (r < 30 && random() < 0.3) r = random(W / 4, W / 2);
+    if (r < 5 && random() < 0.6) r = W / 2;
+    if (r < 10 && random() < 0.5) r = W / 2;
+    if (r < 20 && random() < 0.4) r = W / 2;
+    if (r < 30 && random() < 0.3) r = W / 2;
     let x = r * cos(a);
     let y = r * sin(a);
     if (x < -(W / 2 - W / 5)) {
