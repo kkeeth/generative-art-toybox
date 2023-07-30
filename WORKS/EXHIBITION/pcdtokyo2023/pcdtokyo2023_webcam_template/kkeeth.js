@@ -30,6 +30,7 @@ let kkeeth_xoff = 0.0;
 let kkeeth_boff = 0.0;
 
 function kkeeth_setup() {
+  cnv = createCanvas(windowWidth, windowHeight);
   pixelDensity(1);
   changeMode();
   kkeeth_seed = ~~random(99);
@@ -153,7 +154,7 @@ function kkeeth_draw() {
         for (let x = step; x < camImg.width; x += step) {
           let r = camImg.pixels[(y * camImg.width + x) * 4];
           let dir = map(r, 0, 255, step, 4);
-          let dx = map(x, 0, camImg.width, 0, width);
+          let dx = map(x, 0, camImg.width, width, 0);
           let dy = map(y, 0, camImg.height, 0, height);
 
           let pixel = camImg.get(x, y);
