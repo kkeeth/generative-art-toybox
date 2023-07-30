@@ -17,16 +17,6 @@ function setup() {
 function draw() {
   background(255);
 
-  // push();
-  // stroke("orange");
-  // for (let x = 0; x < W; x += g) {
-  //   for (let y = 0; y < W; y += g) {
-  //     line(x, 0, x, W);
-  //     line(0, y, W, y);
-  //   }
-  // }
-  // pop();
-
   for (let item of items) {
     item.update();
     item.show();
