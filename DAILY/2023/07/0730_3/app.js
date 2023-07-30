@@ -1,4 +1,4 @@
-const baseSize = 4;
+const baseSize = 3;
 const cp = [
   "#e6302b",
   "#fd7800",
