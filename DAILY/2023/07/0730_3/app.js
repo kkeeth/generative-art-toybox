@@ -9,13 +9,16 @@ const cp = [
   "#085a9b",
   "#f477c3",
 ];
+let circleSize;
+let opacity;
+let selectedColor;
 
 function setup() {
   createCanvas((W = windowHeight - 100), W);
-  // noStroke();
-  background("navy");
-  let selectedColor = "#ffffff";
-  let opacity;
+  noStroke();
+  selectedColor = random(cp);
+  background(selectedColor);
+  circleSize = W / 1.2;
 
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
@@ -27,11 +30,20 @@ function setup() {
         } else {
           opacity = calculateOpacity(x * baseSize, 2);
         }
-        fill(...hexToRgb(selectedColor), opacity);
+        fill(255, opacity);
         ellipse(x * baseSize, y * baseSize, baseSize);
       }
     }
   }
+  drawingContext.shadowColor = "beige";
+  drawingContext.shadowBlur = 40;
+
+  push();
+  stroke("white");
+  strokeWeight(200);
+  noFill();
+  ellipse(W / 2, W / 2, circleSize * 1.5, circleSize * 1.5);
+  pop();
 }
 
 function calculateOpacity(x, nth) {
