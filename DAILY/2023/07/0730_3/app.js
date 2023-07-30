@@ -36,13 +36,13 @@ function setup() {
 
 function calculateOpacity(x, nth) {
   if (x < (W * (1 + nth * 5)) / 15) {
-    return 51;
-  } else if (x < (W * (2 + nth * 5)) / 15) {
     return 102;
-  } else if (x < (W * (3 + nth * 5)) / 15) {
+  } else if (x < (W * (2 + nth * 5)) / 15) {
     return 153;
-  } else if (x < (W * (4 + nth * 5)) / 15) {
+  } else if (x < (W * (3 + nth * 5)) / 15) {
     return 204;
+  } else if (x < (W * (4 + nth * 5)) / 15) {
+    return 234;
   } else {
     return 255;
   }
