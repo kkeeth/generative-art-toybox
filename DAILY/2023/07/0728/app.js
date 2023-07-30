@@ -4,7 +4,16 @@ const NUM = 30;
 let leafWidth;
 let leafHeight;
 let leafLineBase;
-let diff = 0.0;
+const cp = [
+  "#e6302b",
+  "#fd7800",
+  "#fbd400",
+  "#51b72d",
+  "#2abde4",
+  "#4e59a4",
+  "#085a9b",
+  "#f477c3",
+];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -21,14 +30,13 @@ function draw() {
     drawLeaf(
       random(width),
       random(height),
-      random(TAU) + diff,
-      "lightgreen",
+      random([PI / 4, (2 * PI) / 4, (3 * PI) / 4, PI]),
+      random(cp),
       random() > 0.5
         ? random(1, 5) * map(sin((frameCount + i) / 100), -1, 1, 0.5, 1)
         : random(1, 5) * map(cos((frameCount + i) / 100), -1, 1, 0.5, 1),
     );
   }
-  diff += 0.01;
 }
 
 function drawLeaf(x, y, angle, color, size) {
