@@ -1,4 +1,4 @@
-const size = 1;
+const size = 1.5;
 const NUM = 1e4;
 const cp = [
   "#e6302b",
@@ -16,7 +16,6 @@ function setup() {
   background(250);
   translate(W / 2, W / 2);
   strokeWeight(size);
-  // ellipse(0, 0, 20);
 
   let [color1, color2, color3, color4, color5] = [
     random(cp),
