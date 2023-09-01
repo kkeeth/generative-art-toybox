@@ -21,7 +21,7 @@ function setup() {
   background("#1f3134");
 
   for (let j = random([0, 1]); j < int(random(2, 6)); j += 2) {
-    const initX = ~~(random(-10, W / 2) / baseSize);
+    const initX = ~~(random(-W / 4, W / 2) / baseSize);
     const maxX = random(600, 800) / baseSize;
     drawRectLine(initX, maxX, ((j + 1) * W) / 6);
   }
