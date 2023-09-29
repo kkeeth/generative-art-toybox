@@ -46,9 +46,11 @@ class Item {
     rect(
       this.x * (SIZE + padding),
       this.y * (SIZE + padding),
-      SIZE + noise(frameCount / 50, this.diffX) * 20,
-      SIZE + noise(frameCount / 50, this.diffY) * 20,
+      // SIZE + noise(frameCount / 50, this.diffX) * 20,
+      // SIZE + noise(frameCount / 50, this.diffY) * 20,
       (SIZE * (sin(frameCount / 50 + this.initialAngle) + 1)) / 2,
+      (SIZE * (cos(frameCount / 50 + this.initialAngle) + 1)) / 2,
+      (SIZE * (sin(frameCount / 30 + this.initialAngle) + 1)) / 2,
     );
   }
 }
