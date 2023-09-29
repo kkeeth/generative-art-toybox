@@ -1,11 +1,12 @@
 const NUM = 5;
-const padding = 20;
+const padding = 30;
 let SIZE;
 let targetSize;
 let items = [];
 
 function setup() {
   createCanvas((W = 600), W);
+  rectMode(CENTER);
   noStroke();
 
   SIZE = W / 8;
@@ -20,7 +21,10 @@ function setup() {
 
 function draw() {
   background(255);
-  translate((width - targetSize) / 2, (height - targetSize) / 2);
+  translate(
+    (width - targetSize) / 2 + SIZE / 2,
+    (height - targetSize) / 2 + SIZE / 2,
+  );
 
   for (item of items) {
     item.show();
@@ -31,6 +35,8 @@ class Item {
   constructor(x, y) {
     this.x = x;
     this.y = y;
+    this.diffX = random();
+    this.diffY = random();
     this.color = color(random(200, 240), random(200, 240), random(200, 240));
     this.initialAngle = random(TAU);
   }
@@ -40,8 +46,8 @@ class Item {
     rect(
       this.x * (SIZE + padding),
       this.y * (SIZE + padding),
-      SIZE,
-      SIZE,
+      SIZE + noise(frameCount / 50, this.diffX) * 20,
+      SIZE + noise(frameCount / 50, this.diffY) * 20,
       (SIZE * (sin(frameCount / 50 + this.initialAngle) + 1)) / 2,
     );
   }
