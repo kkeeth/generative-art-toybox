@@ -37,11 +37,13 @@ class Item {
     this.y = y;
     this.diffX = random();
     this.diffY = random();
-    this.color = color(random(200, 240), random(200, 240), random(200, 240));
+    this.color = color(random(180, 220), random(180, 220), random(180, 220));
     this.initialAngle = random(TAU);
   }
 
   show() {
+    drawingContext.shadowColor = color(220);
+    drawingContext.shadowBlur = 16;
     fill(this.color);
     rect(
       this.x * (SIZE + padding),
