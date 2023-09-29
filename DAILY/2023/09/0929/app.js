@@ -37,7 +37,7 @@ class Item {
     this.y = y;
     this.diffX = random();
     this.diffY = random();
-    this.color = color(random(180, 220), random(180, 220), random(180, 220));
+    this.color = color(random(200, 240), random(200, 240), random(200, 240));
     this.initialAngle = random(TAU);
   }
 
@@ -48,10 +48,10 @@ class Item {
     rect(
       this.x * (SIZE + padding),
       this.y * (SIZE + padding),
-      // SIZE + noise(frameCount / 50, this.diffX) * 20,
-      // SIZE + noise(frameCount / 50, this.diffY) * 20,
-      (SIZE * (sin(frameCount / 50 + this.initialAngle) + 1)) / 2,
-      (SIZE * (cos(frameCount / 50 + this.initialAngle) + 1)) / 2,
+      SIZE + noise(frameCount / 50, this.diffX) * 20,
+      SIZE + noise(frameCount / 50, this.diffY) * 20,
+      // (SIZE * (sin(frameCount / 50 + this.initialAngle) + 1)) / 2,
+      // (SIZE * (cos(frameCount / 50 + this.initialAngle) + 1)) / 2,
       (SIZE * (sin(frameCount / 30 + this.initialAngle) + 1)) / 2,
     );
   }
