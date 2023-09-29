@@ -48,6 +48,6 @@ class Item {
 }
 function keyPressed() {
   if (key === "s") {
-    saveCanvas("mySketch", "png");
+    saveGif("mySketch", 5);
   }
 }
