@@ -5,8 +5,8 @@ let items = [];
 
 function setup() {
   createCanvas((W = 700), W);
-  // strokeWeight(8);
-  noStroke();
+  strokeWeight(8);
+  stroke(255);
 
   for (let i = 0; i < NUM; i++) {
     items.push({
@@ -21,7 +21,7 @@ function setup() {
 }
 
 function draw() {
-  background(255);
+  background(0);
   for (let i = SIZE; i < W - SIZE; i += SIZE + margin) {
     for (let j = 0; j < items.length; j++) {
       items[j].position = map(
