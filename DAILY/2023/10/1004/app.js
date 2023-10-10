@@ -1,7 +1,9 @@
 const NUM = 12;
 const SIZE = 50;
-const margin = 30;
+const RAW = 8;
 let items = [];
+let outer;
+let margin;
 
 function setup() {
   createCanvas((W = 700), W);
@@ -13,26 +15,27 @@ function setup() {
       c: color(
         map(i, 0, NUM, 0, 255),
         map(i, 0, NUM, 255, 0),
-        map(i, 0, NUM, 255, 127),
+        map(i, 0, NUM, 255, 127)
       ),
       position: SIZE + margin,
     });
   }
+  margin = (W - RAW * SIZE) / (RAW + 1);
 }
 
 function draw() {
-  background(0);
-  for (let i = SIZE; i < W - SIZE; i += SIZE + margin) {
+  background(100);
+  for (let i = 0; i < RAW; i++) {
     for (let j = 0; j < items.length; j++) {
       items[j].position = map(
-        sin((frameCount + j * 8 + i / 12) / 40),
+        sin((frameCount + j * RAW + (i * (SIZE + margin)) / 10) / 40),
         -1,
         1,
         SIZE,
-        W - SIZE,
+        W - SIZE
       );
       fill(items[j].c);
-      ellipse(i, items[j].position, SIZE);
+      ellipse(i * (SIZE + margin) + margin + SIZE / 2, items[j].position, SIZE);
     }
   }
 }
