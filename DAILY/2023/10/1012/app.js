@@ -57,6 +57,7 @@ const colorScheme = [
   },
 ];
 const NUM = 50;
+const MAX = 150;
 const items = [];
 let colorPattern;
 
@@ -70,7 +71,7 @@ function setup() {
     items.push({
       x: random(width),
       y: random(height),
-      size: random(5, 100),
+      size: random(5, MAX),
       color: random(colorPattern),
       initAngleX: random(TAU),
       initAngleY: random(TAU),
@@ -88,10 +89,10 @@ function draw() {
     item.size += 1.2;
     ellipse(x, y, item.size);
 
-    if (item.size > 150) {
+    if (item.size > MAX) {
       item.x = random(width);
       item.y = random(height);
-      item.size = random(5, 20);
+      item.size = random(5, 30);
     }
   }
 }
