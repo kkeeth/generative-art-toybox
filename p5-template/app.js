@@ -1,14 +1,17 @@
 function setup() {
-  createCanvas(400, 400)
+  createCanvas((W = windowHeight - 50), W);
 }
 
 function draw() {
-  background(220)
+  background(255);
 }
 
 function keyPressed() {
-  // this will download the first 5 seconds of the animation!
-  if (key === 's') {
-    saveGif('mySketch', 5);
+  if (key === "s") {
+    saveGif("mySketch", 5);
+  }
+
+  if (key === "c") {
+    saveCanvas("mySketch", "png");
   }
 }
