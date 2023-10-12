@@ -99,6 +99,6 @@ function draw() {
 
 function keyPressed() {
   if (key === "s") {
-    saveGif("mySketch", 3);
+    saveGif("mySketch", 5);
   }
 }
