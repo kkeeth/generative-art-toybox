@@ -81,8 +81,6 @@ function setup() {
 function draw() {
   background(255, 10);
 
-  push();
-
   for (let item of items) {
     fill(item.color);
     let x = item.x + 70 * cos(item.initAngleX + frameCount / 17);
@@ -96,7 +94,6 @@ function draw() {
       item.size = random(5, 20);
     }
   }
-  pop();
 }
 
 function keyPressed() {
