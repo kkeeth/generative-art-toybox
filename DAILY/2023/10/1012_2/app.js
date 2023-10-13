@@ -69,10 +69,10 @@ function draw() {
   background(255, 10);
   translate(width / 2, height / 2);
 
-  for (let i = 0, j = 0; i < TAU; i += TAU / 5, j++) {
+  for (let i = 0, j = 0; i < TAU; i += TAU / 7, j++) {
     push();
     rotate(i);
-    stroke(cp[j]);
+    stroke(cp[j % cp.length]);
     let x = 300 * cos(frameCount / 20 + i / 3);
     let nx = 300 * cos(frameCount / 20 + (i + TAU / 5) / 2);
     let y = 100 * sin(frameCount / 20 + i / 2);
