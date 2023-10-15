@@ -32,7 +32,16 @@ function setup() {
         let isRing = random(1) > 0.2;
 
         if (isRing) {
-          let ringWidth = random(2, 6);
+          let ringWidth = random(1, 6);
+          if (random() < 0.5) {
+            if (ringWidth < 3) {
+              drawingContext.setLineDash([10, 5, 2, 5]);
+            } else if (ringWidth < 4) {
+              drawingContext.setLineDash([5, 10]);
+            }
+          } else {
+            drawingContext.setLineDash([]);
+          }
           strokeWeight(ringWidth);
           stroke(chosenColor);
           noFill();
