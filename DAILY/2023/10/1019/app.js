@@ -29,25 +29,6 @@ function setup() {
   noLoop();
 }
 
-// function draw() {
-//   background(0);
-
-//   for (let i = 0; i < NUM; i++) {
-//     push();
-//     strokeWeight(map(items[i].z, -width, width / 2, 5, 1));
-//     translate(items[i].x, items[i].y, items[i].z);
-//     box(30, 30, 30, 0.1);
-
-//     items[i].z += items[i].speed;
-//     if (items[i].z > width / 2) {
-//       items[i].x = random(-width / 3, width / 3);
-//       items[i].y = random(-width / 3, width / 3);
-//       items[i].z = -width;
-//     }
-//     pop();
-//   }
-// }
-
 function keyPressed() {
   if (key === "s") {
     saveGif("mySketch", 5);
