@@ -13,15 +13,16 @@ function setup() {
   span = W / 5;
   base = PI / 45;
 
-  for (let i = span / 2; i < W; i += span) {
-    for (let j = span / 2; j < W; j += span) {
-      drawRandomBall(i, j, ~~random(10));
+  for (let j = 0; j < W / span; j++) {
+    for (let i = 0; i < W / span; i++) {
+      drawBall(i * span + span / 2, j * span + span / 2, i + j * (W / span));
     }
   }
 }
 
-function drawRandomBall(i, j, pattern) {
+function drawBall(i, j, pattern) {
   let centerColor = color(0);
+  let innerColor = color(180);
   switch (pattern) {
     // normal monster ball
     case 0:
@@ -144,6 +145,15 @@ function drawRandomBall(i, j, pattern) {
 
       pop();
       break;
+    // park ball
+    case 6:
+      stroke(color(245, 202, 96));
+      drawBallOutline(i, j, "top", color(0, 149, 194));
+      stroke(0);
+      drawBallOutline(i, j, "bottom", color(0, 149, 194));
+      centerColor = color(0, 149, 194);
+      innerColor = color(245, 202, 96);
+      break;
   }
 
   push();
@@ -152,7 +162,7 @@ function drawRandomBall(i, j, pattern) {
   stroke(centerColor);
   ellipse(i, j, span / 4.5);
 
-  stroke(180);
+  stroke(innerColor);
   ellipse(i, j, span / 7.5);
   pop();
 }
