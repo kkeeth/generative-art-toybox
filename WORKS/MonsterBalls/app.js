@@ -21,6 +21,7 @@ function setup() {
 }
 
 function drawRandomBall(i, j, pattern) {
+  let centerColor = color(0);
   switch (pattern) {
     // normal monster ball
     case 0:
@@ -80,12 +81,14 @@ function drawRandomBall(i, j, pattern) {
     case 3:
       stroke(146, 33, 139);
       drawBallOutline(i, j, "top");
+
       push();
       textSize(24);
       textAlign(CENTER);
-      noStroke();
+      strokeWeight(2);
+      // noStroke();
       fill(146, 33, 139);
-      text("M", i, j - span / 7.5);
+      text("M", i, j - span / 7);
       pop();
 
       stroke(0);
@@ -95,25 +98,58 @@ function drawRandomBall(i, j, pattern) {
       stroke(208, 11, 136);
       drawBlock(
         i - span / 4.5,
-        j - sqrt(pow(span / 3, 2) - pow(span / 6, 2)),
+        j - sqrt(pow(span / 3.5, 2) - pow(span / 5.5, 2)),
         30,
         4,
         QUARTER_PI
       );
       drawBlock(
         i + span / 4.5,
-        j - sqrt(pow(span / 3, 2) - pow(span / 6, 2)),
+        j - sqrt(pow(span / 3.5, 2) - pow(span / 5.5, 2)),
         30,
         4,
         3 * QUARTER_PI
       );
+      break;
+    // premier ball
+    case 4:
+      stroke(0);
+      drawBallOutline(i, j, "top", color(255, 0, 0));
+      drawBallOutline(i, j, "bottom", color(255, 0, 0));
+      centerColor = color(255, 0, 0);
+
+      break;
+    // sport ball
+    case 5:
+      stroke(255, 0, 0);
+      drawBallOutline(i, j, "top");
+      stroke(0);
+      drawBallOutline(i, j, "bottom");
+
+      push();
+      strokeWeight(4);
+      stroke(255, 215, 0);
+      arc(
+        i,
+        j - span / 4.5,
+        span / 7.5,
+        span / 7.5,
+        PI + PI / 7.5,
+        TAU - PI / 7.5
+      );
+      arc(i, j - span / 4.5, span / 7.5, span / 7.5, PI / 7.5, PI - PI / 7.5);
+
+      fill(255, 215, 0);
+      ellipse(i, j - span / 4.5, span / 24);
+
+      pop();
       break;
   }
 
   push();
   fill(255);
   strokeWeight(4);
-  stroke(0);
+  stroke(centerColor);
   ellipse(i, j, span / 4.5);
 
   stroke(180);
@@ -121,23 +157,29 @@ function drawRandomBall(i, j, pattern) {
   pop();
 }
 
-function drawBallOutline(i, j, flg) {
+function drawBallOutline(i, j, flg, centerColor) {
   if (flg === "top") {
     arc(i, j, span / 1.5, span / 1.5, PI + base, TAU - base);
+    push();
+    if (centerColor) stroke(centerColor);
     line(
       i - span / 3 + (weight + 1),
       j - 3 * cos(base),
       i + span / 3 - (weight + 1),
       j - 3 * cos(base)
     );
+    pop();
   } else {
     arc(i, j, span / 1.5, span / 1.5, base, PI - base);
+    push();
+    if (centerColor) stroke(centerColor);
     line(
       i - span / 3 + (weight + 1),
       j + 3 * cos(base),
       i + span / 3 - (weight + 1),
       j + 3 * cos(base)
     );
+    pop();
   }
 }
 
