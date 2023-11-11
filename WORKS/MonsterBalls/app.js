@@ -147,12 +147,72 @@ function drawBall(i, j, pattern) {
       break;
     // park ball
     case 6:
-      stroke(color(245, 202, 96));
+      stroke(245, 202, 96);
       drawBallOutline(i, j, "top", color(0, 149, 194));
       stroke(0);
       drawBallOutline(i, j, "bottom", color(0, 149, 194));
       centerColor = color(0, 149, 194);
       innerColor = color(245, 202, 96);
+      break;
+    // quick ball
+    case 7:
+      stroke(3, 99, 142);
+      drawBallOutline(i, j, "top");
+      drawBallOutline(i, j, "bottom");
+
+      // draw bolt
+      stroke(255, 215, 0);
+      // square
+      line(
+        i - (2 * span) / 9 + weight,
+        j - weight * 2,
+        i,
+        j - (2 * span) / 9 - weight
+      );
+      line(
+        i + (2 * span) / 9 - weight,
+        j - weight * 2,
+        i,
+        j - (2 * span) / 9 - weight
+      );
+      line(
+        i - (2 * span) / 9 + weight,
+        j + weight * 2,
+        i,
+        j + (2 * span) / 9 + weight
+      );
+      line(
+        i + (2 * span) / 9 - weight,
+        j + weight * 2,
+        i,
+        j + (2 * span) / 9 + weight
+      );
+
+      // outer lines
+      line(
+        i + ((sqrt(2) * span) / 9 + weight * 2) * cos(-QUARTER_PI),
+        j + ((sqrt(2) * span) / 9 + weight * 2) * sin(-QUARTER_PI),
+        i + (span / 3 - weight) * cos(-QUARTER_PI),
+        j + (span / 3 - weight) * sin(-QUARTER_PI)
+      );
+      line(
+        i - ((sqrt(2) * span) / 9 + weight * 2) * cos(-QUARTER_PI),
+        j + ((sqrt(2) * span) / 9 + weight * 2) * sin(-QUARTER_PI),
+        i - (span / 3 - weight) * cos(-QUARTER_PI),
+        j + (span / 3 - weight) * sin(-QUARTER_PI)
+      );
+      line(
+        i + ((sqrt(2) * span) / 9 + weight * 2) * cos(-QUARTER_PI),
+        j - ((sqrt(2) * span) / 9 + weight * 2) * sin(-QUARTER_PI),
+        i + (span / 3 - weight) * cos(-QUARTER_PI),
+        j - (span / 3 - weight) * sin(-QUARTER_PI)
+      );
+      line(
+        i - ((sqrt(2) * span) / 9 + weight * 2) * cos(-QUARTER_PI),
+        j - ((sqrt(2) * span) / 9 + weight * 2) * sin(-QUARTER_PI),
+        i - (span / 3 - weight) * cos(-QUARTER_PI),
+        j - (span / 3 - weight) * sin(-QUARTER_PI)
+      );
       break;
   }
 
