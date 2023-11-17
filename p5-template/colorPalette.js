@@ -1,4 +1,4 @@
-let colorScheme = [
+let colorPalette = [
   {
     name: "Benedictus",
     colors: ["#F27EA9", "#366CD9", "#5EADF2", "#636E73", "#F2E6D8"],
