@@ -11,7 +11,7 @@
 
 const ulim = 0.8
 const petals = []
-const petalNumer = 50
+const petalNumer = 80
 
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL)
@@ -103,5 +103,14 @@ class CherryBlossom {
 
     endShape(CLOSE)
     pop()
+  }
+}
+
+function keyPressed() {
+  if (key === "s") {
+    saveGif("mySketch", 8);
+  }
+  if (key === "c") {
+    saveCanvas("mySketch", "png");
   }
 }
