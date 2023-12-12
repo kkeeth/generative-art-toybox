@@ -5,8 +5,8 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
   blendMode(DARKEST);
-  for (let x = 0; x < width; x += 30) {
-    dotts.push(new Dot(x, yPos))
+  for (let x = 0; x < width; x += 80) {
+    dotts.push(new Dot(x, yPos));
   }
 }
 
@@ -20,7 +20,7 @@ function draw() {
 class Dot {
   constructor(x, y) {
     this.x = x;
-    this.y = y;
+    this.y = random(y);
     this.size = random(7, 10);
     this.yacc = random(1, 5);
     this.xacc = 0.5;
@@ -37,7 +37,7 @@ class Dot {
 
     const cond = ~~random(3);
 
-    switch(cond) {
+    switch (cond) {
       case 0:
         this.x += this.xacc;
         if (this.x > width) this.x = 0;
@@ -62,5 +62,9 @@ class Dot {
 function keyPressed() {
   if (key === "s") {
     saveCanvas("mySketch", "png");
+  }
+
+  if (key === "r") {
+    clear();
   }
 }

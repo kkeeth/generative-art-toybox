@@ -8,16 +8,15 @@ function preload() {
 }
 
 function setup() {
-  cnv = createCanvas(img.width, img.height);
-  pg = createGraphics(img.width, img.height);
+  cnv = createCanvas(640, 400);
+  pg = createGraphics(width, height);
 
-  let newCanvasX = (windowWidth - img.width) / 2;
-  let newCanvasY = (windowHeight - img.height) / 2;
-  cnv.position(newCanvasX, newCanvasY);
   noStroke();
+  pg.strokeWeight(3);
+  img.resize(width, height);
 
-  for (let col = 0; col < img.width; col += 1) {
-    for (let row = 0; row < img.height; row += 1) {
+  for (let col = 0; col < width; col += 2) {
+    for (let row = 0; row < height; row += 2) {
       let xPos = col;
       let yPos = row;
       let c = img.get(xPos, yPos);
@@ -31,21 +30,23 @@ function setup() {
     let snow = createVector(random(width), random(height));
     snow.size = random(3, 10);
     snow.color = color(255, random(100, 255));
-    snow.velocity = map(snow.color.levels[3], 100, 255, 1, 3);
+    snow.velocity = random(1, 5);
+    snow.swing = random(20, 50);
     snows.push(snow);
   }
 }
 
 function draw() {
-  // pg.background(0, 1);
-
+  background(200, 8);
   image(pg, 0, 0);
+  drawingContext.shadowColor = "#FFF";
+  drawingContext.shadowBlur = 20;
 
   for (let i = 0; i < NUM; i++) {
-    let { x, y, size, color, velocity } = snows[i];
+    let { x, y, size, color, velocity, swing } = snows[i];
 
     fill(color);
-    circle(x, y, size);
+    circle(x + swing * sin((frameCount + i) / 20), y, size);
 
     if (y > height) {
       x = random(width);

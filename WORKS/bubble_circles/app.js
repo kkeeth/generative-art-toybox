@@ -32,7 +32,7 @@ function setup() {
   targetColorSmall = color(cp[0]);
   targetColorMedium = color(cp[1]);
   targetColorLarge = color(cp[2]);
-  frameRate(5);
+  frameRate(8);
   smooth();
   noStroke();
 }
@@ -50,7 +50,7 @@ function draw() {
     rSmall,
     weightSmall,
     targetColorSmall,
-    "small",
+    "small"
   );
   drawCircles(
     incMedium,
@@ -58,7 +58,7 @@ function draw() {
     rMedium,
     weightMedium,
     targetColorMedium,
-    "medium",
+    "medium"
   );
   drawCircles(
     incLarge,
@@ -66,7 +66,7 @@ function draw() {
     rLarge,
     weightLarge,
     targetColorLarge,
-    "large",
+    "large"
   );
 }
 

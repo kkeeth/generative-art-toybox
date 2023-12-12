@@ -4,8 +4,7 @@ let cHeight = 30;
 function setup() {
   createCanvas(920, 700);
   background(220);
-  randomSeed(9);
-  //blendMode(DARKEST);
+  randomSeed(random(1000));
 
   for (let i = cWidth; i < width; i += cWidth * 3.5) {
     for (let j = cHeight; j < height; j += cHeight * 3.5) {

@@ -40,4 +40,3 @@ function drawPoint(x, y, noiseFactor) {
   sphere(sphereSize);
   pop();
 }
-
