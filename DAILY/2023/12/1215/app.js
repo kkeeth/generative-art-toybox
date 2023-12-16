@@ -11,27 +11,27 @@ function setup() {
   strokeWeight(2);
   rectMode(CENTER);
 
-  base = W - 160;
+  base = W - 200;
   grid = base / 3;
   span = base / 15;
   seed = random(1000);
 }
 
 function draw() {
-  background(255, 10);
+  background(255, 12);
   randomSeed(seed);
 
   for (let i = grid / 2; i < base; i += grid) {
     for (let j = grid / 2; j < base; j += grid) {
       push();
-      translate(W / 2, -span);
+      translate(W / 2, -grid / 20);
       rotate(QUARTER_PI);
       rect(i, j, size, size);
       pop();
       for (let h = -2 * span; h <= 2 * span; h += span) {
         for (let v = -2 * span; v <= 2 * span; v += span) {
           push();
-          translate(W / 2, -span);
+          translate(W / 2, -grid / 20);
           rotate(QUARTER_PI);
           if (h === v || h === -v) {
             push();
@@ -59,7 +59,7 @@ function draw() {
 
 function keyPressed() {
   if (key === "s") {
-    saveGif("mySketch", 5);
+    saveGif("mySketch", 3);
   }
 
   if (key === "c") {
