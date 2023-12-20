@@ -1,20 +1,20 @@
-let radius = 150
+let radius = 150;
 
 function setup() {
-  createCanvas(640, 420, WEBGL)
-  pixelDensity(displayDensity())
+  createCanvas(640, 420, WEBGL);
+  pixelDensity(displayDensity());
 }
 
 function draw() {
-  background(255)
-  rotateY(frameCount * 0.01)
+  background(255);
+  rotateY(frameCount * 0.01);
 
   for (let dTheta = 0; dTheta <= 180; dTheta += 10) {
-    const theta = radians(dTheta)
-    const z = radius * cos(theta)
-    const r = radius * sin(theta)
+    const theta = radians(dTheta);
+    const z = radius * cos(theta);
+    const r = radius * sin(theta);
 
-    drawCircle(z, r)
+    drawCircle(z, r);
   }
 }
 
@@ -24,14 +24,14 @@ function draw() {
  */
 function drawCircle(z, r) {
   for (let dPhi = 0; dPhi < 360; dPhi += 10) {
-    const phi = radians(dPhi)
+    const phi = radians(dPhi);
     // x-coordinate
-    const x = r * cos(phi)
+    const x = r * cos(phi);
     // y-coordinate
-    const y = r * sin(phi)
+    const y = r * sin(phi);
 
-    stroke('#008080')
-    strokeWeight(4)
-    point(x, y, z)
+    stroke("#008080");
+    strokeWeight(4);
+    point(x, y, z);
   }
 }
