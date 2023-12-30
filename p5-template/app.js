@@ -12,6 +12,6 @@ function keyPressed() {
   }
 
   if (key === "c") {
-    saveCanvas("mySketch", "png");
+    saveCanvas("mySketch", "jpeg");
   }
 }
