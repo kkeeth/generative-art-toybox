@@ -39,6 +39,10 @@ class Particle {
       this.radius * sin(this.angle) + (noise(this.angle + 100) - 0.5) * 10;
 
     this.y -= this.ySpeed;
+    this.radius =
+      this.y > 0
+        ? map(this.y, 0, height / 2, 50, W / 2)
+        : map(this.y, -height / 2, 0, W / 2, 50);
 
     if (this.y < -height / 2) {
       this.y = height / 2;
