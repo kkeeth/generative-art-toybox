@@ -16,7 +16,6 @@ function setup() {
   angleMode(DEGREES);
   rectMode(CENTER);
   noStroke();
-  frameRate(1);
 }
 
 function draw() {
