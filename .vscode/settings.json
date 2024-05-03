@@ -8,5 +8,6 @@
     "html": true,
     "css": true
   },
-  "vue.features.codeActions.enable": false
+  "vue.features.codeActions.enable": false,
+  "editor.formatOnSave": true
 }
