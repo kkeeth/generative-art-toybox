@@ -1,4 +1,4 @@
-const COUNT = 12
+const COUNT = 8
 
 function setup() {
   createCanvas((W = windowHeight - 50), W)
@@ -15,8 +15,9 @@ function setup() {
 
         push()
         translate(x * w + w / 2, y * w + w / 2)
-        rotate(random(TWO_PI))
-        ellipse(0, 0, random(20, w), random(20, w))
+        // rotate(random(TWO_PI))
+        ellipse(0, 0, w)
+        // ellipse(0, 0, random(20, w), random(20, w))
         pop()
       }
     }
