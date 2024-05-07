@@ -1,16 +1,19 @@
 const R = 200
 const N = 12
+let angle = 0
 
 function setup() {
   createCanvas((W = windowHeight - 50), W)
   rectMode(CENTER)
+  frameRate(60)
   // noLoop();
 }
 
 function draw() {
   background(255)
   translate(width / 2, height / 2)
-  rotate(-millis() / 33)
+  angle = (angle - TAU / 7.5) % TAU
+  rotate(angle)
 
   push()
   stroke('orange')
