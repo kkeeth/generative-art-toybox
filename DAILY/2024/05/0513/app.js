@@ -8,15 +8,13 @@ function setup() {
 
   const w = W / COUNT
 
-  for (let x = 0; x < COUNT; x++) {
-    for (let y = 0; y < COUNT; y++) {
-      if ((x + y) % 2 === 0) {
-        fill(`${random(random(colorPalette).colors)}66`)
+  translate(w, w)
+  for (let x = 0; x < COUNT * 2; x++) {
+    for (let y = 0; y < COUNT; y += 2) {
+      fill(`${random(random(colorPalette).colors)}77`)
 
-        push()
-        translate(x * w + w / 2, y * w + w / 2)
-        ellipse(0, 0, w * 2)
-        pop()
+      if (y % 2 === 0) {
+        ellipse((x * w) / 2.5, y * w, w * 2)
       }
     }
   }
