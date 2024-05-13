@@ -1,22 +1,44 @@
+const N = 4
+// const N = 6
 const COUNT = 8
+const SIZE = 90
+// const SIZE = 60
 
 function setup() {
   createCanvas((W = windowHeight - 50), W)
-  background(255)
+  background('beige')
   noLoop()
   noStroke()
 
   const w = W / COUNT
 
-  translate(w, w)
-  for (let x = 0; x < COUNT * 2; x += 1) {
-    for (let y = 0; y < COUNT; y += 2) {
-      fill(`${random(random(colorPalette).colors)}77`)
-
-      if (y % 2 === 0) {
-        ellipse((x * w) / 2.5, y * w, w * 2)
-      }
+  for (let x = 1; x < COUNT; x++) {
+    for (let y = 1; y < COUNT; y += 1.2) {
+      push()
+      drawPolygon(x, y, w)
+      pop()
     }
+  }
+}
+
+function drawPolygon(x, y, w) {
+  translate(x * w, y * w)
+  rotate(-HALF_PI)
+  for (let i = 0; i < N; i++) {
+    beginShape()
+
+    let angle = map(i, 0, N, 0, TAU)
+    let x = cos(angle) * SIZE
+    let y = sin(angle) * SIZE
+    vertex(0, 0)
+    vertex(x, y)
+
+    angle = map(i + 1, 0, N, 0, TAU)
+    x = cos(angle) * SIZE
+    y = sin(angle) * SIZE
+    vertex(x, y)
+    fill(`${random(random(colorPalette).colors)}66`)
+    endShape(CLOSE)
   }
 }
 
