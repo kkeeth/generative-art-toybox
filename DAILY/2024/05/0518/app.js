@@ -1,5 +1,5 @@
 function setup() {
-  createCanvas(800, 600)
+  createCanvas((W = windowHeight - 50), W)
   background(240)
   noLoop()
   paintOilPainting()
