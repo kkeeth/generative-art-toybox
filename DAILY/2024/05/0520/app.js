@@ -1,7 +1,7 @@
-const NUM = 9
+const NUM = 21
 const drops = []
 const COUNT = 50
-const R = 80
+const R = 100
 
 function setup() {
   createCanvas((W = windowHeight - 100), W, WEBGL)
@@ -14,14 +14,15 @@ function setup() {
         z: R * cos(map(i % NUM, 0, NUM, 0, TAU)),
         size: random(3, 6),
         speed: random(1, 5),
+        alpha: map(R * cos(map(i % NUM, 0, NUM, 0, TAU)), -R, R, 128, 255),
       }),
     )
   }
 }
 
 function draw() {
-  background(240)
-  lights()
+  background(255)
+  // lights()
   orbitControl()
 
   for (let drop of drops) {
@@ -31,12 +32,13 @@ function draw() {
 }
 
 class Drop {
-  constructor({ x, y, z, size, speed }) {
+  constructor({ x, y, z, size, speed, alpha }) {
     this.x = x
     this.y = y
     this.z = z
     this.speed = speed
     this.size = size
+    this.alpha = alpha
   }
 
   update() {
@@ -47,17 +49,26 @@ class Drop {
 
   show() {
     noStroke()
-    fill('#3399FF')
     for (let i = 0; i < this.size; i++) {
       push()
       push()
       stroke(0)
       line(this.x, -W / 2, this.z, this.x, W / 2, this.z)
       pop()
+      const c = color('#3399FF')
+      c.setAlpha(this.alpha)
+      fill(c)
       translate(this.x, this.y + i * 1.5, this.z)
       sphere(i)
       pop()
     }
+    push()
+    fill(220)
+    translate(0, -W / 2, 0)
+    cylinder(R, 1)
+    translate(0, W, 0)
+    cylinder(R, 1)
+    pop()
   }
 }
 
