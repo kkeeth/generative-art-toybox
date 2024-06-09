@@ -3,7 +3,7 @@ const colors = ['#ED6A5A', '#F4F1BB', '#9BC1BC', '#5CA4A9', '#E6EBE0']
 let span
 
 function setup() {
-  createCanvas(windowWidth, windowHeight)
+  createCanvas((W = min(windowWidth, windowHeight)), W)
   background(255)
   noLoop()
   noStroke()
@@ -18,8 +18,8 @@ function setup() {
 }
 
 function drawPerson(x, y) {
-  x = span * x + span / 2 + random(-span / 2, span / 2)
-  y = span * y + span / 2 + random(-span / 2, span / 2)
+  x = span * x + span / 2 + random(-span / 2.5, span / 2.5)
+  y = span * y + span / 2 + random(-span / 2.5, span / 2.5)
 
   // head
   const headW = 12
@@ -52,21 +52,22 @@ function drawPerson(x, y) {
   )
 
   // one's feet shadow
+  const shadowColor = random(100, 180)
   push()
   rectMode(CENTER)
-  stroke(120)
-  fill(120)
+  stroke(shadowColor)
+  fill(shadowColor)
   ellipse(x, y + headW * 6, headW * 2.5, headW)
   pop()
 
   // shadows created by the sun
   push()
   const c1 = color(255)
-  const c2 = color(120)
+  const c2 = color(shadowColor)
   translate(x - 4, y + headW * 6)
   rotate(-PI / 12)
-  for (let i = 0; i > -headW * 5; i--) {
-    const inter = map(i, -headW * 5, 0, 0, 1)
+  for (let i = 0; i > -headW * 6; i--) {
+    const inter = map(i, -headW * 6, 0, 0, 1)
     let c = lerpColor(c1, c2, inter)
     stroke(c)
     const h = map(inter, 0, 1, 0, headW * 0.53)
