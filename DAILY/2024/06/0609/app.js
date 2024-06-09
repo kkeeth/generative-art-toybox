@@ -79,13 +79,13 @@ function drawPerson(x, y) {
   line(
     x - headW / 3,
     y + headW * 4.5,
-    random() > 0.5 ? x - headW / 2 : x - headW / 3,
+    random() > 0.5 ? x - headW / 1.5 : x - headW / 3,
     y + headW * 6,
   )
   line(
     x + headW / 3,
     y + headW * 4.5,
-    random() > 0.5 ? x + headW / 2 : x + headW / 3,
+    random() > 0.5 ? x + headW / 1.5 : x + headW / 3,
     y + headW * 6,
   )
 
