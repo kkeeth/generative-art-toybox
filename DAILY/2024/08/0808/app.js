@@ -5,7 +5,7 @@ function setup() {
   createCanvas((W = min(windowWidth, windowHeight) - 40), W)
   background(255)
 
-  g = W / 5
+  g = W / 4
 
   for (let x = g / 2; x < width; x += g) {
     for (let y = g / 2; y < height; y += g) {
@@ -39,6 +39,8 @@ function setup() {
 }
 
 function drawEar(x, y, isOrval, g, isBlack) {
+  push()
+  random() > 0.8 && fill(0)
   if (isOrval) {
     bezier(
       x - g / 4.5,
@@ -82,6 +84,7 @@ function drawEar(x, y, isOrval, g, isBlack) {
       y - g / 5,
     )
   }
+  pop()
 }
 
 function drawMouth(x, y, g, isBlack) {
@@ -173,8 +176,8 @@ function drawEye(x, y, isOrval, isBlack) {
   if (eyeFramePattern === 'circle') {
     push()
     isBlack && noStroke()
-    ellipse(x - g / 7, y, 20)
-    ellipse(x + g / 7, y, 20)
+    ellipse(x - g / 7, y, g / 9)
+    ellipse(x + g / 7, y, g / 9)
     pop()
     switch (eyeDirection) {
       case 'up':
@@ -216,8 +219,8 @@ function drawEye(x, y, isOrval, isBlack) {
     case 'vertical':
       push()
       fill(0)
-      ellipse(x - g / 7, y, 8, 16)
-      ellipse(x + g / 7, y, 8, 16)
+      ellipse(x - g / 7, y, 8, g / 12)
+      ellipse(x + g / 7, y, 8, g / 12)
       pop()
       break
     case 'point':
@@ -313,7 +316,21 @@ function drawMarking(x, y, isOrval, isBlack) {
       ? rect(x - g / 3, y - g / 4, g / 3, g / 3, g / 4.5, 20, g / 6, 24)
       : rect(x, y - g / 4, g / 3, g / 3, 20, g / 4.5, 24, g / 6)
   } else {
-    random() > 0.7 && ellipse(x, y - g / 5.5, g / 4.5, g / 7)
+    const det = random()
+    if (det > 0.7) {
+      ellipse(x, y - g / 5.5, g / 4.5, g / 7)
+    } else if (det > 0.5) {
+      push()
+      translate(x - g / 7.5, y - g / 6)
+      rotate(-PI / 9)
+      ellipse(0, 0, g / 3.5, g / 7)
+      pop()
+      push()
+      translate(x + g / 7.5, y - g / 6)
+      rotate(PI / 9)
+      ellipse(0, 0, g / 3.5, g / 7)
+      pop()
+    }
   }
   pop()
 }
