@@ -2,11 +2,10 @@ let g
 const cp = ['#FB8C0099', '#82B1FF99', '#21212199']
 
 function setup() {
-  createCanvas((W = min(windowWidth, windowHeight)), W)
+  createCanvas((W = min(windowWidth, windowHeight) - 40), W)
   background(255)
-  // rectMode(CENTER)
 
-  g = W / 4
+  g = W / 5
 
   for (let x = g / 2; x < width; x += g) {
     for (let y = g / 2; y < height; y += g) {
@@ -31,7 +30,7 @@ function setup() {
         ellipse(x, y, g / 1.6, g / 2)
         pop()
       }
-      drawMarking(x, y, isOrval)
+      drawMarking(x, y, isOrval, isBlack)
       drawEye(x, y, isOrval, isBlack)
       drawMouth(x, y, g, isBlack)
       drawWhisker(x, y, g)
@@ -224,6 +223,9 @@ function drawEye(x, y, isOrval, isBlack) {
     case 'point':
       push()
       strokeWeight(8)
+      if (random() > 0.9) {
+        stroke('#d9333f')
+      }
       point(x - g / 7 + ux, y + uy)
       point(x + g / 7 + ux, y + uy)
       pop()
@@ -231,7 +233,6 @@ function drawEye(x, y, isOrval, isBlack) {
     case 'stroke':
       push()
       strokeWeight(4)
-      isBlack && stroke(255)
       ellipse(x - g / 7 + ux, y, 10)
       ellipse(x + g / 7 + ux, y, 10)
       pop()
@@ -244,7 +245,9 @@ function drawEye(x, y, isOrval, isBlack) {
     case 'dot':
       push()
       strokeWeight(4)
-      if (isBlack && eyeFramePattern === false) stroke(255)
+      if (isBlack && eyeFramePattern === false) {
+        stroke(255)
+      }
       point(x - g / 7, y)
       point(x + g / 7, y)
       pop()
@@ -294,11 +297,18 @@ function drawEye(x, y, isOrval, isBlack) {
   pop()
 }
 
-function drawMarking(x, y, isOrval) {
+function drawMarking(x, y, isOrval, isBlack) {
   push()
   fill(random(cp))
   noStroke()
-  if (isOrval) {
+  if (random() > 0.7) {
+    push()
+    fill(isBlack ? 255 : 0)
+    arc(x, isOrval ? y - g / 4.3 : y - g / 4, g / 15, g / 3.5, 0, PI)
+    ellipse(x, isOrval ? y - g / 5.2 : y - g / 4.8, g / 6.5, 8)
+    ellipse(x, isOrval ? y - g / 6.7 : y - g / 6.2, g / 6.5, 8)
+    pop()
+  } else if (isOrval) {
     random() > 0.5
       ? rect(x - g / 3, y - g / 4, g / 3, g / 3, g / 4.5, 20, g / 6, 24)
       : rect(x, y - g / 4, g / 3, g / 3, 20, g / 4.5, 24, g / 6)
