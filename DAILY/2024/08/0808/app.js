@@ -11,12 +11,14 @@ function setup() {
   for (let x = g / 2; x < width; x += g) {
     for (let y = g / 2; y < height; y += g) {
       const isOrval = random() > 0.5
+      let isBlack
 
       drawEar(x, y, isOrval, g)
       if (isOrval) {
         push()
         if (random() > 0.7) {
           fill(0)
+          isBlack = true
         }
         ellipse(x, y, g / 1.5, g / 2.2)
         pop()
@@ -24,19 +26,20 @@ function setup() {
         push()
         if (random() > 0.7) {
           fill(0)
+          isBlack = true
         }
         ellipse(x, y, g / 1.6, g / 2)
         pop()
       }
       drawMarking(x, y, isOrval)
-      drawEye(x, y, isOrval)
-      drawMouth(x, y, g)
+      drawEye(x, y, isOrval, isBlack)
+      drawMouth(x, y, g, isBlack)
       drawWhisker(x, y, g)
     }
   }
 }
 
-function drawEar(x, y, isOrval, g) {
+function drawEar(x, y, isOrval, g, isBlack) {
   if (isOrval) {
     bezier(
       x - g / 4.5,
@@ -82,16 +85,17 @@ function drawEar(x, y, isOrval, g) {
   }
 }
 
-function drawMouth(x, y, g) {
+function drawMouth(x, y, g, isBlack) {
   if (random() > 0.1) {
     const uy = y + random([g / 12, g / 6.5])
     push()
-    fill(0)
+    fill(isBlack ? 255 : 0)
     ellipse(x, uy, random([5, 8]))
     pop()
 
     push()
     noFill()
+    isBlack && stroke(255)
     bezier(
       x,
       uy + 3,
@@ -146,7 +150,7 @@ function drawWhisker(x, y, g) {
   }
 }
 
-function drawEye(x, y, isOrval) {
+function drawEye(x, y, isOrval, isBlack) {
   const eyeBrowPattern = random(['level', 'curve', 'tilt'])
   const eyeFramePattern = random() > 0.5 ? random(['circle', 'orval']) : false
   const eyePattern =
@@ -221,23 +225,27 @@ function drawEye(x, y, isOrval) {
     case 'stroke':
       push()
       strokeWeight(4)
+      isBlack && stroke(255)
       ellipse(x - g / 7 + ux, y, 10)
       ellipse(x + g / 7 + ux, y, 10)
       pop()
       break
     case 'line':
+      isBlack && stroke(255)
       line(x - g / 5, y, x - g / 12, y)
       line(x + g / 5, y, x + g / 12, y)
       break
     case 'dot':
       push()
       strokeWeight(4)
+      if (isBlack && eyeFramePattern === false) stroke(255)
       point(x - g / 7, y)
       point(x + g / 7, y)
       pop()
 
       // eyebrow
       if (eyeFramePattern === false) {
+        isBlack && stroke(255)
         switch (eyeBrowPattern) {
           case 'level':
             line(x - g / 5, y - 8, x - g / 9, y - 8)
