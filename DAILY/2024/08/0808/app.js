@@ -100,21 +100,21 @@ function drawMouth(x, y, g, isBlack) {
       x,
       uy + 3,
       x - 5,
-      uy + g / 10.5,
+      uy + g / 12.5,
       x - 9,
-      uy + g / 10.5,
+      uy + g / 12.5,
       x - 14,
-      uy + g / 12,
+      uy + g / 14,
     )
     bezier(
       x,
       uy + 3,
       x + 5,
-      uy + g / 10.5,
+      uy + g / 12.5,
       x + 9,
-      uy + g / 10.5,
+      uy + g / 12.5,
       x + 14,
-      uy + g / 12,
+      uy + g / 14,
     )
     pop()
   }
@@ -172,8 +172,11 @@ function drawEye(x, y, isOrval, isBlack) {
   translate(0, isOrval ? 0 : -g / 20)
 
   if (eyeFramePattern === 'circle') {
+    push()
+    isBlack && noStroke()
     ellipse(x - g / 7, y, 20)
     ellipse(x + g / 7, y, 20)
+    pop()
     switch (eyeDirection) {
       case 'up':
         uy = -3
@@ -189,8 +192,11 @@ function drawEye(x, y, isOrval, isBlack) {
         break
     }
   } else if (eyeFramePattern === 'orval') {
+    push()
+    isBlack && noStroke()
     ellipse(x - g / 7, y, 24, 16)
     ellipse(x + g / 7, y, 24, 16)
+    pop()
     switch (eyeDirection) {
       case 'up':
         uy = -5
@@ -297,7 +303,7 @@ function drawMarking(x, y, isOrval) {
       ? rect(x - g / 3, y - g / 4, g / 3, g / 3, g / 4.5, 20, g / 6, 24)
       : rect(x, y - g / 4, g / 3, g / 3, 20, g / 4.5, 24, g / 6)
   } else {
-    random() > 0.7 && ellipse(x, y - g / 5.5, g / 6, g / 7)
+    random() > 0.7 && ellipse(x, y - g / 5.5, g / 4.5, g / 7)
   }
   pop()
 }
