@@ -69,7 +69,7 @@ function setup() {
             1,
           ),
         )
-        // scale(0.8);
+        scale(0.8)
       }
       for (let i = 0; i < n; i++) {
         fill(
