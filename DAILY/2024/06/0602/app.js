@@ -4,7 +4,7 @@ let v
 
 function setup() {
   createCanvas(600, 600, WEBGL)
-  fill('violet')
+  // fill('violet')
   stroke(255)
 
   for (let i = 0; i < NUM; i++) {
@@ -14,7 +14,7 @@ function setup() {
       x: 200 * v.x,
       y: 200 * v.y,
       z: 200 * v.z,
-      size: random(3, 5),
+      size: random(2, 4),
     })
   }
 }
@@ -22,16 +22,17 @@ function setup() {
 function draw() {
   background(0)
   orbitControl()
+  lights()
 
   rotateX(frameCount * 0.01)
   rotateY(frameCount * 0.03)
 
   for (let i = 0; i < NUM; i++) {
-    // push();
-    // noStroke();
-    // translate(items[i].x, items[i].y, items[i].z);
-    // sphere(items[i].size);
-    // pop();
+    push()
+    noStroke()
+    translate(items[i].x, items[i].y, items[i].z)
+    sphere(items[i].size)
+    pop()
     for (let j = 0; j < NUM; j++) {
       if (
         i + 1 !== NUM &&

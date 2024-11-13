@@ -25,7 +25,7 @@ function draw() {
       let n = noise(x / 100 + SEED + t / 99, y / 100 + SEED + t / 77)
       let c = colors[floor(n * colors.length)]
       stroke(c)
-      strokeWeight(2)
+      strokeWeight(3)
       point(x, y)
     }
   }

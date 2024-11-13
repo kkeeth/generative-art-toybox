@@ -26,13 +26,13 @@ function draw() {
     fill(c[0])
     circle(i * n * sin(m), i * 1.5, i * u * radiusScale * 0.4)
     fill(c[1])
-    circle(i * n * cos(m), i * 2.0, i * u * radiusScale * 0.2)
+    // circle(i * n * cos(m), i * 2.0, i * u * radiusScale * 0.2)
     fill(c[2])
-    circle(i * n * sin(m), i * 2.5, i * u * radiusScale * 0.2)
+    // circle(i * n * sin(m), i * 2.5, i * u * radiusScale * 0.2)
     fill(c[3])
-    circle(i * n * cos(m), i * 3.0, i * u * radiusScale * 0.3)
+    // circle(i * n * cos(m), i * 3.0, i * u * radiusScale * 0.3)
     fill(c[4])
-    circle(i * n * sin(m), i * 3.5, i * u * radiusScale * 0.4)
+    // circle(i * n * sin(m), i * 3.5, i * u * radiusScale * 0.4)
   }
 
   xoff += 0.05
