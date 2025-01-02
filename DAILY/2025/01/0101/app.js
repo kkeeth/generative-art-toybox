@@ -45,3 +45,8 @@ function drawCircleWithLines(cx, cy, radius, col) {
     }
   }
 }
+function keyPressed() {
+  if (key === 's') {
+    saveCanvas('mySketch', 'png');
+  }
+}
