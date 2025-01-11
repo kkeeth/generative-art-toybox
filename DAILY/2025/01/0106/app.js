@@ -3,8 +3,8 @@ let houseWidth;
 let houseHeight;
 let spacingX = 80;
 let spacingY = 40;
-let rows = 3;
-let cols = 6;
+let rows = 4;
+let cols = 12;
 let cp1, cp2;
 
 function setup() {
@@ -13,8 +13,8 @@ function setup() {
   noStroke();
 
   margin = 30;
-  cellWidth = width / rows;
-  cellHeight = height / cols;
+  cellWidth = width / cols;
+  cellHeight = height / rows;
   cp1 = random(colorPalette).colors;
   cp2 = random(colorPalette).colors;
 }
@@ -23,18 +23,30 @@ function draw() {
   background(0);
 
   for (let row = rows; row > 0; row--) {
-    for (let col = 0; col < cols; col++) {
-      let x = col * cellWidth + (col % 2) * margin;
-      let y = height * 1.1 - row * cellHeight - margin;
+    for (let col = cellWidth / 2; col < width; col += cellWidth) {
+      let x = col;
+      let y = height - (row * cellHeight) / 2 + 25;
 
-      if (random() < 0.5) {
-        houseWidth = random(30, 50);
-        houseHeight = random(50, 70);
-        drawHouse(x, y, houseWidth, houseHeight);
+      if (row === rows) {
+        houseWidth = random(30, cellWidth / 2);
+        houseHeight = random(90, cellHeight);
+        if (random() < 0.6) {
+          drawBuilding(x, y - margin, houseWidth, houseHeight);
+        }
+      } else if (row === rows - 1) {
+        houseWidth = random(30, cellWidth / 2);
+        houseHeight = random(90, cellHeight);
+        if (random() < 0.9) {
+          drawBuilding(x, y - margin, houseWidth, houseHeight);
+        }
+      } else if (random() < 0.5) {
+        houseWidth = random(30, cellWidth / 2);
+        houseHeight = random(50, 100);
+        drawHouse(x, y, houseWidth, houseHeight, 0.5);
       } else {
-        houseWidth = random(30, 40);
-        houseHeight = random(70, 150);
-        drawBuilding(x, y - margin, houseWidth, houseHeight);
+        houseWidth = random(30, cellWidth / 2);
+        houseHeight = random(50, 100);
+        drawHouse(x, y, houseWidth, houseHeight, 0.2);
       }
     }
   }
@@ -42,36 +54,59 @@ function draw() {
   drawBlurredMoon(width - 40, 40, 40);
 }
 
-function drawHouse(x, y, w, h) {
+function drawHouse(x, y, w, h, opacity) {
   push();
-  translate(x, y);
+  translate(x + random(-cellWidth / 4, cellWidth / 4), y);
   random() < 0.5 && scale(-1, 1);
+
+  let roofHeight = random(-h / 3, -h / 6);
 
   let bodyColor = color(random(cp1));
   let roofColor = color(random(cp2));
-  let shadowColor = lerpColor(bodyColor, color(0), 0.4);
-  let roofShadowColor = lerpColor(roofColor, color(0), 0.4);
+  let shadowColor = lerpColor(bodyColor, color(0), opacity);
+  let roofShadowColor = lerpColor(roofColor, color(0), opacity + 0.2);
 
   // 屋根
   fill(roofShadowColor);
-  quad(-w / 2 - w / 8, -h / 2, w / 2, -h / 2, w, 0, -w - w / 8, 0);
+  quad(-w / 2 - w / 8, roofHeight, w / 2, roofHeight, w, 0, -w - w / 8, 0);
 
-  // 家の本体
+  /**
+   * 家
+   */
+  // 本体
   fill(bodyColor);
   rect(0, 0, w, h);
+  // 側面
   fill(shadowColor);
-  quad(-w / 2, -h / 2, 0, 0, 0, h, -w / 2, h);
-  quad(-w, 0, -w / 2, -h / 2, 0, h, -w, h);
+  quad(-w / 2, roofHeight, 0, 0, 0, h, -w / 2, h);
+  quad(-w, 0, -w / 2, roofHeight, 0, h, -w, h);
 
-  // 屋根
+  /**
+   * 屋根
+   */
   fill(roofColor);
-  quad(-w / 2 - w / 8, -h / 2, w / 2 + w / 8, -h / 2, w + w / 8, 0, -w / 8, 0);
+  quad(
+    -w / 2 - w / 8,
+    roofHeight,
+    w / 2 + w / 8,
+    roofHeight,
+    w + w / 8,
+    0,
+    -w / 8,
+    0,
+  );
 
-  // 窓
-  fill(255);
+  /**
+   * 窓
+   */
+  fill(255, 255, 200, 255);
   let windowSize = w * 0.1;
-  rect(w / 2 - windowSize, h / 4, windowSize, windowSize);
-  rect(w / 2 - windowSize + w / 6, h / 4, windowSize, windowSize);
+  // 本体
+  rect(w / 2 - windowSize, h / 3, windowSize, windowSize);
+  rect(w / 2 - windowSize + w / 6, h / 3, windowSize, windowSize);
+  // 側面
+  rect(-w / 2 - windowSize, h / 6, windowSize, windowSize);
+  rect(-w / 2 - windowSize + w / 6, h / 6, windowSize, windowSize);
 
   pop();
 }
@@ -81,10 +116,10 @@ function drawBuilding(x, y, w, h) {
   translate(x, y);
   random() < 0.5 && scale(-1, 1);
 
-  let bodyColor = color(random(cp1));
-  let shadowColor = lerpColor(bodyColor, color(0), 0.4);
+  let bodyColor = lerpColor(color(random(cp1)), color(0), 0.6);
+  let shadowColor = lerpColor(bodyColor, color(0), 0.7);
 
-  if (random() < 0.1) {
+  if (random() < 0.5) {
     fill(bodyColor);
     rect(0, 0, w * 1.5, h);
     fill(shadowColor);
