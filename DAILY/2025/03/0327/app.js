@@ -4,7 +4,7 @@ function setup() {
   createCanvas((W = 400), W);
   noStroke();
   background(255);
-  fill('green');
+  fill('navy');
   rectMode(CENTER);
   textAlign(CENTER, CENTER);
 

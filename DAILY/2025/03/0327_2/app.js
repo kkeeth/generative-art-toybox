@@ -3,7 +3,7 @@ const NUM = 8;
 function setup() {
   createCanvas((W = 400), W);
   background(255);
-  stroke(0);
+  stroke('navy');
 
   const SIZE = W / NUM;
 
