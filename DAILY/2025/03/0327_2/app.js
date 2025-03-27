@@ -19,7 +19,7 @@ function setup() {
 }
 
 function drawLineRect(x, y, size) {
-  const LINE_NUM = 8;
+  const LINE_NUM = 12;
   const span = size / LINE_NUM;
   for (let i = 0; i < LINE_NUM; i++) {
     for (let j = 0; j < LINE_NUM; j++) {
