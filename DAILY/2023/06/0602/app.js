@@ -1,17 +1,17 @@
 const cp = [
-  "#ffb6b9",
-  "#bbded6",
-  "#fae3d9",
-  "#8ac6d1",
-  "#fff1ac",
-  "#f9bcdd",
-  "#d5a4cf",
-  "#b689b0",
-  "#382E37",
-  "#DF642F",
-  "#FAAB10",
-  "#CB812B",
-  "#3CAE64",
+  '#ffb6b9',
+  '#bbded6',
+  '#fae3d9',
+  '#8ac6d1',
+  '#fff1ac',
+  '#f9bcdd',
+  '#d5a4cf',
+  '#b689b0',
+  '#382E37',
+  '#DF642F',
+  '#FAAB10',
+  '#CB812B',
+  '#3CAE64',
 ];
 
 const radius = 70;
@@ -65,7 +65,7 @@ function drawRose(n, d, v, h) {
 }
 
 function keyPressed() {
-  if (key === "s") {
-    saveGif("mySketch", 3);
+  if (key === 's') {
+    saveGif('mySketch', 3);
   }
 }
