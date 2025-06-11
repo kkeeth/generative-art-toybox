@@ -20,7 +20,7 @@ function setup() {
   noStroke();
 
   // Create a temporary canvas to get the emoji outline
-  // let tempCanvas = createGraphics(W, W);
+  let tempCanvas = createGraphics(W, W);
   let img = createImage(W, W);
   img.loadPixels();
   tempCanvas.background(255);
