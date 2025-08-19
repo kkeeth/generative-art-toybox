@@ -19,8 +19,8 @@ function draw() {
   rotateX(QUARTER_PI);
   rotateY(ma);
 
-  for (let x = 0; x < width-100; x += w) {
-    for (let z = 0; z < height-100; z += w) {
+  for (let x = 0; x < width - 100; x += w) {
+    for (let z = 0; z < height - 100; z += w) {
       push();
       let d = dist(x, z, width / 2 - 50, height / 2 - 50);
       let offset = map(d, 0, maxD, -PI, PI);
@@ -38,7 +38,7 @@ function draw() {
 
 function keyPressed() {
   // this will download the first 5 seconds of the animation!
-  if (key === "s") {
-    saveGif("mySketch", 5);
+  if (key === 's') {
+    saveGif('mySketch', 5);
   }
 }

@@ -1,9 +1,9 @@
 const cp = Object.freeze({
-  cT: "#50d0d0",
-  cM: "#be1e3e",
-  cK: "#7967c3",
-  cH: "#ffc639",
-  cN: "#255699",
+  cT: '#50d0d0',
+  cM: '#be1e3e',
+  cK: '#7967c3',
+  cH: '#ffc639',
+  cN: '#255699',
 });
 
 let trails = [];
@@ -61,7 +61,7 @@ function createFourRectBox() {
       centerPos.z,
       100,
       color(cp.cK),
-      true,
+      false,
     ),
   );
   trails.push(
@@ -71,7 +71,7 @@ function createFourRectBox() {
       centerPos.z,
       100,
       color(cp.cH),
-      true,
+      false,
     ),
   );
 }
