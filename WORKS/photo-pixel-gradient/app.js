@@ -168,12 +168,7 @@ function drawPixelatedImage() {
       stroke(strokeColor);
       strokeWeight(map(normalizedProgress, 0, 1, 1, 0.3));
 
-      if (brightness(pixelColor) > 70) {
-        let backgroundAlpha = map(normalizedProgress, 0, 1, 50, 255);
-        fill(255, 255, 255, backgroundAlpha);
-      } else {
-        fill(red(pixelColor), green(pixelColor), blue(pixelColor), fillAlpha);
-      }
+      fill(red(pixelColor), green(pixelColor), blue(pixelColor), fillAlpha);
 
       drawGradualRect(
         pixel.x,
@@ -187,7 +182,7 @@ function drawPixelatedImage() {
 }
 
 function drawGradualRect(x, y, w, h, progress) {
-  let maxJitter = 1;
+  let maxJitter = 3;
   let jitterAmount = map(progress, 0, 1, maxJitter, 0);
 
   if (progress < 0.9) {
