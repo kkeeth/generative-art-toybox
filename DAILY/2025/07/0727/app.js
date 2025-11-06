@@ -89,7 +89,7 @@ class Particle {
     this.vel = createVector(random(-1, 1), random(-1, 1));
     this.acc = createVector(0, 0);
     this.maxSpeed = 4;
-    this.size = random(2, 6);
+    this.size = random(4, 9);
     this.color = random(currentPalette.colors);
     this.hue = random(360);
     this.brightness = random(150, 255);

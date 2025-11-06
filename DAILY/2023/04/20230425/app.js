@@ -16,7 +16,7 @@ let prevTimeString;
 let seed;
 
 function setup() {
-  createCanvas(800, 400);
+  createCanvas(windowWidth - 20, windowHeight - 20);
   textAlign(CENTER, CENTER);
   strokeWeight(2);
   strokeCap(ROUND);
@@ -41,7 +41,7 @@ function draw() {
   const timeString = `${displayHours}:${displayMinutes}:${displaySeconds}`;
 
   push();
-  translate(100, 100);
+  translate(width / 2 - 500, height / 2 - 160);
 
   for (let i = 0; i < timeString.length; i++) {
     if (timeString[i] !== ":") {
