@@ -1,59 +1,58 @@
 // ===========================
-// Global Variables
+// Config
 // ===========================
-let W;
-let routes = [];
-let gridSize;
-let hubPoints = [];
+let W,
+  routes = [],
+  gridSize,
+  hubPoints = [];
 
-// ===========================
-// Constants
-// ===========================
-const GRID_EDGE_MIN = 2;
-const GRID_EDGE_MAX = 12;
-const GRID_HUB_MIN = 4;
-const GRID_HUB_MAX = 10;
-const GRID_CELLS = 14;
+const GRID = { edgeMin: 2, edgeMax: 12, hubMin: 4, hubMax: 10, cells: 14 };
+const ROUTE = {
+  min: 7,
+  max: 10,
+  waypoints: [6, 9],
+  stations: [8, 12],
+  hubs: [3, 6],
+};
+const THRESH = {
+  selfIntersect: 2.5,
+  minWaypoint: 1.5,
+  hubReach: 1.5,
+  cornerRadius: 0.8,
+  transfer: 0.6,
+};
+const PROB = { hubPass: 0.7, maxAttempts: 20 };
+const STYLE = {
+  line: 5,
+  lineOutline: 8,
+  stationNormal: 9,
+  stationTransfer: 11,
+  strokeNormal: 3.5,
+  strokeTransfer: 4.5,
+};
 
-const MIN_ROUTE_COUNT = 7;
-const MAX_ROUTE_COUNT = 10;
-const MIN_WAYPOINTS = 6;
-const MAX_WAYPOINTS = 9;
-const MIN_STATIONS = 8;
-const MAX_STATIONS = 12;
-const MIN_HUB_COUNT = 3;
-const MAX_HUB_COUNT = 6;
-
-const SELF_INTERSECTION_THRESHOLD = 2.5;
-const MIN_WAYPOINT_DISTANCE = 1.5;
-const HUB_REACH_THRESHOLD = 1.5;
-const CORNER_RADIUS_FACTOR = 0.8;
-const TRANSFER_STATION_THRESHOLD = 0.6;
-
-const HUB_PASS_PROBABILITY = 0.7;
-const MAX_WAYPOINT_ATTEMPTS = 20;
-
-const LINE_THICKNESS = 5;
-const LINE_OUTLINE_THICKNESS = 8;
-const STATION_SIZE_NORMAL = 9;
-const STATION_SIZE_TRANSFER = 11;
-const STATION_STROKE_NORMAL = 3.5;
-const STATION_STROKE_TRANSFER = 4.5;
-
-// MRT-inspired color palette
 const colors = [
-  '#E63946', // Red Line
-  '#06FFA5', // Green Line
-  '#4361EE', // Blue Line
-  '#F77F00', // Orange Line
-  '#9B5DE5', // Purple Line
-  '#FFD60A', // Yellow Line
-  '#FF006E', // Magenta Line
-  '#00B4D8', // Cyan Line
-  '#90E0EF', // Light Blue Line
+  '#E63946',
+  '#06FFA5',
+  '#4361EE',
+  '#F77F00',
+  '#9B5DE5',
+  '#FFD60A',
+  '#FF006E',
+  '#00B4D8',
+  '#90E0EF',
 ];
-
-// English station names (poetic/abstract)
+const lineNames = [
+  'Red',
+  'Green',
+  'Blue',
+  'Orange',
+  'Purple',
+  'Yellow',
+  'Magenta',
+  'Cyan',
+  'Light Blue',
+].map((n) => n + ' Line');
 const stationNames = [
   'Dawn Square',
   'Memory Cross',
@@ -101,432 +100,302 @@ const stationNames = [
   'Meteor Stop',
 ];
 
-const lineNames = [
-  'Red Line',
-  'Green Line',
-  'Blue Line',
-  'Orange Line',
-  'Purple Line',
-  'Yellow Line',
-  'Magenta Line',
-  'Cyan Line',
-  'Light Blue Line',
-];
+// ===========================
+// Helpers
+// ===========================
+const dist2d = (p1, p2) => Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
+const pathDist = (path) =>
+  path.reduce((sum, p, i) => (i > 0 ? sum + dist2d(path[i - 1], p) : sum), 0);
+const getEdgePos = () => {
+  const side = floor(random(4));
+  return [
+    { x: GRID.edgeMin, y: floor(random(3, 11)) },
+    { x: GRID.edgeMax, y: floor(random(3, 11)) },
+    { x: floor(random(3, 11)), y: GRID.edgeMin },
+    { x: floor(random(3, 11)), y: GRID.edgeMax },
+  ][side];
+};
+
+const isTooClose = (x, y, visited, thresh) =>
+  visited.slice(0, -1).some((v) => dist(x, y, v.x, v.y) < thresh);
 
 // ===========================
-// Helper Functions
+// Setup
 // ===========================
-
-/**
- * Calculate Euclidean distance between two points
- */
-function calculateDistance(p1, p2) {
-  return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-}
-
-/**
- * Get random edge position for route start
- */
-function getRandomEdgePosition() {
-  const startSide = floor(random(4));
-  const positions = [
-    { x: GRID_EDGE_MIN, y: floor(random(3, 11)) }, // Left
-    { x: GRID_EDGE_MAX, y: floor(random(3, 11)) }, // Right
-    { x: floor(random(3, 11)), y: GRID_EDGE_MIN }, // Top
-    { x: floor(random(3, 11)), y: GRID_EDGE_MAX }, // Bottom
-  ];
-  return positions[startSide];
-}
-
-/**
- * Check if a position is too close to visited positions
- */
-function isTooCloseToVisited(newX, newY, visitedPositions, threshold) {
-  for (let j = 0; j < visitedPositions.length - 1; j++) {
-    const visited = visitedPositions[j];
-    if (dist(newX, newY, visited.x, visited.y) < threshold) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Calculate total path distance
- */
-function calculatePathDistance(path) {
-  let totalDistance = 0;
-  for (let i = 0; i < path.length - 1; i++) {
-    totalDistance += calculateDistance(path[i], path[i + 1]);
-  }
-  return totalDistance;
-}
-
-// ===========================
-// Setup and Generation
-// ===========================
-
 function setup() {
   createCanvas((W = min(windowWidth, windowHeight) - 50), W);
-  gridSize = W / GRID_CELLS;
-  generateRoutes();
+  gridSize = W / GRID.cells;
+  generate();
 }
 
-function generateRoutes() {
+function generate() {
   routes = [];
 
-  // Create hub points for transfer stations
-  hubPoints = [];
-  const numHubs = floor(random(MIN_HUB_COUNT, MAX_HUB_COUNT));
-  for (let i = 0; i < numHubs; i++) {
-    hubPoints.push({
-      x: floor(random(GRID_HUB_MIN, GRID_HUB_MAX)),
-      y: floor(random(GRID_HUB_MIN, GRID_HUB_MAX)),
-    });
-  }
+  // Create hubs
+  hubPoints = Array.from({ length: floor(random(...ROUTE.hubs)) }, () => ({
+    x: floor(random(GRID.hubMin, GRID.hubMax)),
+    y: floor(random(GRID.hubMin, GRID.hubMax)),
+  }));
 
   // Generate routes
-  let numRoutes = floor(random(MIN_ROUTE_COUNT, MAX_ROUTE_COUNT));
+  const numRoutes = floor(random(ROUTE.min, ROUTE.max));
+  routes.push(createLoopLine());
 
-  // Always include a loop line
-  routes.push(createRandomLoopLine());
-  numRoutes--;
-
-  // Create remaining routes
-  for (let i = 0; i < numRoutes; i++) {
-    routes.push(createRandomRoute(colors[i], lineNames[i]));
+  for (let i = 0; i < numRoutes - 1; i++) {
+    routes.push(createRoute(colors[i], lineNames[i]));
   }
 }
 
 // ===========================
 // Route Creation
 // ===========================
-
-function createRandomRoute(color, lineName) {
-  const numWaypoints = floor(random(MIN_WAYPOINTS, MAX_WAYPOINTS));
+function createRoute(color, name) {
   const waypoints = [];
-  const visitedPositions = [];
+  const visited = [];
+  const start = getEdgePos();
 
-  // Set starting position
-  const startPoint = getRandomEdgePosition();
-  waypoints.push(startPoint);
-  visitedPositions.push({ x: startPoint.x, y: startPoint.y });
+  waypoints.push(start);
+  visited.push({ ...start });
 
   // Generate waypoints
-  const generatedWaypoints = generateWaypoints(
-    startPoint,
-    numWaypoints,
-    visitedPositions
-  );
-  waypoints.push(...generatedWaypoints);
-
-  return createRouteFromWaypoints(color, waypoints, lineName);
-}
-
-function generateWaypoints(startPoint, numWaypoints, visitedPositions) {
-  const waypoints = [];
-  let currentX = startPoint.x;
-  let currentY = startPoint.y;
-  let lastDirection = null;
-  let directionChangeCounter = 0;
-
-  // Hub targeting
-  const passThoughHub = random() > (1 - HUB_PASS_PROBABILITY) && hubPoints.length > 0;
-  const targetHub = passThoughHub ? random(hubPoints) : null;
+  let { x, y } = start;
+  let lastDir = null;
+  let dirCounter = 0;
+  const numWaypoints = floor(random(...ROUTE.waypoints));
+  const targetHub =
+    random() > 1 - PROB.hubPass && hubPoints.length > 0
+      ? random(hubPoints)
+      : null;
   let hubReached = false;
 
   for (let i = 1; i < numWaypoints; i++) {
-    const result = findNextWaypoint(
-      currentX,
-      currentY,
-      visitedPositions,
-      targetHub,
-      hubReached,
-      lastDirection,
-      directionChangeCounter,
-      i
-    );
+    let valid = false;
+    let attempts = 0;
+    let newX, newY, dir;
 
-    if (result.valid) {
-      waypoints.push({ x: result.x, y: result.y });
-      visitedPositions.push({ x: result.x, y: result.y });
-      currentX = result.x;
-      currentY = result.y;
+    while (!valid && attempts++ < PROB.maxAttempts) {
+      // Move towards hub or random direction
+      if (targetHub && !hubReached && i > 2 && random() > 0.5) {
+        const dx = targetHub.x - x;
+        const dy = targetHub.y - y;
+        if (abs(dx) > abs(dy)) {
+          newX = constrain(
+            x + (dx > 0 ? floor(random(1, 3)) : -floor(random(1, 3))),
+            GRID.edgeMin,
+            GRID.edgeMax,
+          );
+          newY = y;
+        } else {
+          newX = x;
+          newY = constrain(
+            y + (dy > 0 ? floor(random(1, 3)) : -floor(random(1, 3))),
+            GRID.edgeMin,
+            GRID.edgeMax,
+          );
+        }
+        if (dist(newX, newY, targetHub.x, targetHub.y) < THRESH.hubReach) {
+          [newX, newY] = [targetHub.x, targetHub.y];
+          hubReached = true;
+        }
+      } else {
+        dirCounter++;
+        const forceChange = dirCounter >= floor(random(2, 4));
 
-      if (result.direction !== lastDirection) {
-        lastDirection = result.direction;
-        directionChangeCounter = 0;
+        // Select direction
+        let validDir = false;
+        while (!validDir && attempts < PROB.maxAttempts) {
+          const r = random();
+          dir = r < 0.35 ? 'h' : r < 0.7 ? 'v' : 'd';
+          if (dir !== lastDir || forceChange) validDir = true;
+        }
+
+        // Apply movement
+        const d = floor(random(2, dir === 'd' ? 4 : 5));
+        if (dir === 'h') {
+          newX = constrain(
+            x + (random() > 0.5 ? d : -d),
+            GRID.edgeMin,
+            GRID.edgeMax,
+          );
+          newY = y;
+        } else if (dir === 'v') {
+          newX = x;
+          newY = constrain(
+            y + (random() > 0.5 ? d : -d),
+            GRID.edgeMin,
+            GRID.edgeMax,
+          );
+        } else {
+          newX = constrain(
+            x + (random() > 0.5 ? d : -d),
+            GRID.edgeMin,
+            GRID.edgeMax,
+          );
+          newY = constrain(
+            y + (random() > 0.5 ? d : -d),
+            GRID.edgeMin,
+            GRID.edgeMax,
+          );
+        }
       }
 
-      if (result.hubReached) {
-        hubReached = true;
+      // Validate
+      const notClose = dist(newX, newY, x, y) > THRESH.minWaypoint;
+      const notVisited = !isTooClose(newX, newY, visited, THRESH.selfIntersect);
+      valid = notClose && notVisited;
+    }
+
+    if (valid) {
+      waypoints.push({ x: newX, y: newY });
+      visited.push({ x: newX, y: newY });
+      [x, y] = [newX, newY];
+      if (dir !== lastDir) {
+        lastDir = dir;
+        dirCounter = 0;
       }
     }
   }
 
-  return waypoints;
+  return createRouteFromWaypoints(color, waypoints, name);
 }
 
-function findNextWaypoint(
-  currentX,
-  currentY,
-  visitedPositions,
-  targetHub,
-  hubReached,
-  lastDirection,
-  directionChangeCounter,
-  iteration
-) {
-  let validPosition = false;
-  let attemptCount = 0;
-  let newX, newY, directionType;
+function createLoopLine() {
+  const cx = random(5, 9),
+    cy = random(5, 9),
+    r = random(2.3, 3.5);
+  const numStations = floor(random(...ROUTE.stations));
+  const stations = [];
+  const path = [];
 
-  while (!validPosition && attemptCount < MAX_WAYPOINT_ATTEMPTS) {
-    attemptCount++;
-
-    // Try to move towards hub
-    if (targetHub && !hubReached && iteration > 2 && random() > 0.5) {
-      const hubResult = moveTowardsHub(currentX, currentY, targetHub);
-      newX = hubResult.x;
-      newY = hubResult.y;
-
-      if (dist(newX, newY, targetHub.x, targetHub.y) < HUB_REACH_THRESHOLD) {
-        newX = targetHub.x;
-        newY = targetHub.y;
-        hubReached = true;
-      }
-    } else {
-      // Normal direction-based movement
-      directionChangeCounter++;
-      const forceChange = directionChangeCounter >= floor(random(2, 4));
-      directionType = selectDirection(lastDirection, forceChange);
-
-      const movement = applyDirectionMovement(currentX, currentY, directionType);
-      newX = movement.x;
-      newY = movement.y;
-    }
-
-    // Validate position
-    const notTooClose = dist(newX, newY, currentX, currentY) > MIN_WAYPOINT_DISTANCE;
-    const notVisited = !isTooCloseToVisited(
-      newX,
-      newY,
-      visitedPositions,
-      SELF_INTERSECTION_THRESHOLD
-    );
-
-    if (notTooClose && notVisited) {
-      validPosition = true;
-    }
-  }
-
-  return {
-    valid: validPosition,
-    x: newX,
-    y: newY,
-    direction: directionType,
-    hubReached: hubReached,
-  };
-}
-
-function moveTowardsHub(currentX, currentY, targetHub) {
-  const dx = targetHub.x - currentX;
-  const dy = targetHub.y - currentY;
-  let newX, newY;
-
-  if (abs(dx) > abs(dy)) {
-    newX = currentX + (dx > 0 ? floor(random(1, 3)) : -floor(random(1, 3)));
-    newY = currentY;
-  } else {
-    newX = currentX;
-    newY = currentY + (dy > 0 ? floor(random(1, 3)) : -floor(random(1, 3)));
-  }
-
-  return {
-    x: constrain(newX, GRID_EDGE_MIN, GRID_EDGE_MAX),
-    y: constrain(newY, GRID_EDGE_MIN, GRID_EDGE_MAX),
-  };
-}
-
-function selectDirection(lastDirection, forceChange) {
-  let directionType;
-  let attempts = 0;
-
-  do {
-    const rand = random();
-    if (rand < 0.35) {
-      directionType = 'horizontal';
-    } else if (rand < 0.7) {
-      directionType = 'vertical';
-    } else {
-      directionType = 'diagonal';
-    }
-
-    attempts++;
-    if (attempts > 5) break;
-  } while (directionType === lastDirection && !forceChange);
-
-  return directionType;
-}
-
-function applyDirectionMovement(currentX, currentY, directionType) {
-  let newX, newY;
-
-  if (directionType === 'horizontal') {
-    const distance = floor(random(2, 5));
-    newX = constrain(currentX + (random() > 0.5 ? distance : -distance), GRID_EDGE_MIN, GRID_EDGE_MAX);
-    newY = currentY;
-  } else if (directionType === 'vertical') {
-    const distance = floor(random(2, 5));
-    newX = currentX;
-    newY = constrain(currentY + (random() > 0.5 ? distance : -distance), GRID_EDGE_MIN, GRID_EDGE_MAX);
-  } else {
-    const distance = floor(random(2, 4));
-    newX = constrain(currentX + (random() > 0.5 ? distance : -distance), GRID_EDGE_MIN, GRID_EDGE_MAX);
-    newY = constrain(currentY + (random() > 0.5 ? distance : -distance), GRID_EDGE_MIN, GRID_EDGE_MAX);
-  }
-
-  return { x: newX, y: newY };
-}
-
-function createRandomLoopLine() {
-  const route = {
-    color: colors[floor(random(colors.length))],
-    name: 'Loop Line',
-    stations: [],
-    path: [],
-  };
-
-  const centerX = random(5, 9);
-  const centerY = random(5, 9);
-  const radius = random(2.3, 3.5);
-  const numStations = floor(random(MIN_STATIONS, MAX_STATIONS));
-
-  // Create stations
   for (let i = 0; i < numStations; i++) {
     const angle = (TWO_PI / numStations) * i - HALF_PI;
-    const x = centerX + cos(angle) * radius;
-    const y = centerY + sin(angle) * radius;
-
-    route.stations.push({
-      x: x * gridSize,
-      y: y * gridSize,
+    stations.push({
+      x: (cx + cos(angle) * r) * gridSize,
+      y: (cy + sin(angle) * r) * gridSize,
       name: random(stationNames),
     });
   }
 
-  // Generate circular path
-  const steps = 100;
-  for (let i = 0; i <= steps; i++) {
-    const angle = (TWO_PI / steps) * i - HALF_PI;
-    const x = (centerX + cos(angle) * radius) * gridSize;
-    const y = (centerY + sin(angle) * radius) * gridSize;
-    route.path.push({ x, y });
+  for (let i = 0; i <= 100; i++) {
+    const angle = (TWO_PI / 100) * i - HALF_PI;
+    path.push({
+      x: (cx + cos(angle) * r) * gridSize,
+      y: (cy + sin(angle) * r) * gridSize,
+    });
   }
+
+  return { color: random(colors), name: 'Loop Line', stations, path };
+}
+
+function createRouteFromWaypoints(color, waypoints, name) {
+  const path = generatePath(waypoints);
+  const route = { color, name, stations: [], path };
+
+  if (path.length === 0) return route;
+
+  // Place stations
+  const totalDist = pathDist(path);
+  const numStations = floor(random(...ROUTE.stations));
+  const spacing = totalDist / (numStations - 1);
+
+  route.stations.push({
+    x: path[0].x,
+    y: path[0].y,
+    name: random(stationNames),
+  });
+
+  for (let s = 1; s < numStations - 1; s++) {
+    const pos = findPointAtDist(path, s * spacing);
+    if (pos) route.stations.push({ ...pos, name: random(stationNames) });
+  }
+
+  const last = path[path.length - 1];
+  route.stations.push({ x: last.x, y: last.y, name: random(stationNames) });
 
   return route;
 }
 
-function createRouteFromWaypoints(color, waypoints, lineName) {
-  const route = {
-    color: color,
-    name: lineName,
-    stations: [],
-    path: [],
-  };
-
-  // Generate path first
-  route.path = generatePathWithRoundedCorners(waypoints);
-
-  if (route.path.length === 0) {
-    return route;
-  }
-
-  // Place stations along the path
-  placeStationsAlongPath(route);
-
-  return route;
-}
-
-function placeStationsAlongPath(route) {
-  const totalPathDistance = calculatePathDistance(route.path);
-  const numStations = floor(random(MIN_STATIONS, MAX_STATIONS));
-
-  // First station at path start
-  route.stations.push({
-    x: route.path[0].x,
-    y: route.path[0].y,
-    name: random(stationNames),
-  });
-
-  // Intermediate stations
-  if (numStations > 2) {
-    const stationSpacing = totalPathDistance / (numStations - 1);
-
-    for (let s = 1; s < numStations - 1; s++) {
-      const targetDistance = s * stationSpacing;
-      const stationPos = findPointAtDistance(route.path, targetDistance);
-
-      if (stationPos) {
-        route.stations.push({
-          x: stationPos.x,
-          y: stationPos.y,
-          name: random(stationNames),
-        });
-      }
-    }
-  }
-
-  // Last station at path end
-  route.stations.push({
-    x: route.path[route.path.length - 1].x,
-    y: route.path[route.path.length - 1].y,
-    name: random(stationNames),
-  });
-}
-
-function findPointAtDistance(path, targetDistance) {
-  let accumulatedDistance = 0;
-
+function findPointAtDist(path, targetDist) {
+  let acc = 0;
   for (let i = 0; i < path.length - 1; i++) {
-    const p1 = path[i];
-    const p2 = path[i + 1];
-    const segmentDist = calculateDistance(p1, p2);
-
-    if (accumulatedDistance + segmentDist >= targetDistance) {
-      const t = (targetDistance - accumulatedDistance) / segmentDist;
+    const segDist = dist2d(path[i], path[i + 1]);
+    if (acc + segDist >= targetDist) {
+      const t = (targetDist - acc) / segDist;
       return {
-        x: lerp(p1.x, p2.x, t),
-        y: lerp(p1.y, p2.y, t),
+        x: lerp(path[i].x, path[i + 1].x, t),
+        y: lerp(path[i].y, path[i + 1].y, t),
       };
     }
-
-    accumulatedDistance += segmentDist;
+    acc += segDist;
   }
-
   return null;
 }
 
-function generatePathWithRoundedCorners(waypoints) {
+function generatePath(waypoints) {
   const path = [];
-  const cornerRadius = gridSize * CORNER_RADIUS_FACTOR;
+  const cornerR = gridSize * THRESH.cornerRadius;
 
   for (let i = 0; i < waypoints.length; i++) {
-    const current = waypoints[i];
-    const next = waypoints[i + 1];
-    const prev = waypoints[i - 1];
+    const cur = waypoints[i],
+      next = waypoints[i + 1],
+      prev = waypoints[i - 1];
 
-    if (i === 0) {
-      path.push({ x: current.x * gridSize, y: current.y * gridSize });
-    }
+    if (i === 0) path.push({ x: cur.x * gridSize, y: cur.y * gridSize });
 
     if (next) {
-      const isCorner = prev && hasDirectionChange(prev, current, next);
+      const isCorner =
+        prev &&
+        (cur.x - prev.x !== next.x - cur.x ||
+          cur.y - prev.y !== next.y - cur.y);
 
       if (isCorner) {
-        addRoundedCorner(path, prev, current, next, cornerRadius);
+        // Rounded corner
+        let [pdx, pdy] = [cur.x - prev.x, cur.y - prev.y];
+        let [ndx, ndy] = [next.x - cur.x, next.y - cur.y];
+        const pLen = Math.sqrt(pdx ** 2 + pdy ** 2);
+        const nLen = Math.sqrt(ndx ** 2 + ndy ** 2);
+        [pdx, pdy] = [pdx / pLen, pdy / pLen];
+        [ndx, ndy] = [ndx / nLen, ndy / nLen];
+
+        const approach = Math.min(cornerR / gridSize, 0.8);
+        const [ax, ay] = [
+          (cur.x - pdx * approach) * gridSize,
+          (cur.y - pdy * approach) * gridSize,
+        ];
+        const [ex, ey] = [
+          (cur.x + ndx * approach) * gridSize,
+          (cur.y + ndy * approach) * gridSize,
+        ];
+
+        // Line to approach
+        const last = path[path.length - 1];
+        const steps = Math.floor(dist2d(last, { x: ax, y: ay }) / 10);
+        for (let t = 1; t <= steps; t++) {
+          path.push({
+            x: lerp(last.x, ax, t / steps),
+            y: lerp(last.y, ay, t / steps),
+          });
+        }
+
+        // Bezier curve
+        const [cx, cy] = [cur.x * gridSize, cur.y * gridSize];
+        for (let t = 0; t <= 15; t++) {
+          const p = t / 15;
+          path.push({
+            x: (1 - p) ** 2 * ax + 2 * (1 - p) * p * cx + p ** 2 * ex,
+            y: (1 - p) ** 2 * ay + 2 * (1 - p) * p * cy + p ** 2 * ey,
+          });
+        }
       } else {
-        addStraightSegment(path, current, next);
+        // Straight line
+        const [dx, dy] = [next.x - cur.x, next.y - cur.y];
+        const steps = Math.floor(Math.sqrt(dx ** 2 + dy ** 2) * 8);
+        for (let t = 1; t <= steps; t++) {
+          path.push({
+            x: cur.x * gridSize + dx * gridSize * (t / steps),
+            y: cur.y * gridSize + dy * gridSize * (t / steps),
+          });
+        }
       }
     }
   }
@@ -534,281 +403,125 @@ function generatePathWithRoundedCorners(waypoints) {
   return path;
 }
 
-function hasDirectionChange(prev, current, next) {
-  const prevDx = current.x - prev.x;
-  const prevDy = current.y - prev.y;
-  const nextDx = next.x - current.x;
-  const nextDy = next.y - current.y;
-  return prevDx !== nextDx || prevDy !== nextDy;
-}
-
-function addRoundedCorner(path, prev, current, next, cornerRadius) {
-  let prevDx = current.x - prev.x;
-  let prevDy = current.y - prev.y;
-  let nextDx = next.x - current.x;
-  let nextDy = next.y - current.y;
-
-  // Normalize
-  const prevLen = Math.sqrt(prevDx * prevDx + prevDy * prevDy);
-  const nextLen = Math.sqrt(nextDx * nextDx + nextDy * nextDy);
-  prevDx /= prevLen;
-  prevDy /= prevLen;
-  nextDx /= nextLen;
-  nextDy /= nextLen;
-
-  // Calculate corner points
-  const approachDist = Math.min(cornerRadius / gridSize, 0.8);
-  const approachX = (current.x - prevDx * approachDist) * gridSize;
-  const approachY = (current.y - prevDy * approachDist) * gridSize;
-  const exitX = (current.x + nextDx * approachDist) * gridSize;
-  const exitY = (current.y + nextDy * approachDist) * gridSize;
-
-  // Add straight line to approach
-  const lastPoint = path[path.length - 1];
-  const dist = calculateDistance(lastPoint, { x: approachX, y: approachY });
-  const steps = Math.floor(dist / 10);
-
-  for (let t = 1; t <= steps; t++) {
-    const progress = t / steps;
-    path.push({
-      x: lerp(lastPoint.x, approachX, progress),
-      y: lerp(lastPoint.y, approachY, progress),
-    });
-  }
-
-  // Add curved corner (quadratic bezier)
-  const controlX = current.x * gridSize;
-  const controlY = current.y * gridSize;
-  const curveSteps = 15;
-
-  for (let t = 0; t <= curveSteps; t++) {
-    const progress = t / curveSteps;
-    const x =
-      Math.pow(1 - progress, 2) * approachX +
-      2 * (1 - progress) * progress * controlX +
-      Math.pow(progress, 2) * exitX;
-    const y =
-      Math.pow(1 - progress, 2) * approachY +
-      2 * (1 - progress) * progress * controlY +
-      Math.pow(progress, 2) * exitY;
-    path.push({ x, y });
-  }
-}
-
-function addStraightSegment(path, current, next) {
-  const dx = next.x - current.x;
-  const dy = next.y - current.y;
-  const dist = Math.sqrt(dx * dx + dy * dy);
-  const steps = Math.floor(dist * 8);
-
-  for (let t = 1; t <= steps; t++) {
-    const progress = t / steps;
-    const lastPoint = path[path.length - 1];
-    const targetX = current.x * gridSize + (next.x - current.x) * gridSize * progress;
-    const targetY = current.y * gridSize + (next.y - current.y) * gridSize * progress;
-    path.push({ x: targetX, y: targetY });
-  }
-}
-
 // ===========================
-// Drawing Functions
+// Drawing
 // ===========================
-
 function draw() {
   background(245, 243, 238);
 
-  drawGrid();
-  drawRoutes();
-  drawStations();
-  drawStationNames();
-  drawLegend();
-  drawTitle();
-}
-
-function drawGrid() {
+  // Grid
   push();
   stroke(230, 230, 230);
   strokeWeight(0.5);
-
-  for (let i = 0; i <= GRID_CELLS; i++) {
-    const pos = i * gridSize;
-    line(pos, 0, pos, W);
-    line(0, pos, W, pos);
+  for (let i = 0; i <= GRID.cells; i++) {
+    const p = i * gridSize;
+    line(p, 0, p, W);
+    line(0, p, W, p);
   }
   pop();
-}
 
-function drawRoutes() {
-  for (const route of routes) {
-    drawRoute(route);
+  // Routes
+  for (const r of routes) {
+    push();
+    stroke(255);
+    strokeWeight(STYLE.lineOutline);
+    strokeCap(ROUND);
+    strokeJoin(ROUND);
+    noFill();
+    beginShape();
+    r.path.forEach((p) => vertex(p.x, p.y));
+    endShape();
+
+    stroke(r.color);
+    strokeWeight(STYLE.line);
+    beginShape();
+    r.path.forEach((p) => vertex(p.x, p.y));
+    endShape();
+    pop();
   }
-}
 
-function drawRoute(route) {
-  push();
+  // Stations
+  for (const r of routes) {
+    push();
+    for (const s of r.stations) {
+      const isTransfer = routes.some(
+        (route) =>
+          route.stations.filter(
+            (st) => dist(s.x, s.y, st.x, st.y) < gridSize * THRESH.transfer,
+          ).length > 1,
+      );
+      const size = isTransfer ? STYLE.stationTransfer : STYLE.stationNormal;
+      const sw = isTransfer ? STYLE.strokeTransfer : STYLE.strokeNormal;
 
-  // White outline
-  stroke(255);
-  strokeWeight(LINE_OUTLINE_THICKNESS);
-  strokeCap(ROUND);
-  strokeJoin(ROUND);
-  noFill();
-
-  beginShape();
-  for (const p of route.path) {
-    vertex(p.x, p.y);
-  }
-  endShape();
-
-  // Colored line
-  stroke(route.color);
-  strokeWeight(LINE_THICKNESS);
-
-  beginShape();
-  for (const p of route.path) {
-    vertex(p.x, p.y);
-  }
-  endShape();
-
-  pop();
-}
-
-function drawStations() {
-  for (const route of routes) {
-    drawRouteStations(route);
-  }
-}
-
-function drawRouteStations(route) {
-  push();
-
-  for (const station of route.stations) {
-    const isTransfer = isTransferStation(station);
-    const size = isTransfer ? STATION_SIZE_TRANSFER : STATION_SIZE_NORMAL;
-    const strokeWeight_ = isTransfer ? STATION_STROKE_TRANSFER : STATION_STROKE_NORMAL;
-
-    // White filled circle with colored ring
-    fill(255);
-    stroke(route.color);
-    strokeWeight(strokeWeight_);
-    ellipse(station.x, station.y, size * 2);
-
-    // White dot for transfer stations
-    if (isTransfer) {
-      noStroke();
       fill(255);
-      ellipse(station.x, station.y, size * 0.6);
-    }
-  }
+      stroke(r.color);
+      strokeWeight(sw);
+      ellipse(s.x, s.y, size * 2);
 
-  pop();
-}
-
-function isTransferStation(station) {
-  let count = 0;
-  for (const route of routes) {
-    for (const s of route.stations) {
-      if (dist(station.x, station.y, s.x, s.y) < gridSize * TRANSFER_STATION_THRESHOLD) {
-        count++;
-        if (count > 1) return true;
+      if (isTransfer) {
+        noStroke();
+        fill(255);
+        ellipse(s.x, s.y, size * 0.6);
       }
     }
+    pop();
   }
-  return false;
-}
 
-function drawStationNames() {
-  for (const route of routes) {
-    drawRouteStationNames(route);
-  }
-}
-
-function drawRouteStationNames(route) {
+  // Station names
   push();
   textFont('sans-serif');
   textSize(10);
+  for (const r of routes) {
+    for (let i = 0; i < r.stations.length; i++) {
+      const s = r.stations[i];
+      let angle;
+      if (r.name === 'Loop Line') {
+        angle = atan2(s.y - W / 2, s.x - W / 2);
+      } else if (i > 0 && i < r.stations.length - 1) {
+        angle =
+          atan2(
+            r.stations[i + 1].y - r.stations[i - 1].y,
+            r.stations[i + 1].x - r.stations[i - 1].x,
+          ) + HALF_PI;
+      } else if (i === 0) {
+        angle = atan2(r.stations[1].y - s.y, r.stations[1].x - s.x) + HALF_PI;
+      } else {
+        angle =
+          atan2(s.y - r.stations[i - 1].y, s.x - r.stations[i - 1].x) + HALF_PI;
+      }
 
-  for (let i = 0; i < route.stations.length; i++) {
-    const station = route.stations[i];
-    const angle = getStationNameAngle(station, route, i);
-    const distance = 22;
-    const tx = station.x + cos(angle) * distance;
-    const ty = station.y + sin(angle) * distance;
+      const [tx, ty] = [s.x + cos(angle) * 22, s.y + sin(angle) * 22];
+      const tw = textWidth(s.name);
 
-    // Background
-    const textW = textWidth(station.name);
-    const padding = 3;
-    fill(245, 243, 238, 240);
-    noStroke();
-    rect(tx - textW / 2 - padding, ty - 7, textW + padding * 2, 14, 2);
+      fill(245, 243, 238, 240);
+      noStroke();
+      rect(tx - tw / 2 - 3, ty - 7, tw + 6, 14, 2);
 
-    // Text
-    fill(route.color);
-    noStroke();
-    textAlign(CENTER, CENTER);
-    text(station.name, tx, ty);
+      fill(r.color);
+      textAlign(CENTER, CENTER);
+      text(s.name, tx, ty);
+    }
   }
-
   pop();
-}
 
-function getStationNameAngle(station, route, index) {
-  if (route.name === 'Loop Line') {
-    return atan2(station.y - W / 2, station.x - W / 2);
-  }
-
-  const stations = route.stations;
-
-  if (index > 0 && index < stations.length - 1) {
-    const lineAngle = atan2(
-      stations[index + 1].y - stations[index - 1].y,
-      stations[index + 1].x - stations[index - 1].x
-    );
-    return lineAngle + HALF_PI;
-  } else if (index === 0) {
-    const lineAngle = atan2(
-      stations[1].y - station.y,
-      stations[1].x - station.x
-    );
-    return lineAngle + HALF_PI;
-  } else {
-    const lineAngle = atan2(
-      station.y - stations[index - 1].y,
-      station.x - stations[index - 1].x
-    );
-    return lineAngle + HALF_PI;
-  }
-}
-
-function drawLegend() {
+  // Legend
   push();
-  const legendX = W * 0.03;
-  const legendY = W * 0.88;
-  const lineHeight = 16;
-
+  const [lx, ly] = [W * 0.03, W * 0.88];
   textFont('sans-serif');
   textSize(10);
-
-  for (let i = 0; i < routes.length; i++) {
-    const route = routes[i];
-    const y = legendY - (routes.length - 1 - i) * lineHeight;
-
-    // Line sample
-    stroke(route.color);
+  routes.forEach((r, i) => {
+    const y = ly - (routes.length - 1 - i) * 16;
+    stroke(r.color);
     strokeWeight(3.5);
-    line(legendX, y, legendX + 22, y);
-
-    // Name
+    line(lx, y, lx + 22, y);
     noStroke();
     fill(80);
     textAlign(LEFT, CENTER);
-    text(route.name, legendX + 28, y);
-  }
-
+    text(r.name, lx + 28, y);
+  });
   pop();
-}
 
-function drawTitle() {
+  // Title
   push();
   fill(0, 0, 0, 100);
   noStroke();
@@ -817,36 +530,21 @@ function drawTitle() {
   textFont('sans-serif');
   textStyle(BOLD);
   text('MRT NETWORK MAP', W * 0.03, W * 0.02);
-
   textStyle(NORMAL);
   textSize(W * 0.016);
   fill(0, 0, 0, 80);
   text(
-    `${routes.length} Lines • ${getTotalStations()} Stations`,
+    `${routes.length} Lines • ${routes.reduce(
+      (t, r) => t + r.stations.length,
+      0,
+    )} Stations`,
     W * 0.03,
-    W * 0.05
+    W * 0.05,
   );
   pop();
 }
 
-function getTotalStations() {
-  return routes.reduce((total, route) => total + route.stations.length, 0);
-}
-
-// ===========================
-// Event Handlers
-// ===========================
-
-function mousePressed() {
-  generateRoutes();
-}
-
 function keyPressed() {
-  if (key === 'c') {
-    saveCanvas(`mrt-network-${round(new Date().getTime() / 100000)}`, 'jpeg');
-  }
-
-  if (key === 'r') {
-    generateRoutes();
-  }
+  if (key === 'c') saveCanvas(`mrt-${round(Date.now() / 100000)}`, 'jpeg');
+  if (key === 'r') generate();
 }
