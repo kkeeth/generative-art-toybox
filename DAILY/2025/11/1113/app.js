@@ -155,7 +155,7 @@ function updateFallingParticle(particle) {
     particle.noiseOffsetZ + frameCount * particle.flowSpeed,
   );
 
-  particle.currentAngle += (noiseAngle - 0.5) * 0.02;
+  particle.currentAngle += (noiseAngle - 0.5) * 0.07;
   particle.currentRadius += (noiseRadius - 0.5) * particle.flowStrength * 0.02;
 
   // 落下
