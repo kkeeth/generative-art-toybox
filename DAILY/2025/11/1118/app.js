@@ -1,15 +1,15 @@
 /**
- * Submarine Line Art Generator
+ * Submarine Line Art Generator (v3: Rounded & Fitted)
  * * Features:
- * - Generates 3 distinct types of submarines (Streamlined, Boxy, Futuristic).
- * - High contrast, thick outline style.
- * - Seamlessly connected conning tower (sail).
- * - Colorful, randomized palette.
- * - Interactive: Click canvas to regenerate.
+ * - Generates 3 distinct types of submarines.
+ * - Rounded Bow and Stern (No sharp points).
+ * - Conning tower sits PERFECTLY on the hull curve using math.
+ * - High contrast, colorful, thick outline style.
+ * - "Futaba" style propeller.
  */
 
-let palette = ['#FFFFFF', '#E0E0E0', '#00FFFF', '#FFA500', '#FF00FF', '#FFFF00'];
-let bgColor = '#1a1a2e'; // Dark Navy / Charcoal
+let palette = ['#FFFFFF', '#E0E0E0', '#00FFFF', '#FFA500', '#FF00FF', '#FFFF00', '#00FF00'];
+let bgColor = '#1a1a2e'; // Dark Navy
 
 function setup() {
   createCanvas(800, 600);
@@ -20,11 +20,7 @@ function setup() {
 
 function draw() {
   background(bgColor);
-  
-  // Center the submarine
   translate(width / 2, height / 2);
-  
-  // Generate a random submarine
   generateSubmarine();
 }
 
@@ -33,254 +29,214 @@ function mousePressed() {
 }
 
 function generateSubmarine() {
-  // 1. Determine Basic Parameters
+  // 1. Basic Parameters
   let subType = floor(random(3)); // 0: Streamlined, 1: Boxy, 2: Special
   let subWidth = random(400, 550);
-  let subHeight = random(100, 180);
+  let subHeight = random(120, 180);
   let halfW = subWidth / 2;
   let halfH = subHeight / 2;
   
-  // Pick Colors
+  // Colors
   let colTop = random(palette);
   let colBottom = random(palette);
-  while(colBottom === colTop) colBottom = random(palette); // Ensure distinct
+  while(colBottom === colTop) colBottom = random(palette);
   let colTower = random(palette);
   let colDetail = random(palette);
   
-  strokeWeight(4); // Thick lines for visibility
-  
-  // --- DRAWING LOGIC ---
-  
-  // We use a specific drawing order to achieve the "Outline" look with seamless connections:
-  // 1. Draw Top Hull
-  // 2. Draw Bottom Hull
-  // 3. Draw Divider
-  // 4. Draw Tower (filled with BG color to mask the hull line, stroked with color)
-  // 5. Details
-  
-  // -- 2. Draw Hull (Top and Bottom) --
-  
-  if (subType === 0) {
-    // === TYPE A: Streamlined (Teardrop / Cigar) ===
-    
-    // Top Hull
-    stroke(colTop);
-    noFill();
-    beginShape();
-    vertex(-halfW, 0);
-    // Control points for smooth teardrop shape
-    bezierVertex(-halfW, -halfH * 1.2, halfW * 0.6, -halfH * 1.2, halfW, 0);
-    endShape();
+  strokeWeight(4);
 
-    // Bottom Hull
-    stroke(colBottom);
-    noFill();
-    beginShape();
-    vertex(-halfW, 0);
-    // Bottom is usually slightly flatter or symmetric
-    bezierVertex(-halfW, halfH * 1.2, halfW * 0.6, halfH * 1.2, halfW, 0);
-    endShape();
+  // --- HELPER: Hull Top Curve Function ---
+  // Returns the Y coordinate of the top hull at a given X
+  function getHullTopY(x) {
+    // Normalize x to -1 to 1
+    let nx = x / halfW;
     
-  } else if (subType === 1) {
-    // === TYPE B: Boxy (Research / Industrial) ===
-    
-    let cornerRadius = subHeight * 0.4;
-    let noseStickout = random(20, 50);
-    
-    // Top Hull
-    stroke(colTop);
-    noFill();
-    beginShape();
-    vertex(-halfW - noseStickout, 0); // Nose
-    // Go up and flat
-    vertex(-halfW + cornerRadius, -halfH); 
-    vertex(halfW - cornerRadius, -halfH);
-    vertex(halfW, 0);
-    endShape();
-    
-    // Connect nose manually for boxy shape
-    line(-halfW - noseStickout, 0, -halfW + cornerRadius, -halfH);
+    if (subType === 0) { 
+      // === TYPE A: Rounded Teardrop (Elliptical) ===
+      // y = -halfH * sqrt(1 - x^2)
+      // Added easing to make ends rounder, not pointy
+      if (abs(nx) > 0.95) return 0; // Safe guard for ends
+      return -halfH * Math.pow(1 - nx*nx, 0.4); // 0.4 power makes it "fatter" and rounder at ends
+      
+    } else if (subType === 1) { 
+      // === TYPE B: Boxy with Rounded Corners ===
+      // Flat top with rounded corners
+      let cornerX = halfW * 0.8;
+      if (abs(x) < cornerX) {
+        return -halfH;
+      } else {
+        // Elliptical corner
+        let cx = (x > 0) ? cornerX : -cornerX;
+        let dx = x - cx;
+        let maxDx = halfW - cornerX;
+        return -halfH + halfH * (dx*dx)/(maxDx*maxDx); // Parabolic drop
+      }
 
-    // Bottom Hull
-    stroke(colBottom);
-    noFill();
-    beginShape();
-    vertex(-halfW - noseStickout, 0);
-    vertex(-halfW + cornerRadius, halfH);
-    vertex(halfW - cornerRadius, halfH);
-    vertex(halfW, 0);
-    endShape();
-    line(-halfW - noseStickout, 0, -halfW + cornerRadius, halfH);
-
-  } else {
-    // === TYPE C: Special (Futuristic / Asymmetric / Pods) ===
-    
-    // Top Hull (Bulbous front, tapered back)
-    stroke(colTop);
-    noFill();
-    beginShape();
-    vertex(-halfW, 0);
-    // Double curve for "future" look
-    bezierVertex(-halfW, -halfH * 1.5, -halfW * 0.2, -halfH * 0.5, 0, -halfH * 0.8);
-    bezierVertex(halfW * 0.5, -halfH * 1.0, halfW, -halfH * 0.2, halfW, 0);
-    endShape();
-
-    // Bottom Hull (Deep belly)
-    stroke(colBottom);
-    noFill();
-    beginShape();
-    vertex(-halfW, 0);
-    bezierVertex(-halfW * 0.8, halfH * 1.5, halfW * 0.5, halfH, halfW, 0);
-    endShape();
+    } else {
+      // === TYPE C: Futuristic (S-Curve / Bulbous) ===
+      // A mix of sine and ellipse
+      return -halfH * 0.8 * Math.cos(nx * PI * 0.5) - (halfH * 0.2);
+    }
   }
 
-  // -- 3. Divider Line (Horizontal Split) --
+  // --- 2. Draw Hull ---
+  
+  // We draw the hull using small steps to match the curve function exactly
+  // This ensures the visual line matches our math for the tower.
+  
+  // Top Hull
+  stroke(colTop);
+  noFill();
+  beginShape();
+  // Iterate from left to right
+  for (let x = -halfW; x <= halfW; x += 5) {
+    let y = getHullTopY(x);
+    
+    // Rounding the ends:
+    // Near -halfW and halfW, we want a vertical curve, not a point.
+    // The loop inherently closes at y=0 if function returns 0 at ends.
+    // To ensure roundness, we can adjust the start/end vertices manually.
+    if (x === -halfW) vertex(x, 0); 
+    else vertex(x, y);
+  }
+  endShape();
+
+  // Bottom Hull (Mirror or varied)
+  stroke(colBottom);
+  noFill();
+  beginShape();
+  for (let x = -halfW; x <= halfW; x += 5) {
+    let y = 0;
+    if (subType === 1) {
+      // Boxy bottom
+      y = -getHullTopY(x); // Mirror top roughly
+    } else {
+      // Streamlined bottom (classic curve)
+      // y = halfH * sqrt(1 - x^2)
+      let nx = x / halfW;
+      y = halfH * Math.pow(1 - nx*nx, 0.5); // Standard ellipse
+    }
+    vertex(x, y);
+  }
+  endShape();
+
+  // --- 3. Divider Line ---
   stroke(random(palette));
   strokeWeight(3);
-  // Simple line through center, strictly restricted by width approx
-  // For perfect masking, we just draw a line from nose-ish to tail-ish
-  // But since shapes vary, we draw a visual divider where it makes sense.
-  if (subType === 1) {
-     line(-halfW * 1.1, 0, halfW, 0);
-  } else {
-     line(-halfW, 0, halfW, 0);
-  }
+  // Draw line slightly shorter than full width to fit inside the rounded ends
+  line(-halfW * 0.95, 0, halfW * 0.95, 0);
 
 
-  // -- 4. Draw Conning Tower (Sail) --
-  // To make it seamless, we draw a shape filled with bgColor to mask the hull line below it.
+  // --- 4. Draw Conning Tower (Sail) ---
   
   let towerW = random(60, 100);
-  let towerH = random(50, 90);
-  let towerX = random(-halfW * 0.3, halfW * 0.1); // Position
-  let towerType = floor(random(3)); // 0: Tapered, 1: Rect, 2: Curved Back
+  let towerH = random(60, 90);
+  let towerX = random(-halfW * 0.3, halfW * 0.2); // Center-ish
+  
+  // Calculate exact Y for tower base using our function
+  // We calculate Y at the left edge, center, and right edge of the tower
+  // to make a "skirt" or just pick the highest point (min Y) to avoid floating.
+  // Ideally, we mask the hull line.
+  
+  // Strategy: Calculate Y at towerX (center of tower base)
+  // Then draw the tower starting from that Y.
+  // To mask the hull line perfectly, we use the Hull Function to draw the bottom of the tower!
   
   stroke(colTower);
-  fill(bgColor); // SECRET SAUCE: Mask the line below
+  fill(bgColor); // Masking
   strokeWeight(4);
   
   beginShape();
-  // Start at bottom left of tower (on hull)
-  vertex(towerX, 0); 
+  // 1. Draw top part of tower (Counter-clockwise)
+  // Top Right
+  vertex(towerX + towerW/2, getHullTopY(towerX + towerW/2) - towerH);
+  // Top Left
+  vertex(towerX - towerW/2, getHullTopY(towerX - towerW/2) - towerH);
   
-  if (towerType === 0) { // Tapered Trapezoind
-    vertex(towerX + 10, -towerH);
-    vertex(towerX + towerW - 10, -towerH);
-    vertex(towerX + towerW, 0);
-  } else if (towerType === 1) { // Rectangular with rounded top
-    vertex(towerX, -towerH + 10);
-    quadraticVertex(towerX, -towerH, towerX + 10, -towerH);
-    vertex(towerX + towerW - 10, -towerH);
-    quadraticVertex(towerX + towerW, -towerH, towerX + towerW, -towerH + 10);
-    vertex(towerX + towerW, 0);
-  } else { // Curved Back (Modern)
-    vertex(towerX + 5, -towerH);
-    vertex(towerX + towerW * 0.6, -towerH);
-    bezierVertex(towerX + towerW, -towerH, towerX + towerW, -towerH * 0.5, towerX + towerW * 1.2, 0);
+  // 2. Draw bottom part matching the hull curve EXACTLY
+  // Iterate from Left to Right along the hull curve
+  for (let x = towerX - towerW/2; x <= towerX + towerW/2; x += 2) {
+    vertex(x, getHullTopY(x));
   }
-  
-  // Close shape implicitly for fill, but we don't want the bottom line drawn stroke
-  // However, since y=0 is the split line, drawing the bottom line matches the divider.
-  // To be perfectly seamless with the Top hull, we should NOT stroke the bottom.
-  // p5.js shape closing is tricky with stroke. 
-  // Strategy: Close it to mask, then redraw without bottom stroke?
-  // Simpler: Just draw the bottom line with the Divider Color or rely on the masking.
+  // Close shape
   endShape(CLOSE);
   
-  // Redraw the bottom line of the tower with the DIVIDER color to merge it,
-  // OR draw a BG colored line over the bottom of the tower if we want it fully open.
-  // The prompt implies "Seamless with Hull Top".
-  // Let's erase the bottom stroke of the tower visually:
-  stroke(colTop); // Match top hull color? Or Divider?
-  strokeWeight(4);
-  // No, actually, we want the tower to sit ON the hull. 
-  // The masking above removed the "hull top line" passing through the tower.
-  // Now we just have the outline. It looks connected.
-  
-  // Add Periscope / Antennas
+  // Draw details on tower
   stroke(colDetail);
-  strokeWeight(3);
-  line(towerX + towerW * 0.3, -towerH, towerX + towerW * 0.3, -towerH - random(20, 40));
-  line(towerX + towerW * 0.6, -towerH, towerX + towerW * 0.6, -towerH - random(10, 25));
+  line(towerX, getHullTopY(towerX) - towerH, towerX, getHullTopY(towerX) - towerH - 30); // Periscope
 
 
-  // -- 5. Details: Windows (Portholes) --
+  // --- 5. Windows (Portholes) ---
   let winCount = floor(random(3, 6));
-  let winSpacing = (subWidth * 0.5) / winCount;
-  let winStart = towerX - (winCount * winSpacing) / 2 + towerW / 2; // Center around tower area
+  let winSpacing = 60;
+  let winStartX = towerX - ((winCount - 1) * winSpacing) / 2;
   
   for (let i = 0; i < winCount; i++) {
-    let wx = winStart + i * winSpacing;
-    // Keep windows within hull bounds approx
-    if (wx > -halfW + 30 && wx < halfW - 30) {
+    let wx = winStartX + i * winSpacing;
+    // Only draw if within hull width safely
+    if (abs(wx) < halfW * 0.8) {
       stroke(colDetail);
-      fill(bgColor); // Ensure no fill look
-      strokeWeight(3);
+      fill(bgColor);
       
-      let winType = random() > 0.5 ? 'circle' : 'rect';
-      if (winType === 'circle') {
-        ellipse(wx, 10, 25, 25); // Slightly below centerline
-      } else {
+      if (random() > 0.5) ellipse(wx, 0, 20, 20); // Center on line
+      else {
         rectMode(CENTER);
-        rect(wx, 10, 30, 20, 5);
+        rect(wx, 0, 30, 15, 4);
       }
     }
   }
 
-
-  // -- 6. Details: Propeller & Fins --
+  // --- 6. Propeller (Futaba Style) & Fins ---
   push();
-  translate(halfW, 0); // Move to tail
+  translate(halfW, 0); // Go to stern
   
-  // Propeller
+  // Propeller: Vertical Two-Leaf (Figure 8)
   stroke(random(palette));
-  strokeWeight(3);
   noFill();
-  // Draw a hub
-  arc(0, 0, 20, 40, PI/2, 3*PI/2);
+  strokeWeight(3);
   
-  // Draw Blades
-  let bladeSize = random(30, 50);
-  line(10, 0, 10 + bladeSize, -bladeSize/2); // Top blade
-  line(10, 0, 10 + bladeSize, bladeSize/2);  // Bottom blade
-  line(10, 0, 10 + bladeSize, 0);            // Middle
+  // Hub
+  fill(bgColor);
+  ellipse(10, 0, 10, 10); 
+  noFill();
   
-  // Rudder / Stabilizer (Tail Fin)
+  // Leaves
+  let leafLen = 35;
+  let leafW = 15;
+  
+  // Upper Leaf (Teardrop shape pointing up)
+  beginShape();
+  vertex(10, 0);
+  bezierVertex(10 + leafW, -leafLen * 0.5, 10 - leafW, -leafLen, 10, -leafLen);
+  bezierVertex(10 + leafW/2, -leafLen, 10 + leafW/2, -leafLen * 0.2, 10, 0);
+  endShape();
+  
+  // Lower Leaf (Teardrop shape pointing down)
+  beginShape();
+  vertex(10, 0);
+  bezierVertex(10 + leafW, leafLen * 0.5, 10 - leafW, leafLen, 10, leafLen);
+  bezierVertex(10 + leafW/2, leafLen, 10 + leafW/2, leafLen * 0.2, 10, 0);
+  endShape();
+  
+  // Tail Fins
   stroke(colDetail);
   fill(bgColor);
   
-  // Top Rudder
+  // Upper Fin
   beginShape();
-  vertex(-30, -halfH * 0.5);
-  vertex(0, -halfH * 0.5 - 30);
-  vertex(20, -halfH * 0.5 - 30);
-  vertex(10, -halfH * 0.5);
+  vertex(-40, -5);
+  vertex(-10, -40);
+  vertex(20, -40);
+  vertex(0, -5);
   endShape(CLOSE);
-  
-  // Bottom Rudder
+
+  // Lower Fin
   beginShape();
-  vertex(-30, halfH * 0.5);
-  vertex(0, halfH * 0.5 + 30);
-  vertex(20, halfH * 0.5 + 30);
-  vertex(10, halfH * 0.5);
+  vertex(-40, 5);
+  vertex(-10, 40);
+  vertex(20, 40);
+  vertex(0, 5);
   endShape(CLOSE);
   
   pop();
-  
-  // -- 7. Side Fins (Dive Planes) --
-  // Usually near the front
-  stroke(colDetail);
-  fill(bgColor);
-  let finX = -halfW * 0.6;
-  let finY = 10; // Slightly below center
-  
-  beginShape();
-  vertex(finX, finY);
-  vertex(finX - 20, finY + 15);
-  vertex(finX + 30, finY + 15);
-  vertex(finX + 40, finY);
-  endShape(CLOSE);
-  
-  // Horizontal line across fin for detail
-  line(finX - 10, finY + 7, finX + 35, finY + 7);
 }
