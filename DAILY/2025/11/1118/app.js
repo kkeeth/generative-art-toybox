@@ -240,3 +240,9 @@ function generateSubmarine() {
   
   pop();
 }
+
+function keyPressed() {
+  if (key === "c") {
+    saveCanvas("mySketch", "png")
+  }
+}
