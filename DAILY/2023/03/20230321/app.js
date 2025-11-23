@@ -21,13 +21,12 @@ function setup() {
 function draw() {
   background(255, 30);
 
+  let ballGradient = drawingContext.createLinearGradient(0, 0, width, height);
+  ballGradient.addColorStop(0, 'blue');
+  ballGradient.addColorStop(1, 'turquoise');
+  drawingContext.fillStyle = ballGradient;
+  drawingContext.strokeStyle = ballGradient;
   items.forEach((item, index) => {
-    let ballGradient = drawingContext.createLinearGradient(0, 0, width, height);
-    ballGradient.addColorStop(0, "blue");
-    ballGradient.addColorStop(1, "turquoise");
-    drawingContext.fillStyle = ballGradient;
-    drawingContext.strokeStyle = ballGradient;
-
     // ripple
     push();
     noFill();
@@ -55,8 +54,7 @@ function draw() {
 
 function keyPressed() {
   // this will download the first 5 seconds of the animation!
-  if (key === "s") {
-    saveGif("mySketch", 5);
+  if (key === 's') {
+    saveGif('mySketch', 5);
   }
 }
-
