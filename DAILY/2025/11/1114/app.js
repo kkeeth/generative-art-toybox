@@ -13,9 +13,9 @@ function setup() {
 
   // 色設定: 青 → 赤 → 緑
   colors = [
-    color(50, 100, 200),   // 青
-    color(200, 50, 100),   // 赤
-    color(50, 200, 100)    // 緑
+    color(50, 100, 200), // 青
+    color(200, 50, 100), // 赤
+    color(50, 200, 100), // 緑
   ];
 
   // 3層分の正四面体を生成
@@ -25,7 +25,7 @@ function setup() {
       vertices: currentTet,
       edges: edges,
       color: colors[i],
-      layer: i
+      layer: i,
     });
 
     // 次の層は現在の層の各面の中心を結んで作る
@@ -52,7 +52,12 @@ function draw() {
   for (let i = 0; i < tetrahedrons.length; i++) {
     let tet = tetrahedrons[i];
     let alpha = map(i, 0, tetrahedrons.length - 1, 200, 150);
-    let edgeColor = color(red(tet.color), green(tet.color), blue(tet.color), alpha);
+    let edgeColor = color(
+      red(tet.color),
+      green(tet.color),
+      blue(tet.color),
+      alpha,
+    );
     drawEdgesStippled(tet.vertices, edgeColor, 60);
   }
 
@@ -62,9 +67,9 @@ function draw() {
       // 各頂点から複数のパーティクルを生成
       for (let vertex of tet.vertices) {
         if (random() < 0.3) {
-          let edge = random(tet.edges.filter(e =>
-            e[0].equals(vertex) || e[1].equals(vertex)
-          ));
+          let edge = random(
+            tet.edges.filter((e) => e[0].equals(vertex) || e[1].equals(vertex)),
+          );
 
           createParticle(vertex, edge, tet.color, tet.layer);
         }
@@ -90,7 +95,7 @@ function createTetrahedron(size) {
     createVector(size, size, size),
     createVector(size, -size, -size),
     createVector(-size, size, -size),
-    createVector(-size, -size, size)
+    createVector(-size, -size, size),
   ];
 }
 
@@ -102,7 +107,7 @@ function getEdges(vertices) {
     [vertices[0], vertices[3]],
     [vertices[1], vertices[2]],
     [vertices[1], vertices[3]],
-    [vertices[2], vertices[3]]
+    [vertices[2], vertices[3]],
   ];
 }
 
@@ -112,7 +117,7 @@ function createDualTetrahedron(vertices) {
     [0, 1, 2], // 面1
     [0, 1, 3], // 面2
     [0, 2, 3], // 面3
-    [1, 2, 3]  // 面4
+    [1, 2, 3], // 面4
   ];
 
   let dual = [];
@@ -139,7 +144,7 @@ function createParticle(startVertex, edge, col, layer) {
     life: 255,
     size: 5 + layer * 0.5,
 
-    update: function() {
+    update: function () {
       if (this.state === 'ALONG_EDGE') {
         // エッジに沿って移動
         this.edgeProgress += 0.02;
@@ -154,7 +159,6 @@ function createParticle(startVertex, edge, col, layer) {
         let start = this.edge[0];
         let end = this.edge[1];
         this.pos = p5.Vector.lerp(start, end, this.edgeProgress);
-
       } else if (this.state === 'TO_CENTER') {
         // 中心に向かって移動
         let toCenter = p5.Vector.mult(this.pos, -1);
@@ -171,30 +175,29 @@ function createParticle(startVertex, edge, col, layer) {
       }
     },
 
-    display: function() {
+    display: function () {
       push();
       strokeWeight(this.size);
-      stroke(
-        red(this.color),
-        green(this.color),
-        blue(this.color),
-        this.life
-      );
+      stroke(red(this.color), green(this.color), blue(this.color), this.life);
       point(this.pos.x, this.pos.y, this.pos.z);
       pop();
     },
 
-    isDead: function() {
+    isDead: function () {
       return this.life <= 0;
-    }
+    },
   });
 }
 
 // エッジを点描で描画（静的）
 function drawEdgesStippled(vertices, col, numPoints) {
   let edges = [
-    [0, 1], [0, 2], [0, 3],
-    [1, 2], [1, 3], [2, 3]
+    [0, 1],
+    [0, 2],
+    [0, 3],
+    [1, 2],
+    [1, 3],
+    [2, 3],
   ];
 
   strokeWeight(3);
@@ -220,6 +223,9 @@ function keyPressed() {
   }
 
   if (key === 'c') {
-    saveCanvas(`tetrahedron-dual-${round(new Date().getTime() / 100000)}`, 'jpeg');
+    saveCanvas(
+      `tetrahedron-dual-${round(new Date().getTime() / 100000)}`,
+      'jpeg',
+    );
   }
 }
