@@ -8,20 +8,18 @@
 let W;
 let refImg = null;
 let showRef = true;
-let refAlpha = 55; // 参照画像の不透明度 (0-255)
+let refAlpha = 55;
 
-// PS1アート風カラーパレット（パーツごとに色を変える）
+// PS1アート風カラーパレット
 const C = {
-  wing:  [220,  88,  88],   // 翼: 赤
-  body:  [ 88, 140, 220],   // 体: 青
-  head:  [220, 155,  55],   // 頭: オレンジ
-  spine: [ 70, 185, 125],   // 背中トゲ: 緑
-  tail:  [168,  82, 210],   // 尻尾: 紫
-  beak:  [155, 170, 205],   // くちばし: グレー青
-  eye:   [ 88, 142, 218],   // 目リング: 青
+  wing:  [220,  88,  88],
+  body:  [ 88, 140, 220],
+  head:  [220, 155,  55],
+  spine: [ 70, 185, 125],
+  tail:  [168,  82, 210],
+  beak:  [155, 170, 205],
 };
 
-// ─────────────────────────────────────────────────────────────────────────
 function preload() {
   loadImage(
     'reference.jpg',
@@ -44,20 +42,16 @@ function setup() {
 function draw() {
   background(248, 250, 255);
 
-  // 参照画像を半透明で表示
   if (refImg && showRef) {
     push();
     tint(255, refAlpha);
     imageMode(CORNER);
-    // アスペクト比を保ちつつ中央配置
-    let rw = refImg.width, rh = refImg.height;
-    let scale = min(W / rw, W / rh);
-    let ox = (W - rw * scale) / 2;
-    let oy = (W - rh * scale) / 2;
-    image(refImg, ox, oy, rw * scale, rh * scale);
+    let sc = min(W / refImg.width, W / refImg.height);
+    let ox = (W - refImg.width  * sc) / 2;
+    let oy = (W - refImg.height * sc) / 2;
+    image(refImg, ox, oy, refImg.width * sc, refImg.height * sc);
     pop();
 
-    // 不透明度のインジケーター（右上に小さく）
     push();
     noStroke();
     fill(80, 80, 120, 180);
@@ -65,18 +59,8 @@ function draw() {
     textAlign(RIGHT);
     text(`ref: ${round(refAlpha / 255 * 100)}%  [r: 切替 ↑↓: 濃淡]`, W - 8, 18);
     pop();
-  } else if (!refImg) {
-    // 参照画像がない場合のガイドメッセージ
-    push();
-    noStroke();
-    fill(180, 180, 200);
-    textSize(13);
-    textAlign(CENTER);
-    text("reference.jpg をこのフォルダに置くと参照画像が表示されます", W / 2, 22);
-    pop();
   }
 
-  // ルギア線画を描く
   push();
   translate(W / 2, W / 2);
   scale(W / 600);
@@ -88,6 +72,7 @@ function draw() {
 
 // ─────────────────────────────────────────────────────────────────────────
 function drawLugia() {
+  // 正面視点：翼が横に広がり、胴体が手前に大きく見えるポーズ
   drawRightWing();
   drawLeftWing();
   drawTail();
@@ -102,24 +87,25 @@ function drawLugia() {
 }
 
 // ── BODY ─────────────────────────────────────────────────────────────────
+// 正面から見た丸い胴体
 function drawBody() {
   fill(248, 251, 255);
   stroke(...C.body);
   strokeWeight(6);
 
   beginShape();
-  curveVertex(-32, -58);
-  curveVertex(-32, -58);
-  curveVertex(-85,   2);
-  curveVertex(-80,  75);
-  curveVertex(-42, 125);
-  curveVertex( 15, 138);
-  curveVertex( 72, 118);
-  curveVertex( 90,  48);
-  curveVertex( 78, -22);
-  curveVertex( 22, -60);
-  curveVertex(-32, -58);
-  curveVertex(-32, -58);
+  curveVertex(-30, -78);
+  curveVertex(-30, -78);
+  curveVertex(-98, -18);
+  curveVertex(-102, 55);
+  curveVertex(-65, 130);
+  curveVertex(  0, 142);
+  curveVertex( 65, 130);
+  curveVertex(102, 55);
+  curveVertex( 98, -18);
+  curveVertex( 30, -78);
+  curveVertex(-30, -78);
+  curveVertex(-30, -78);
   endShape(CLOSE);
 }
 
@@ -128,17 +114,18 @@ function drawBellyPlate() {
   noStroke();
 
   beginShape();
-  curveVertex(-15, -22);
-  curveVertex(-15, -22);
-  curveVertex(-45,  22);
-  curveVertex(-40,  78);
-  curveVertex(  2, 115);
-  curveVertex( 48, 110);
-  curveVertex( 70,  68);
-  curveVertex( 58,  18);
-  curveVertex( 18, -20);
-  curveVertex(-15, -22);
-  curveVertex(-15, -22);
+  curveVertex(-18, -50);
+  curveVertex(-18, -50);
+  curveVertex(-68, -8);
+  curveVertex(-70, 58);
+  curveVertex(-40, 112);
+  curveVertex(  0, 122);
+  curveVertex( 40, 112);
+  curveVertex( 70, 58);
+  curveVertex( 68, -8);
+  curveVertex( 18, -50);
+  curveVertex(-18, -50);
+  curveVertex(-18, -50);
   endShape(CLOSE);
 }
 
@@ -149,38 +136,38 @@ function drawNeck() {
   strokeWeight(6);
 
   beginShape();
-  curveVertex(-32, -58);
-  curveVertex(-32, -58);
-  curveVertex(-50, -75);
-  curveVertex(-48, -95);
-  curveVertex(-22, -98);
-  curveVertex( -2, -82);
-  curveVertex(  0, -60);
-  curveVertex(-10, -58);
-  curveVertex(-32, -58);
-  curveVertex(-32, -58);
+  curveVertex(-28, -78);
+  curveVertex(-28, -78);
+  curveVertex(-38, -98);
+  curveVertex(-28, -115);
+  curveVertex( 12, -115);
+  curveVertex( 22, -98);
+  curveVertex( 12, -78);
+  curveVertex(-28, -78);
+  curveVertex(-28, -78);
   endShape(CLOSE);
 }
 
 // ── HEAD ─────────────────────────────────────────────────────────────────
+// 正面向き、やや左向きのデフォルメ頭部
 function drawHead() {
   fill(248, 251, 255);
   stroke(...C.head);
   strokeWeight(6);
 
   beginShape();
-  curveVertex(-22, -95);
-  curveVertex(-22, -95);
-  curveVertex(-58, -112);
-  curveVertex(-68, -142);
-  curveVertex(-55, -170);
-  curveVertex(-28, -185);
-  curveVertex(  5, -175);
-  curveVertex( 15, -148);
-  curveVertex(  5, -120);
-  curveVertex(-15,  -95);
-  curveVertex(-22, -95);
-  curveVertex(-22, -95);
+  curveVertex(-18, -112);
+  curveVertex(-18, -112);
+  curveVertex(-55, -128);
+  curveVertex(-65, -158);
+  curveVertex(-48, -182);
+  curveVertex(-12, -192);
+  curveVertex( 22, -182);
+  curveVertex( 35, -158);
+  curveVertex( 22, -128);
+  curveVertex(  8, -112);
+  curveVertex(-18, -112);
+  curveVertex(-18, -112);
   endShape(CLOSE);
 }
 
@@ -190,45 +177,48 @@ function drawBeak() {
   stroke(...C.beak);
   strokeWeight(5);
 
+  // upper beak
   beginShape();
-  curveVertex(-58, -118);
-  curveVertex(-58, -118);
-  curveVertex(-102, -118);
-  curveVertex(-128, -110);
-  curveVertex(-108,  -99);
-  curveVertex( -62,  -99);
-  curveVertex(-58, -118);
-  curveVertex(-58, -118);
+  curveVertex(-42, -130);
+  curveVertex(-42, -130);
+  curveVertex(-82, -128);
+  curveVertex(-102, -120);
+  curveVertex( -82, -110);
+  curveVertex( -45, -110);
+  curveVertex(-42, -130);
+  curveVertex(-42, -130);
   endShape(CLOSE);
 
+  // lower beak
   beginShape();
-  curveVertex( -58,  -99);
-  curveVertex( -58,  -99);
-  curveVertex( -98,  -99);
-  curveVertex(-114,  -92);
-  curveVertex( -94,  -84);
-  curveVertex( -60,  -86);
-  curveVertex( -58,  -99);
-  curveVertex( -58,  -99);
+  curveVertex( -42, -110);
+  curveVertex( -42, -110);
+  curveVertex( -78, -110);
+  curveVertex( -94, -103);
+  curveVertex( -75,  -95);
+  curveVertex( -44,  -97);
+  curveVertex( -42, -110);
+  curveVertex( -42, -110);
   endShape(CLOSE);
 }
 
 // ── EYE ──────────────────────────────────────────────────────────────────
 function drawEye() {
-  let ex = -22, ey = -148;
+  let ex = -15, ey = -158;
 
+  // brow ridge
   fill(105, 158, 225);
   stroke(25, 30, 65);
   strokeWeight(3);
   beginShape();
-  curveVertex(-42, -164);
-  curveVertex(-42, -164);
-  curveVertex(-22, -172);
-  curveVertex( -2, -164);
-  curveVertex( -8, -155);
-  curveVertex(-36, -155);
-  curveVertex(-42, -164);
-  curveVertex(-42, -164);
+  curveVertex(-35, -174);
+  curveVertex(-35, -174);
+  curveVertex(-15, -182);
+  curveVertex(  5, -174);
+  curveVertex( -2, -165);
+  curveVertex(-28, -165);
+  curveVertex(-35, -174);
+  curveVertex(-35, -174);
   endShape(CLOSE);
 
   fill(88, 142, 218);
@@ -251,16 +241,17 @@ function drawEye() {
 }
 
 // ── BACK SPINES ───────────────────────────────────────────────────────────
+// 正面視点では右肩の後ろ側に見える
 function drawBackSpines() {
   fill(150, 220, 190);
   stroke(...C.spine);
   strokeWeight(4);
 
   let spines = [
-    [[ 55, -58], [ 72, -58], [ 63, -92]],
-    [[ 65, -22], [ 82, -22], [ 74, -58]],
-    [[ 72,  15], [ 90,  15], [ 81, -20]],
-    [[ 75,  50], [ 92,  50], [ 84,  15]],
+    [[ 35, -78], [ 52, -78], [ 43, -115]],
+    [[ 52, -70], [ 68, -70], [ 60, -106]],
+    [[ 65, -58], [ 80, -58], [ 72,  -95]],
+    [[ 75, -42], [ 90, -42], [ 82,  -80]],
   ];
 
   for (let [[lx, ly], [rx, ry], [tx, ty]] of spines) {
@@ -273,39 +264,42 @@ function drawBackSpines() {
 }
 
 // ── WINGS ────────────────────────────────────────────────────────────────
+// 正面から横に大きく広がる翼（参照画像に合わせた水平展開）
 function drawLeftWing() {
   fill(248, 251, 255);
   stroke(...C.wing);
   strokeWeight(6);
 
   beginShape();
-  curveVertex(-65, -15);
-  curveVertex(-65, -15);
-  curveVertex(-115, -65);
-  curveVertex(-180, -122);
-  curveVertex(-228, -165);
-  curveVertex(-192,  -88);
-  curveVertex(-135,  -30);
-  curveVertex( -80,  42);
-  curveVertex(-65, -15);
-  curveVertex(-65, -15);
+  curveVertex( -90, -15);
+  curveVertex( -90, -15);
+  curveVertex(-148, -45);
+  curveVertex(-210, -62);
+  curveVertex(-255, -45);
+  curveVertex(-238,   8);
+  curveVertex(-172,  32);
+  curveVertex( -92,  30);
+  curveVertex( -90, -15);
+  curveVertex( -90, -15);
   endShape(CLOSE);
 
-  // 翼膜の構造線
+  // 翼膜ライン
+  stroke(...C.wing);
   strokeWeight(2);
-  line( -82, 38, -205, -115);
-  line( -90, 22, -215, -132);
-  line(-100,  8, -222, -148);
+  line(-96,  28, -242, -28);
+  line(-100, 14, -250, -14);
+  line(-105,  0, -255,  -2);
 
   // 翼端の指
+  fill(248, 251, 255);
+  stroke(...C.wing);
   strokeWeight(4);
   let fingers = [
-    [[-198, -128], [-228, -162], [-212, -148]],
-    [[-210, -145], [-242, -182], [-226, -162]],
-    [[-220, -158], [-252, -200], [-236, -178]],
+    [[-208, -60], [-248, -72], [-230, -48]],
+    [[-230, -48], [-268, -55], [-252, -30]],
+    [[-240, -28], [-278, -28], [-262,  -8]],
   ];
   for (let [[lx, ly], [tx, ty], [rx, ry]] of fingers) {
-    fill(248, 251, 255);
     beginShape();
     vertex(lx, ly);
     vertex(tx, ty);
@@ -320,31 +314,33 @@ function drawRightWing() {
   strokeWeight(6);
 
   beginShape();
-  curveVertex( 65, -15);
-  curveVertex( 65, -15);
-  curveVertex(112, -62);
-  curveVertex(175, -118);
-  curveVertex(222, -158);
-  curveVertex(188,  -82);
-  curveVertex(132,  -28);
-  curveVertex( 78,  42);
-  curveVertex( 65, -15);
-  curveVertex( 65, -15);
+  curveVertex(  90, -15);
+  curveVertex(  90, -15);
+  curveVertex( 148, -45);
+  curveVertex( 210, -62);
+  curveVertex( 255, -45);
+  curveVertex( 238,   8);
+  curveVertex( 172,  32);
+  curveVertex(  92,  30);
+  curveVertex(  90, -15);
+  curveVertex(  90, -15);
   endShape(CLOSE);
 
+  stroke(...C.wing);
   strokeWeight(2);
-  line( 80, 38, 198, -108);
-  line( 88, 22, 210, -125);
-  line( 98,  8, 218, -140);
+  line( 96,  28, 242, -28);
+  line(100,  14, 250, -14);
+  line(105,   0, 255,  -2);
 
+  fill(248, 251, 255);
+  stroke(...C.wing);
   strokeWeight(4);
   let fingers = [
-    [[192, -122], [222, -155], [208, -142]],
-    [[205, -138], [238, -175], [222, -158]],
-    [[215, -150], [248, -192], [232, -170]],
+    [[208, -60], [248, -72], [230, -48]],
+    [[230, -48], [268, -55], [252, -30]],
+    [[240, -28], [278, -28], [262,  -8]],
   ];
   for (let [[lx, ly], [tx, ty], [rx, ry]] of fingers) {
-    fill(248, 251, 255);
     beginShape();
     vertex(lx, ly);
     vertex(tx, ty);
@@ -360,25 +356,25 @@ function drawTail() {
   strokeWeight(5);
 
   beginShape();
-  curveVertex( 28, 130);
-  curveVertex( 28, 130);
-  curveVertex( 68, 155);
-  curveVertex(105, 185);
-  curveVertex(122, 215);
-  curveVertex(108, 232);
-  curveVertex( 82, 225);
-  curveVertex( 48, 198);
-  curveVertex( 15, 162);
-  curveVertex(  8, 138);
-  curveVertex( 28, 130);
-  curveVertex( 28, 130);
+  curveVertex( 22, 140);
+  curveVertex( 22, 140);
+  curveVertex( 60, 165);
+  curveVertex( 92, 198);
+  curveVertex( 98, 230);
+  curveVertex( 75, 242);
+  curveVertex( 48, 235);
+  curveVertex( 20, 208);
+  curveVertex(  5, 172);
+  curveVertex(  5, 145);
+  curveVertex( 22, 140);
+  curveVertex( 22, 140);
   endShape(CLOSE);
 
   strokeWeight(3);
   let fins = [
-    [[ 90, 215], [115, 238], [105, 250], [ 80, 230]],
-    [[ 68, 222], [ 88, 250], [ 68, 255], [ 50, 232]],
-    [[ 48, 218], [ 58, 245], [ 38, 248], [ 25, 224]],
+    [[ 78, 220], [105, 240], [ 95, 252], [ 70, 235]],
+    [[ 55, 228], [ 78, 252], [ 60, 258], [ 40, 238]],
+    [[ 35, 225], [ 48, 250], [ 30, 255], [ 15, 232]],
   ];
   for (let pts of fins) {
     beginShape();
@@ -389,8 +385,8 @@ function drawTail() {
 
 // ── FEET ─────────────────────────────────────────────────────────────────
 function drawFeet() {
-  drawFoot(-40, 130);
-  drawFoot( 20, 138);
+  drawFoot(-35, 140);
+  drawFoot( 18, 144);
 }
 
 function drawFoot(fx, fy) {
