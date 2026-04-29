@@ -8,48 +8,49 @@ function setup() {
 }
 
 function draw() {
-  background(208, 228, 252);
+  background(248, 250, 255);
   translate(W / 2, W / 2);
   scale(W / 600);
   strokeJoin(ROUND);
   strokeCap(ROUND);
-  translate(0, 10);
   drawLugia();
 }
 
 function drawLugia() {
-  // Back layer: wings and tail
+  // Draw order: back → body → front details
   drawRightWing();
   drawLeftWing();
   drawTail();
-  // Mid layer: body
   drawBody();
   drawBellyPlate();
-  // Top layer: spines, head, details
+  drawNeck();
   drawBackSpines();
   drawHead();
   drawBeak();
   drawEye();
+  drawFeet();
 }
 
 // ── BODY ─────────────────────────────────────────────────────────────────
+// Upright barrel shape (wider than previous, more "bird chest" feeling)
 function drawBody() {
   fill(245, 249, 255);
   stroke(25, 30, 65);
   strokeWeight(6);
 
   beginShape();
-  curveVertex(-50, -42);
-  curveVertex(-50, -42);
-  curveVertex(-88, 18);
-  curveVertex(-74, 92);
-  curveVertex(-18, 132);
-  curveVertex(48, 130);
-  curveVertex(98, 88);
-  curveVertex(102, 14);
-  curveVertex(62, -42);
-  curveVertex(-50, -42);
-  curveVertex(-50, -42);
+  curveVertex(-32, -58);
+  curveVertex(-32, -58);
+  curveVertex(-85,   2);
+  curveVertex(-80,  75);
+  curveVertex(-42, 125);
+  curveVertex( 15, 138);
+  curveVertex( 72, 118);
+  curveVertex( 90,  48);
+  curveVertex( 78, -22);
+  curveVertex( 22, -60);
+  curveVertex(-32, -58);
+  curveVertex(-32, -58);
   endShape(CLOSE);
 }
 
@@ -58,38 +59,60 @@ function drawBellyPlate() {
   noStroke();
 
   beginShape();
-  curveVertex(-22, -5);
-  curveVertex(-22, -5);
-  curveVertex(-48, 38);
-  curveVertex(-34, 88);
-  curveVertex(5, 114);
-  curveVertex(50, 110);
-  curveVertex(74, 70);
-  curveVertex(58, 20);
-  curveVertex(20, -3);
-  curveVertex(-22, -5);
-  curveVertex(-22, -5);
+  curveVertex(-15, -22);
+  curveVertex(-15, -22);
+  curveVertex(-45,  22);
+  curveVertex(-40,  78);
+  curveVertex(  2, 115);
+  curveVertex( 48, 110);
+  curveVertex( 70,  68);
+  curveVertex( 58,  18);
+  curveVertex( 18, -20);
+  curveVertex(-15, -22);
+  curveVertex(-15, -22);
+  endShape(CLOSE);
+}
+
+// ── NECK ─────────────────────────────────────────────────────────────────
+function drawNeck() {
+  fill(245, 249, 255);
+  stroke(25, 30, 65);
+  strokeWeight(6);
+
+  beginShape();
+  curveVertex(-32, -58);
+  curveVertex(-32, -58);
+  curveVertex(-50, -75);
+  curveVertex(-48, -95);
+  curveVertex(-22, -98);
+  curveVertex( -2, -82);
+  curveVertex(  0, -60);
+  curveVertex(-10, -58);
+  curveVertex(-32, -58);
+  curveVertex(-32, -58);
   endShape(CLOSE);
 }
 
 // ── HEAD ─────────────────────────────────────────────────────────────────
+// Large chibi head, facing left. Crest at top.
 function drawHead() {
   fill(245, 249, 255);
   stroke(25, 30, 65);
   strokeWeight(6);
 
   beginShape();
-  curveVertex(-18, -52);
-  curveVertex(-18, -52);
-  curveVertex(-5,  -108);
-  curveVertex(12,  -158);
-  curveVertex(-16, -180);
-  curveVertex(-58, -168);
-  curveVertex(-86, -126);
-  curveVertex(-82, -78);
-  curveVertex(-58, -52);
-  curveVertex(-18, -52);
-  curveVertex(-18, -52);
+  curveVertex(-22, -95);
+  curveVertex(-22, -95);
+  curveVertex(-58, -112);  // lower-left (beak junction)
+  curveVertex(-68, -142);  // left
+  curveVertex(-55, -170);  // upper-left
+  curveVertex(-28, -185);  // crest (top)
+  curveVertex(  5, -175);  // upper-right
+  curveVertex( 15, -148);  // right
+  curveVertex(  5, -120);  // lower-right
+  curveVertex(-15,  -95);  // neck junction
+  curveVertex(-22, -95);
+  curveVertex(-22, -95);
   endShape(CLOSE);
 }
 
@@ -99,86 +122,86 @@ function drawBeak() {
   stroke(25, 30, 65);
   strokeWeight(5);
 
-  // upper beak
+  // upper beak (points left)
   beginShape();
-  curveVertex(-68, -92);
-  curveVertex(-68, -92);
-  curveVertex(-115, -92);
-  curveVertex(-142, -86);
-  curveVertex(-120, -76);
-  curveVertex(-72, -76);
-  curveVertex(-68, -92);
-  curveVertex(-68, -92);
+  curveVertex(-58, -118);
+  curveVertex(-58, -118);
+  curveVertex(-102, -118);
+  curveVertex(-128, -110);
+  curveVertex(-108,  -99);
+  curveVertex( -62,  -99);
+  curveVertex(-58, -118);
+  curveVertex(-58, -118);
   endShape(CLOSE);
 
   // lower beak
   beginShape();
-  curveVertex(-68, -76);
-  curveVertex(-68, -76);
-  curveVertex(-110, -76);
-  curveVertex(-126, -69);
-  curveVertex(-104, -62);
-  curveVertex(-70, -64);
-  curveVertex(-68, -76);
-  curveVertex(-68, -76);
+  curveVertex( -58,  -99);
+  curveVertex( -58,  -99);
+  curveVertex( -98,  -99);
+  curveVertex(-114,  -92);
+  curveVertex( -94,  -84);
+  curveVertex( -60,  -86);
+  curveVertex( -58,  -99);
+  curveVertex( -58,  -99);
   endShape(CLOSE);
 }
 
 // ── EYE ──────────────────────────────────────────────────────────────────
 function drawEye() {
-  let ex = -34, ey = -120;
+  let ex = -22, ey = -148;
 
-  // blue brow ridge (iconic Lugia marking)
+  // blue brow ridge marking
   fill(105, 158, 225);
   stroke(25, 30, 65);
   strokeWeight(3);
   beginShape();
-  curveVertex(-55, -140);
-  curveVertex(-55, -140);
-  curveVertex(-34, -148);
-  curveVertex(-12, -140);
-  curveVertex(-18, -130);
-  curveVertex(-48, -130);
-  curveVertex(-55, -140);
-  curveVertex(-55, -140);
+  curveVertex(-42, -164);
+  curveVertex(-42, -164);
+  curveVertex(-22, -172);
+  curveVertex( -2, -164);
+  curveVertex( -8, -155);
+  curveVertex(-36, -155);
+  curveVertex(-42, -164);
+  curveVertex(-42, -164);
   endShape(CLOSE);
 
   // outer ring (blue)
   fill(88, 142, 218);
   stroke(25, 30, 65);
   strokeWeight(3);
-  ellipse(ex, ey, 40, 30);
+  ellipse(ex, ey, 36, 28);
 
   // white sclera
   fill(238, 244, 255);
   noStroke();
-  ellipse(ex, ey, 27, 20);
+  ellipse(ex, ey, 24, 18);
 
   // red iris
   fill(218, 48, 48);
-  ellipse(ex, ey, 16, 16);
+  ellipse(ex, ey, 14, 14);
 
   // dark pupil
   fill(15, 15, 35);
-  ellipse(ex, ey, 7, 7);
+  ellipse(ex, ey, 6, 6);
 
   // specular highlight
   fill(255, 255, 255, 230);
-  ellipse(ex + 4, ey - 3, 5, 4);
+  ellipse(ex + 4, ey - 3, 4, 3);
 }
 
 // ── BACK SPINES ───────────────────────────────────────────────────────────
+// 4 triangular spines, visible on the right/back side
 function drawBackSpines() {
   fill(150, 192, 238);
   stroke(25, 30, 65);
   strokeWeight(4);
 
-  // 4 triangular spines along the upper back
   let spines = [
-    [[-48, -42], [-26, -42], [-37, -90]],
-    [[-14, -42], [ 10, -42], [ -2, -88]],
-    [[ 20, -42], [ 44, -42], [ 32, -84]],
-    [[ 52, -42], [ 72, -42], [ 62, -78]],
+    [[ 55, -58], [ 72, -58], [ 63, -92]],
+    [[ 65, -22], [ 82, -22], [ 74, -58]],
+    [[ 72,  15], [ 90,  15], [ 81, -20]],
+    [[ 75,  50], [ 92,  50], [ 84,  15]],
   ];
 
   for (let [[lx, ly], [rx, ry], [tx, ty]] of spines) {
@@ -191,66 +214,89 @@ function drawBackSpines() {
 }
 
 // ── WINGS ────────────────────────────────────────────────────────────────
-function drawRightWing() {
-  fill(245, 249, 255);
-  stroke(25, 30, 65);
-  strokeWeight(6);
-
-  beginShape();
-  curveVertex(55, 2);
-  curveVertex(55, 2);
-  curveVertex(115, -38);
-  curveVertex(195, -78);
-  curveVertex(240, -48);
-  curveVertex(222, 28);
-  curveVertex(150, 68);
-  curveVertex(72, 62);
-  curveVertex(55, 2);
-  curveVertex(55, 2);
-  endShape(CLOSE);
-
-  drawWingFingers(1);
-}
-
+// Wings sweep UPWARD and outward — this is the key fix from previous version
 function drawLeftWing() {
   fill(245, 249, 255);
   stroke(25, 30, 65);
   strokeWeight(6);
 
+  // Main wing body: sweeps from body-left UP and to the left
   beginShape();
-  curveVertex(-55, 2);
-  curveVertex(-55, 2);
-  curveVertex(-115, -38);
-  curveVertex(-195, -78);
-  curveVertex(-240, -48);
-  curveVertex(-222, 28);
-  curveVertex(-150, 68);
-  curveVertex(-72, 62);
-  curveVertex(-55, 2);
-  curveVertex(-55, 2);
+  curveVertex(-65, -15);
+  curveVertex(-65, -15);
+  curveVertex(-115, -65);   // leading up
+  curveVertex(-180, -122);  // leading mid
+  curveVertex(-228, -165);  // wing tip
+  curveVertex(-192,  -88);  // trailing upper
+  curveVertex(-135,  -30);  // trailing lower
+  curveVertex( -80,  42);   // trailing root
+  curveVertex(-65, -15);
+  curveVertex(-65, -15);
   endShape(CLOSE);
 
-  drawWingFingers(-1);
+  // Interior structure lines (wing membrane look)
+  stroke(25, 30, 65);
+  strokeWeight(2);
+  line( -82, 38, -205, -115);
+  line( -90, 22, -215, -132);
+  line(-100,  8, -222, -148);
+
+  // 3 wing-tip fingers
+  fill(245, 249, 255);
+  strokeWeight(4);
+  let fingers = [
+    [[-198, -128], [-228, -162], [-212, -148]],
+    [[-210, -145], [-242, -182], [-226, -162]],
+    [[-220, -158], [-252, -200], [-236, -178]],
+  ];
+  for (let [[lx, ly], [tx, ty], [rx, ry]] of fingers) {
+    beginShape();
+    vertex(lx, ly);
+    vertex(tx, ty);
+    vertex(rx, ry);
+    endShape(CLOSE);
+  }
 }
 
-// dir: 1 = right wing, -1 = left wing
-function drawWingFingers(dir) {
+function drawRightWing() {
   fill(245, 249, 255);
   stroke(25, 30, 65);
+  strokeWeight(6);
+
+  // Mirror of left wing, slightly different angle
+  beginShape();
+  curveVertex( 65, -15);
+  curveVertex( 65, -15);
+  curveVertex(112, -62);
+  curveVertex(175, -118);
+  curveVertex(222, -158);
+  curveVertex(188,  -82);
+  curveVertex(132,  -28);
+  curveVertex( 78,  42);
+  curveVertex( 65, -15);
+  curveVertex( 65, -15);
+  endShape(CLOSE);
+
+  // Interior structure lines
+  stroke(25, 30, 65);
+  strokeWeight(2);
+  line( 80, 38, 198, -108);
+  line( 88, 22, 210, -125);
+  line( 98,  8, 218, -140);
+
+  // 3 wing-tip fingers
+  fill(245, 249, 255);
   strokeWeight(4);
-
-  // 3 pointed finger tips at the wing's leading edge
   let fingers = [
-    [dir * 182, -74, dir * 218, -112, dir * 205, -80],
-    [dir * 228, -50, dir * 262, -70,  dir * 248, -38],
-    [dir * 232, -12, dir * 268,  -8,  dir * 250,  14],
+    [[192, -122], [222, -155], [208, -142]],
+    [[205, -138], [238, -175], [222, -158]],
+    [[215, -150], [248, -192], [232, -170]],
   ];
-
-  for (let [bx, by, tx, ty, ex, ey] of fingers) {
+  for (let [[lx, ly], [tx, ty], [rx, ry]] of fingers) {
     beginShape();
-    vertex(bx, by);
+    vertex(lx, ly);
     vertex(tx, ty);
-    vertex(ex, ey);
+    vertex(rx, ry);
     endShape(CLOSE);
   }
 }
@@ -261,33 +307,64 @@ function drawTail() {
   stroke(25, 30, 65);
   strokeWeight(5);
 
-  // tail body
+  // Long sweeping tail — C-curve going down from body bottom-right
   beginShape();
-  curveVertex(58, 102);
-  curveVertex(58, 102);
-  curveVertex(75, 142);
-  curveVertex(90, 178);
-  curveVertex(80, 202);
-  curveVertex(60, 196);
-  curveVertex(44, 162);
-  curveVertex(40, 120);
-  curveVertex(58, 102);
-  curveVertex(58, 102);
+  curveVertex( 28, 130);
+  curveVertex( 28, 130);
+  curveVertex( 68, 155);
+  curveVertex(105, 185);
+  curveVertex(122, 215);
+  curveVertex(108, 232);
+  curveVertex( 82, 225);
+  curveVertex( 48, 198);
+  curveVertex( 15, 162);
+  curveVertex(  8, 138);
+  curveVertex( 28, 130);
+  curveVertex( 28, 130);
   endShape(CLOSE);
 
-  // 3 tail fin protrusions
+  // 3 tail-end spike fins
   strokeWeight(3);
-
   let fins = [
-    [[64, 150], [98, 158],  [94, 174],  [66, 170]],
-    [[72, 172], [108, 174], [110, 188], [75, 190]],
-    [[56, 190], [80, 202],  [74, 215],  [50, 208]],
+    [[ 90, 215], [115, 238], [105, 250], [ 80, 230]],
+    [[ 68, 222], [ 88, 250], [ 68, 255], [ 50, 232]],
+    [[ 48, 218], [ 58, 245], [ 38, 248], [ 25, 224]],
   ];
-
   for (let pts of fins) {
     beginShape();
     for (let [px, py] of pts) vertex(px, py);
     endShape(CLOSE);
+  }
+}
+
+// ── FEET ─────────────────────────────────────────────────────────────────
+function drawFeet() {
+  drawFoot(-40, 130);
+  drawFoot( 20, 138);
+}
+
+function drawFoot(fx, fy) {
+  fill(245, 249, 255);
+  stroke(25, 30, 65);
+  strokeWeight(5);
+
+  // 3 toes with small claw tips
+  let toes = [
+    [fx - 5, fy, fx - 22, fy + 30, fx - 16, fy + 40],
+    [fx,     fy, fx,      fy + 34, fx +  6, fy + 43],
+    [fx + 5, fy, fx + 20, fy + 30, fx + 26, fy + 40],
+  ];
+
+  for (let [x1, y1, x2, y2, cx, cy] of toes) {
+    line(x1, y1, x2, y2);
+    strokeWeight(3);
+    fill(245, 249, 255);
+    beginShape();
+    vertex(x2 - 4, y2 - 2);
+    vertex(cx, cy);
+    vertex(x2 + 4, y2 - 2);
+    endShape(CLOSE);
+    strokeWeight(5);
   }
 }
 
