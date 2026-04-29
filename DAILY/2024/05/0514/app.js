@@ -1,38 +1,38 @@
-let seed
-let diff = 0
+let seed;
+let diff = 0;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight)
-  // noStroke()
-  noFill()
-  strokeWeight(3)
+  createCanvas(windowWidth, windowHeight);
+  noStroke();
+  noFill();
+  strokeWeight(3);
 
-  seed = random(1000)
+  seed = random(1000);
 }
 
 function draw() {
-  background(255)
-  randomSeed(seed)
+  background(255);
+  randomSeed(seed);
 
-  drawTechnoCircles(width / 2, height / 2, 20)
-  diff += 0.1
+  drawTechnoCircles(width / 2, height / 2, 20);
+  diff += 0.1;
 }
 
 function drawTechnoCircles(cx, cy, numShapes) {
   for (let i = 0; i < numShapes; i++) {
-    let startAngle = random(TAU)
-    let endAngle = startAngle + random(TAU / 15, TAU / 8)
-    let innerRadius = random(40, 100)
-    let outerRadius = innerRadius + random(50, 200)
+    let startAngle = random(TAU);
+    let endAngle = startAngle + random(TAU / 12, TAU / 4);
+    let innerRadius = random(40, 100);
+    let outerRadius = innerRadius + random(50, 200);
 
     drawRadialShape(
       cx,
       cy,
       innerRadius + 30 * sin(diff + map(i, 0, numShapes, -1, 1)),
       outerRadius + 30 * sin(diff + map(i, 0, numShapes, -1, 1)),
-      startAngle + sin(diff / 3 + map(i, 0, numShapes, -1, 1)),
+      startAngle, // + sin(diff / 3 + map(i, 0, numShapes, -1, 1)),
       endAngle,
-    )
+    );
   }
 }
 
@@ -44,29 +44,29 @@ function drawRadialShape(
   startAngle,
   endAngle,
 ) {
-  stroke(`${random(colorPalette).colors[2]}`)
+  fill(`${random(colorPalette).colors[2]}`);
 
-  beginShape()
+  beginShape();
   for (let angle = startAngle; angle <= endAngle; angle += PI / 180) {
-    let x = cx + cos(angle) * outerRadius
-    let y = cy + sin(angle) * outerRadius
-    vertex(x, y)
+    let x = cx + cos(angle) * outerRadius;
+    let y = cy + sin(angle) * outerRadius;
+    vertex(x, y);
   }
   for (let angle = endAngle; angle >= startAngle; angle -= PI / 180) {
-    let x = cx + cos(angle) * innerRadius
-    let y = cy + sin(angle) * innerRadius
-    vertex(x, y)
+    let x = cx + cos(angle) * innerRadius;
+    let y = cy + sin(angle) * innerRadius;
+    vertex(x, y);
   }
-  endShape(CLOSE)
+  endShape(CLOSE);
 }
 
 function keyPressed() {
   if (key === 's') {
-    saveGif('mySketch', 5)
+    saveGif('mySketch', 5);
   }
 
   if (key === 'c') {
-    saveCanvas('mySketch', 'jpeg')
+    saveCanvas('mySketch', 'jpeg');
   }
 }
 
@@ -127,4 +127,4 @@ let colorPalette = [
     name: 'RiverSide',
     colors: ['#906FA6', '#025951', '#252625', '#D99191', '#F2F2F2'],
   },
-]
+];
