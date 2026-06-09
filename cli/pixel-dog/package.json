@@ -1,0 +1,11 @@
+{
+  "name": "pixel-dog",
+  "version": "1.0.0",
+  "description": "Generate 32×32 pixel-art dog portraits as SVG – zero dependencies",
+  "bin": { "pixel-dog": "./generate.js" },
+  "scripts": {
+    "generate": "node generate.js --breed random --preview --output dog.svg",
+    "all":      "node generate.js --breed shiba --output shiba.svg && node generate.js --breed corgi --output corgi.svg && node generate.js --breed dalmatian --output dalmatian.svg && node generate.js --breed golden --output golden.svg && node generate.js --breed husky --output husky.svg && node generate.js --breed dachshund --output dachshund.svg && node generate.js --breed poodle --output poodle.svg"
+  },
+  "engines": { "node": ">=14" }
+}
