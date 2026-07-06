@@ -1,288 +1,430 @@
-// Geometric Abstract Art - inspired by bold graphic/Memphis design style
-// Color palette: red, black, white, gray
-// Features: triangles, concentric circles, stripes, halftone dots, diagonal composition
+// Geometric Abstract Collage — red / black / gray on white
+// inspired by NahoGraphics-style diagonal geometric compositions
+// Motifs: striped triangles, triangle grids, concentric arc fans,
+//         striped/halftone circles, long pin lines along a diagonal axis
 
 let W;
+let blobs = [];
+let linesUnder = [];
+let linesOver = [];
 let shapes = [];
-let bgGradientColors;
+let dots = [];
 
 // ---- Color Palette ----
-const RED = "#E8002A";
-const BLACK = "#1A1A1A";
+const RED = "#E60021";
+const BLACK = "#141414";
+const GRAY = "#9A9A9A";
+const LGRAY = "#C9C9C9";
+const BLOB_GRAY = "#EFEFEF";
 const WHITE = "#FFFFFF";
-const GRAY1 = "#888888";
-const GRAY2 = "#CCCCCC";
-const GRAY3 = "#444444";
-const PALETTE = [RED, BLACK, WHITE, GRAY1, GRAY2];
 
-// Diagonal band parameters (shapes cluster along this axis)
-// Band runs from bottom-left to top-right
-let BAND_ANGLE;  // radians
-let BAND_CENTER; // y center at x=W/2
+// Diagonal band axis: everything aligns to this angle
+let BAND_ANGLE;
+let CX, CY;
 
 function setup() {
   W = min(windowWidth, windowHeight) - 50;
   createCanvas(W, W);
   noLoop();
 
-  BAND_ANGLE = -PI / 6; // ~-30 degrees (left-down to right-up)
-  BAND_CENTER = W * 0.55;
+  BAND_ANGLE = -PI / 9; // ~ -20 degrees, bottom-left to top-right
+  CX = W / 2;
+  CY = W / 2;
 
-  generateShapes();
+  generateComposition();
 }
 
 function draw() {
-  // White background
   background(255);
 
-  // Draw a subtle gradient bar (the purple/blue band at top of reference image)
-  drawGradientBar();
-
-  // Draw all shapes back to front
-  for (let sh of shapes) {
-    drawShape(sh);
-  }
-
-  // Scatter small dots over the composition for texture
+  drawBlobs();
+  for (const l of linesUnder) drawPinLine(l);
+  for (const sh of shapes) drawShape(sh);
+  for (const l of linesOver) drawPinLine(l);
   drawScatteredDots();
 }
 
-// ---- Gradient decorative bar ----
-function drawGradientBar() {
-  push();
-  noStroke();
-  let barH = W * 0.07;
-  let barY = W * 0.28;
-  for (let x = 0; x < W; x++) {
-    let t = x / W;
-    let r = lerp(180, 255, t);
-    let g = lerp(180, 100, t);
-    let b = lerp(255, 200, t);
-    stroke(r, g, b, 180);
-    line(x, barY, x, barY + barH);
-  }
-  pop();
+// ---- Band coordinate helper ----
+// u: along the diagonal axis, v: across it
+function bandToXY(u, v) {
+  return {
+    x: CX + u * cos(BAND_ANGLE) - v * sin(BAND_ANGLE),
+    y: CY + u * sin(BAND_ANGLE) + v * cos(BAND_ANGLE),
+  };
 }
 
-// ---- Generate a collection of shape descriptors ----
-function generateShapes() {
-  shapes = [];
-  let numShapes = floor(random(60, 90));
+// Triangular distribution: dense in the middle, sparse at both ends
+function alongBand() {
+  return ((random(-1, 1) + random(-1, 1)) / 2) * W * 0.62;
+}
 
-  for (let i = 0; i < numShapes; i++) {
-    // Place shapes along a diagonal band
-    let t = random(0, 1);
-    // x spread across most of canvas
-    let x = random(-W * 0.05, W * 1.05);
-    // y follows diagonal band with some scatter
-    let bandY = BAND_CENTER + (x - W / 2) * tan(BAND_ANGLE);
-    let scatter = random(-W * 0.22, W * 0.22);
-    let y = bandY + scatter;
+function acrossBand(sd) {
+  return constrain(randomGaussian(0, sd * W), -W * 0.26, W * 0.26);
+}
 
-    let size = random(W * 0.04, W * 0.18);
-    let color1 = random(PALETTE);
-    let color2 = random(PALETTE);
-    // avoid same color for fill/stroke
-    while (color2 === color1) color2 = random(PALETTE);
+// ---- Composition ----
+function generateComposition() {
+  generateBlobs();
+  generatePinLines();
+  generateShapes();
+  generateDots();
+}
 
-    let shapeType = floor(random(7));
-    // Types:
-    // 0 = filled triangle
-    // 1 = outlined triangle
-    // 2 = concentric circles (target)
-    // 3 = solid circle
-    // 4 = outlined circle
-    // 5 = striped circle
-    // 6 = halftone dot-filled circle
-
-    shapes.push({
-      x, y, size, color1, color2,
-      type: shapeType,
-      rotation: random(TWO_PI),
-      strokeW: random(1, 4),
+function generateBlobs() {
+  blobs = [];
+  // Large soft gray circles behind the cluster
+  const spots = [
+    { u: -W * 0.03, v: -W * 0.18, r: W * 0.16 },
+    { u: W * 0.1, v: W * 0.16, r: W * 0.12 },
+  ];
+  for (const s of spots) {
+    const p = bandToXY(s.u, s.v);
+    // pair of overlapping circles for a blobby silhouette
+    blobs.push({ x: p.x, y: p.y, r: s.r });
+    blobs.push({
+      x: p.x + random(-s.r, s.r) * 0.5,
+      y: p.y + random(-s.r, s.r) * 0.5,
+      r: s.r * random(0.55, 0.8),
     });
   }
 }
 
-// ---- Draw a single shape ----
-function drawShape(sh) {
-  push();
-  translate(sh.x, sh.y);
-  rotate(sh.rotation);
-  strokeWeight(sh.strokeW);
+function generatePinLines() {
+  linesUnder = [];
+  linesOver = [];
+  const num = floor(random(7, 10));
+  for (let i = 0; i < num; i++) {
+    const dir = i % 2 === 0 ? 1 : -1; // extend up-right or down-left
+    const u0 = dir * random(W * 0.05, W * 0.3);
+    const v = acrossBand(0.1);
+    const p = bandToXY(u0, v);
+    const angle = BAND_ANGLE + random(-0.04, 0.04) + (dir < 0 ? PI : 0);
+    const len = random(W * 0.35, W * 0.65);
+    const l = {
+      x: p.x,
+      y: p.y,
+      angle,
+      len,
+      c: random([RED, BLACK, BLACK, GRAY]),
+      sw: random(1, 2.5),
+      dotR: random() < 0.6 ? random(3, 8) : 0,
+    };
+    (random() < 0.5 ? linesUnder : linesOver).push(l);
+  }
+}
 
-  switch (sh.type) {
-    case 0: drawFilledTriangle(sh); break;
-    case 1: drawOutlinedTriangle(sh); break;
-    case 2: drawConcentricCircles(sh); break;
-    case 3: drawSolidCircle(sh); break;
-    case 4: drawOutlinedCircle(sh); break;
-    case 5: drawStripedCircle(sh); break;
-    case 6: drawHalftoneCircle(sh); break;
+const SHAPE_TYPES = [
+  ["stripedTriangle", 5],
+  ["triGrid", 3],
+  ["arcFan", 3],
+  ["stripedCircle", 3],
+  ["halftone", 2],
+  ["target", 2],
+  ["solidCircle", 2],
+  ["solidTriangle", 2],
+  ["dottedRing", 1],
+];
+
+function pickType() {
+  let total = 0;
+  for (const [, w] of SHAPE_TYPES) total += w;
+  let r = random(total);
+  for (const [t, w] of SHAPE_TYPES) {
+    if (r < w) return t;
+    r -= w;
+  }
+  return SHAPE_TYPES[0][0];
+}
+
+function pickInk() {
+  return random([RED, RED, RED, RED, BLACK, BLACK, BLACK, BLACK, GRAY, GRAY]);
+}
+
+function generateShapes() {
+  shapes = [];
+  const num = floor(random(44, 54));
+
+  for (let i = 0; i < num; i++) {
+    const type = pickType();
+    const u = alongBand();
+    const v = acrossBand(0.1);
+    const p = bandToXY(u, v);
+
+    // shapes shrink toward both ends of the band
+    const falloff = map(abs(u), 0, W * 0.62, 1, 0.4);
+    let size = W * random(0.08, 0.22) * falloff;
+    if (type === "solidTriangle" || type === "solidCircle") size *= 0.55;
+    if (type === "arcFan") size *= 1.5;
+    if (type === "stripedTriangle") size *= random(1, 1.4);
+
+    const c1 = pickInk();
+    let c2 = pickInk();
+    while (c2 === c1) c2 = pickInk();
+
+    // rotation snaps to the band axis — this is what keeps the
+    // composition coherent instead of chaotic
+    let rot = BAND_ANGLE;
+    if (type.includes("Triangle") || type === "triGrid") {
+      rot += random([0, 0, PI]); // point "up" or "down" along the band
+    } else {
+      rot += random([0, HALF_PI, PI / 4, -PI / 4]);
+    }
+
+    shapes.push({
+      type, x: p.x, y: p.y, size, rot, c1, c2,
+      p: makeParams(type, size),
+    });
+  }
+
+  // draw big shapes first so small ones layer on top
+  shapes.sort((a, b) => b.size - a.size);
+}
+
+// All randomness resolved here, never inside draw
+function makeParams(type, size) {
+  switch (type) {
+    case "stripedTriangle":
+    case "stripedCircle": {
+      const n = floor(random(7, 14));
+      const gap = max(3, size / n);
+      return { gap, sw: gap * random(0.4, 0.6), dir: random([0, HALF_PI]) };
+    }
+    case "triGrid":
+      return { rows: floor(random(3, 6)), skip: random(0.1, 0.35) };
+    case "arcFan": {
+      const rings = floor(random(5, 9));
+      return {
+        rings,
+        innerRatio: random(0.15, 0.35),
+        a0: random([PI, PI * 0.75, PI * 1.25]),
+        span: random(PI * 0.9, PI * 1.3),
+        twoTone: random() < 0.4,
+      };
+    }
+    case "halftone": {
+      const n = floor(random(6, 11));
+      return { spacing: size / n, stagger: random() < 0.5 };
+    }
+    case "target":
+      return { rings: floor(random(2, 5)) };
+    case "dottedRing":
+      return { n: floor(random(10, 22)) };
+    default:
+      return {};
+  }
+}
+
+function generateDots() {
+  dots = [];
+  const num = floor(random(40, 60));
+  for (let i = 0; i < num; i++) {
+    const p = bandToXY(alongBand() * 1.15, acrossBand(0.14));
+    dots.push({
+      x: p.x,
+      y: p.y,
+      r: random(W * 0.003, W * 0.012),
+      c: pickInk(),
+      ring: random() < 0.25,
+    });
+  }
+}
+
+// ---- Drawing ----
+
+function drawBlobs() {
+  noStroke();
+  fill(BLOB_GRAY);
+  for (const b of blobs) circle(b.x, b.y, b.r * 2);
+}
+
+function drawPinLine(l) {
+  push();
+  stroke(l.c);
+  strokeWeight(l.sw);
+  const x2 = l.x + cos(l.angle) * l.len;
+  const y2 = l.y + sin(l.angle) * l.len;
+  line(l.x, l.y, x2, y2);
+  if (l.dotR > 0) {
+    noStroke();
+    fill(l.c);
+    circle(x2, y2, l.dotR * 2);
   }
   pop();
 }
 
-// ---- Shape drawing functions ----
-
-function drawFilledTriangle(sh) {
-  fill(sh.color1);
-  stroke(sh.color2);
-  let r = sh.size / 2;
-  triangle(0, -r, -r * 0.9, r * 0.7, r * 0.9, r * 0.7);
+function drawShape(sh) {
+  push();
+  translate(sh.x, sh.y);
+  rotate(sh.rot);
+  switch (sh.type) {
+    case "stripedTriangle": drawStripedTriangle(sh); break;
+    case "triGrid": drawTriGrid(sh); break;
+    case "arcFan": drawArcFan(sh); break;
+    case "stripedCircle": drawStripedCircle(sh); break;
+    case "halftone": drawHalftoneCircle(sh); break;
+    case "target": drawTarget(sh); break;
+    case "solidCircle": drawSolidCircle(sh); break;
+    case "solidTriangle": drawSolidTriangle(sh); break;
+    case "dottedRing": drawDottedRing(sh); break;
+  }
+  pop();
 }
 
-function drawOutlinedTriangle(sh) {
-  noFill();
-  stroke(sh.color1);
-  strokeWeight(sh.strokeW * 1.5);
-  let r = sh.size / 2;
-  triangle(0, -r, -r * 0.9, r * 0.7, r * 0.9, r * 0.7);
+function clipTrianglePath(r) {
+  const ctx = drawingContext;
+  ctx.beginPath();
+  ctx.moveTo(0, -r);
+  ctx.lineTo(-r * 1.05, r * 0.75);
+  ctx.lineTo(r * 1.05, r * 0.75);
+  ctx.closePath();
+  ctx.clip();
 }
 
-function drawConcentricCircles(sh) {
-  noFill();
-  let rings = floor(random(3, 7));
-  for (let i = rings; i >= 1; i--) {
-    // alternate colors
-    if (i % 2 === 0) {
-      fill(sh.color1);
-    } else {
-      fill(sh.color2);
+function clipCirclePath(r) {
+  const ctx = drawingContext;
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, TWO_PI);
+  ctx.clip();
+}
+
+function drawStripes(r, gap, sw, dir, c) {
+  push();
+  rotate(dir);
+  stroke(c);
+  strokeWeight(sw);
+  const ext = r * 1.6;
+  for (let y = -ext; y <= ext; y += gap) line(-ext, y, ext, y);
+  pop();
+}
+
+function drawStripedTriangle(sh) {
+  const r = sh.size / 2;
+  push();
+  clipTrianglePath(r);
+  drawStripes(r, sh.p.gap, sh.p.sw, sh.p.dir, sh.c1);
+  pop();
+}
+
+function drawStripedCircle(sh) {
+  const r = sh.size / 2;
+  push();
+  clipCirclePath(r);
+  drawStripes(r, sh.p.gap, sh.p.sw, sh.p.dir, sh.c1);
+  pop();
+}
+
+// Big triangle subdivided into rows of small triangles (triforce grid)
+function drawTriGrid(sh) {
+  const n = sh.p.rows;
+  const s = sh.size / n; // cell base width
+  const h = s * 0.87; // cell height
+  const H = n * h;
+  noStroke();
+  for (let row = 0; row < n; row++) {
+    const yTop = -H / 2 + row * h;
+    for (let j = 0; j <= row; j++) {
+      const x = (j - row / 2) * s;
+      // upward cells alternate colors, downward cells stay white
+      fill((row + j) % 2 === 0 ? sh.c1 : sh.c2);
+      triangle(x, yTop, x - s / 2, yTop + h, x + s / 2, yTop + h);
     }
-    noStroke();
-    let r = (sh.size / rings) * i;
-    ellipse(0, 0, r, r);
+  }
+}
+
+// Concentric striped arcs — the fan / rainbow motif
+function drawArcFan(sh) {
+  const r = sh.size / 2;
+  const inner = r * sh.p.innerRatio;
+  const gap = (r - inner) / sh.p.rings;
+  noFill();
+  strokeWeight(gap * 0.55);
+  for (let i = 0; i < sh.p.rings; i++) {
+    stroke(sh.p.twoTone && i < sh.p.rings / 2 ? sh.c2 : sh.c1);
+    const rr = inner + i * gap;
+    arc(0, 0, rr * 2, rr * 2, sh.p.a0, sh.p.a0 + sh.p.span);
+  }
+}
+
+function drawHalftoneCircle(sh) {
+  const r = sh.size / 2;
+  const sp = sh.p.spacing;
+  const dotR = sp * 0.32;
+  noStroke();
+  fill(sh.c1);
+  let row = 0;
+  for (let y = -r; y <= r; y += sp, row++) {
+    const off = sh.p.stagger && row % 2 === 1 ? sp / 2 : 0;
+    for (let x = -r; x <= r; x += sp) {
+      if (dist(0, 0, x + off, y) <= r - dotR) circle(x + off, y, dotR * 2);
+    }
+  }
+}
+
+function drawTarget(sh) {
+  noStroke();
+  const rings = sh.p.rings;
+  for (let i = rings; i >= 1; i--) {
+    fill(i % 2 === 0 ? sh.c2 : sh.c1);
+    circle(0, 0, (sh.size / rings) * i);
+  }
+  // punch a white hole sometimes to make it a donut
+  if (rings === 2) {
+    fill(WHITE);
+    circle(0, 0, sh.size * 0.3);
   }
 }
 
 function drawSolidCircle(sh) {
-  fill(sh.color1);
   noStroke();
-  ellipse(0, 0, sh.size, sh.size);
+  fill(sh.c1);
+  circle(0, 0, sh.size);
 }
 
-function drawOutlinedCircle(sh) {
-  noFill();
-  stroke(sh.color1);
-  strokeWeight(sh.strokeW * 1.5);
-  ellipse(0, 0, sh.size, sh.size);
+function drawSolidTriangle(sh) {
+  noStroke();
+  fill(sh.c1);
+  const r = sh.size / 2;
+  triangle(0, -r, -r * 1.05, r * 0.75, r * 1.05, r * 0.75);
 }
 
-function drawStripedCircle(sh) {
-  // Draw circle clipped with vertical stripes inside
-  let r = sh.size / 2;
-
-  // Background fill
-  fill(sh.color2);
+function drawDottedRing(sh) {
   noStroke();
-  ellipse(0, 0, sh.size, sh.size);
-
-  // Draw stripes using many thin vertical rects clipped to circle
-  let stripeW = sh.size / 12;
-  fill(sh.color1);
-  noStroke();
-  for (let sx = -r; sx < r; sx += stripeW * 2) {
-    // Clip-like: only draw within circle boundary
-    // Sample at multiple y points to draw a stripe segment
-    beginShape();
-    let steps = 20;
-    // Left edge of stripe, top to bottom inside circle
-    for (let j = 0; j <= steps; j++) {
-      let py = -r + (2 * r * j) / steps;
-      let halfChord = sqrt(max(0, r * r - py * py));
-      let lx = constrain(sx, -halfChord, halfChord);
-      vertex(lx, py);
-    }
-    // Right edge, bottom to top
-    for (let j = steps; j >= 0; j--) {
-      let py = -r + (2 * r * j) / steps;
-      let halfChord = sqrt(max(0, r * r - py * py));
-      let rx2 = constrain(sx + stripeW, -halfChord, halfChord);
-      vertex(rx2, py);
-    }
-    endShape(CLOSE);
+  fill(sh.c1);
+  const r = sh.size / 2;
+  const d = max(2, r * 0.16);
+  for (let i = 0; i < sh.p.n; i++) {
+    const a = (TWO_PI * i) / sh.p.n;
+    circle(cos(a) * r, sin(a) * r, d);
   }
-
-  // Outline
-  noFill();
-  stroke(sh.color1);
-  strokeWeight(sh.strokeW);
-  ellipse(0, 0, sh.size, sh.size);
 }
 
-function drawHalftoneCircle(sh) {
-  // Fill a circle area with a grid of small dots
-  let r = sh.size / 2;
-  let dotSpacing = sh.size / 9;
-  let dotR = dotSpacing * 0.4;
-
-  // Circle outline background
-  fill(sh.color2);
-  noStroke();
-  ellipse(0, 0, sh.size, sh.size);
-
-  fill(sh.color1);
-  noStroke();
-  for (let dx = -r; dx <= r; dx += dotSpacing) {
-    for (let dy = -r; dy <= r; dy += dotSpacing) {
-      if (dist(0, 0, dx, dy) <= r - dotR) {
-        ellipse(dx, dy, dotR * 2, dotR * 2);
-      }
-    }
-  }
-
-  // Outline
-  noFill();
-  stroke(sh.color1);
-  strokeWeight(sh.strokeW);
-  ellipse(0, 0, sh.size, sh.size);
-}
-
-// ---- Scattered small decorative dots ----
 function drawScatteredDots() {
-  let numDots = 80;
-  for (let i = 0; i < numDots; i++) {
-    let x = random(-W * 0.05, W * 1.05);
-    let bandY = BAND_CENTER + (x - W / 2) * tan(BAND_ANGLE);
-    let scatter = random(-W * 0.28, W * 0.28);
-    let y = bandY + scatter;
-
-    let dotSize = random(W * 0.005, W * 0.025);
-    let c = random(PALETTE);
-
-    fill(c);
-    noStroke();
-    ellipse(x, y, dotSize, dotSize);
+  for (const d of dots) {
+    if (d.ring) {
+      noFill();
+      stroke(d.c);
+      strokeWeight(max(1, d.r * 0.5));
+      circle(d.x, d.y, d.r * 2.5);
+    } else {
+      noStroke();
+      fill(d.c);
+      circle(d.x, d.y, d.r * 2);
+    }
   }
-}
-
-// ---- Diagonal accent lines ----
-function drawDiagonalLines() {
-  push();
-  stroke(RED);
-  strokeWeight(1.5);
-  let num = 3;
-  for (let i = 0; i < num; i++) {
-    let y0 = random(W * 0.2, W * 0.8);
-    line(0, y0, W, y0 + W * tan(BAND_ANGLE));
-  }
-  pop();
 }
 
 // ---- Keyboard interactions ----
 function keyPressed() {
   if (key === "r" || key === "R") {
-    // Regenerate
-    generateShapes();
+    generateComposition();
     redraw();
   }
   if (key === "s" || key === "S") {
-    let ts = year() + nf(month(), 2) + nf(day(), 2) + nf(hour(), 2) + nf(minute(), 2);
+    const ts = year() + nf(month(), 2) + nf(day(), 2) + nf(hour(), 2) + nf(minute(), 2);
     saveGif(`abstract-geo-${ts}`, 5);
   }
   if (key === "c" || key === "C") {
-    let ts = year() + nf(month(), 2) + nf(day(), 2) + nf(hour(), 2) + nf(minute(), 2);
+    const ts = year() + nf(month(), 2) + nf(day(), 2) + nf(hour(), 2) + nf(minute(), 2);
     saveCanvas(`abstract-geo-${ts}`, "jpg");
   }
 }
