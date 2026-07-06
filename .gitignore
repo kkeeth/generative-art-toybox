@@ -55,3 +55,5 @@ typings/
 **/**/p5*.js
 WORKS/tmp/
 free_playground
+
+**/*.svg
