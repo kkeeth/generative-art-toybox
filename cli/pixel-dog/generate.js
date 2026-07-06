@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-'use strict';
+"use strict";
 // pixel-dog: generates pixel-art dog portraits (SVG, zero dependencies)
 //
 // Usage:
@@ -14,7 +14,7 @@
 // --preview     print colored block preview to stderr
 // --list        print available breeds and exit
 
-const fs = require('fs');
+const fs = require("fs");
 
 // ── Args ──────────────────────────────────────────────────────────────────────
 const argv = process.argv.slice(2);
@@ -22,23 +22,24 @@ function arg(name, def) {
   const i = argv.indexOf(`--${name}`);
   return i !== -1 ? argv[i + 1] : def;
 }
+
 function flag(name) {
   return argv.includes(`--${name}`);
 }
 
-if (flag('list')) {
+if (flag("list")) {
   console.log(
-    'Available breeds:\n  shiba, corgi, dalmatian, golden, husky, dachshund, poodle\n  random',
+    "Available breeds:\n  shiba, corgi, dalmatian, golden, husky, dachshund, poodle\n  random",
   );
   process.exit(0);
 }
 
-const SEED_ARG = arg('seed', null);
-const BREED_ARG = arg('breed', 'random');
-const SIZE_ARG = arg('size', '32');
-const OUTPUT = arg('output', null);
-const PIXEL_SIZE = parseInt(arg('pixel-size', '10'), 10);
-const PREVIEW = flag('preview');
+const SEED_ARG = arg("seed", null);
+const BREED_ARG = arg("breed", "random");
+const SIZE_ARG = arg("size", "32");
+const OUTPUT = arg("output", null);
+const PIXEL_SIZE = parseInt(arg("pixel-size", "10"), 10);
+const PREVIEW = flag("preview");
 
 // Seeded RNG (mulberry32)
 function makeRng(seed) {
@@ -62,7 +63,7 @@ const rng = makeRng(seedValue);
 
 const SIZE_POOL = [16, 24, 32, 48, 64];
 const SIZE =
-  SIZE_ARG === 'random'
+  SIZE_ARG === "random"
     ? SIZE_POOL[Math.floor(rng() * SIZE_POOL.length)]
     : parseInt(SIZE_ARG, 10);
 
@@ -73,7 +74,7 @@ function darken(hex, f) {
   const r = d((n >> 16) & 255);
   const g = d((n >> 8) & 255);
   const b = d(n & 255);
-  return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+  return "#" + ((r << 16) | (g << 8) | b).toString(16).padStart(6, "0");
 }
 
 // ── Pixel Canvas ──────────────────────────────────────────────────────────────
@@ -146,7 +147,7 @@ class Canvas {
   toSVG(ps = PIXEL_SIZE) {
     const W = this.w * ps,
       H = this.h * ps;
-    let r = '';
+    let r = "";
     for (let y = 0; y < this.h; y++)
       for (let x = 0; x < this.w; x++) {
         const c = this.data[y][x];
@@ -159,8 +160,8 @@ class Canvas {
       `     viewBox="0 0 ${W} ${H}" shape-rendering="crispEdges">`,
       `  <rect width="${W}" height="${H}" fill="#e8e8e8"/>`,
       `  ${r}`,
-      '</svg>',
-    ].join('\n');
+      "</svg>",
+    ].join("\n");
   }
 
   // Terminal preview: two canvas rows → one terminal row using ▄
@@ -182,15 +183,15 @@ class Canvas {
         Math.round(b / 51)
       );
     };
-    const RST = '\x1b[0m';
-    let out = '';
+    const RST = "\x1b[0m";
+    let out = "";
     for (let y = 0; y < this.h; y += 2) {
       for (let x = 0; x < this.w; x++) {
         const top = this.data[y][x];
         const bot = y + 1 < this.h ? this.data[y + 1][x] : null;
         out += `\x1b[48;5;${hex2ansi(top)}m\x1b[38;5;${hex2ansi(bot)}m▄`;
       }
-      out += RST + '\n';
+      out += RST + "\n";
     }
     return out;
   }
@@ -202,13 +203,17 @@ class Canvas {
 // ground line at y=30. Far-side legs are drawn in a darker shade for depth.
 
 const GEO_DEFAULT = {
-  headCx: 24, headCy: 9, headR: 4.2, // head circle
-  neck: [19, 11, 6, 6],              // rect bridging head and chest
-  muzzle: [27, 8, 4, 3],             // snout box pointing right
-  eye: [25, 8],                      // 1×2 eye
-  nose: [30, 8],                     // nose tip at front of muzzle
-  legTop: 23, legH: 8,               // legs end on ground line y=30
-  frontX: 20, backX: 7,              // near-leg x positions
+  headCx: 24,
+  headCy: 9,
+  headR: 4.2, // head circle
+  neck: [19, 11, 6, 6], // rect bridging head and chest
+  muzzle: [27, 8, 4, 3], // snout box pointing right
+  eye: [25, 8], // 1×2 eye
+  nose: [30, 8], // nose tip at front of muzzle
+  legTop: 23,
+  legH: 8, // legs end on ground line y=30
+  frontX: 20,
+  backX: 7, // near-leg x positions
 };
 
 // Two near legs (full color) + two far legs (shade) + paws with a toe pixel
@@ -279,13 +284,13 @@ function drawDog(canvas, breed) {
 const BREEDS = {
   // 柴犬 ─────────────────────────────────────────────────────────────────────
   shiba: {
-    name: '柴犬 (Shiba Inu)',
+    name: "柴犬 (Shiba Inu)",
     colors: {
-      body: '#D9702E',
-      muzzle: '#F7E3BC', // urajiro cream
-      eye: '#2C0A00',
-      nose: '#111111',
-      paw: '#F7E3BC',
+      body: "#D9702E",
+      muzzle: "#F7E3BC", // urajiro cream
+      eye: "#2C0A00",
+      nose: "#111111",
+      paw: "#F7E3BC",
     },
     drawTail(cv, p, c) {
       // tightly curled tail resting over the rump
@@ -310,15 +315,15 @@ const BREEDS = {
 
   // コーギー ──────────────────────────────────────────────────────────────────
   corgi: {
-    name: 'コーギー (Corgi)',
+    name: "コーギー (Corgi)",
     colors: {
-      body: '#E08A3C',
-      muzzle: '#FFFAF0',
-      eye: '#2C0A00',
-      nose: '#111111',
-      white: '#FFFAF0',
-      paw: '#FFFAF0',
-      inner: '#FFB090',
+      body: "#E08A3C",
+      muzzle: "#FFFAF0",
+      eye: "#2C0A00",
+      nose: "#111111",
+      white: "#FFFAF0",
+      paw: "#FFFAF0",
+      inner: "#FFB090",
     },
     geo: {
       headCy: 10,
@@ -326,7 +331,8 @@ const BREEDS = {
       muzzle: [27, 9, 4, 3],
       eye: [25, 9],
       nose: [30, 9],
-      legTop: 26, legH: 5, // famously short legs
+      legTop: 26,
+      legH: 5, // famously short legs
     },
     drawBody(cv, p, c) {
       // long, low loaf of a body
@@ -354,14 +360,14 @@ const BREEDS = {
 
   // ダルメシアン ────────────────────────────────────────────────────────────────
   dalmatian: {
-    name: 'ダルメシアン (Dalmatian)',
+    name: "ダルメシアン (Dalmatian)",
     colors: {
-      body: '#FFFFFF',
-      muzzle: '#FFFFFF',
-      eye: '#111111',
-      nose: '#111111',
-      spot: '#1A1A1A',
-      shade: '#C9C9C9',
+      body: "#FFFFFF",
+      muzzle: "#FFFFFF",
+      eye: "#111111",
+      nose: "#111111",
+      spot: "#1A1A1A",
+      shade: "#C9C9C9",
     },
     drawTail(cv, p, c) {
       // thin tail carried up in a gentle curve
@@ -392,14 +398,14 @@ const BREEDS = {
 
   // ゴールデンレトリバー ─────────────────────────────────────────────────────────
   golden: {
-    name: 'ゴールデンレトリバー (Golden Retriever)',
+    name: "ゴールデンレトリバー (Golden Retriever)",
     colors: {
-      body: '#D89A2B',
-      muzzle: '#E8BC55',
-      eye: '#2C0A00',
-      nose: '#111111',
-      light: '#EDCB6B',
-      ear: '#B87E14',
+      body: "#D89A2B",
+      muzzle: "#E8BC55",
+      eye: "#2C0A00",
+      nose: "#111111",
+      light: "#EDCB6B",
+      ear: "#B87E14",
     },
     geo: { muzzle: [27, 8, 5, 3], nose: [31, 8] }, // longer retriever snout
     drawTail(cv, p, c) {
@@ -421,15 +427,15 @@ const BREEDS = {
 
   // シベリアンハスキー ────────────────────────────────────────────────────────────
   husky: {
-    name: 'シベリアンハスキー (Husky)',
+    name: "シベリアンハスキー (Husky)",
     colors: {
-      body: '#8A8F98',
-      muzzle: '#FFFFFF',
-      eye: '#4FC3F7', // blue eyes!
-      nose: '#111111',
-      white: '#FFFFFF',
-      dark: '#4A4F58',
-      paw: '#FFFFFF',
+      body: "#8A8F98",
+      muzzle: "#FFFFFF",
+      eye: "#4FC3F7", // blue eyes!
+      nose: "#111111",
+      white: "#FFFFFF",
+      dark: "#4A4F58",
+      paw: "#FFFFFF",
     },
     drawTail(cv, p, c) {
       // bushy tail curled up over the back
@@ -456,24 +462,28 @@ const BREEDS = {
 
   // ダックスフント ───────────────────────────────────────────────────────────────
   dachshund: {
-    name: 'ダックスフント (Dachshund)',
+    name: "ダックスフント (Dachshund)",
     colors: {
-      body: '#5C2000',
-      muzzle: '#A0522D',
-      eye: '#1A0A00',
-      nose: '#111111',
-      tan: '#A0522D',
-      paw: '#A0522D',
-      ear: '#3E1400',
+      body: "#5C2000",
+      muzzle: "#A0522D",
+      eye: "#1A0A00",
+      nose: "#111111",
+      tan: "#A0522D",
+      paw: "#A0522D",
+      ear: "#3E1400",
     },
     geo: {
-      headCx: 25, headCy: 12, headR: 3.6,
+      headCx: 25,
+      headCy: 12,
+      headR: 3.6,
       neck: [22, 14, 4, 5],
       muzzle: [28, 11, 4, 2], // long slim snout
       eye: [26, 11],
       nose: [30, 11],
-      legTop: 26, legH: 5,
-      frontX: 22, backX: 6,
+      legTop: 26,
+      legH: 5,
+      frontX: 22,
+      backX: 6,
     },
     drawBody(cv, p, c) {
       // extra-long, low-slung sausage body
@@ -497,14 +507,14 @@ const BREEDS = {
 
   // プードル ─────────────────────────────────────────────────────────────────────
   poodle: {
-    name: 'プードル (Poodle)',
+    name: "プードル (Poodle)",
     colors: {
-      body: '#EDEAE4',
-      muzzle: '#D8D2C8',
-      eye: '#111111',
-      nose: '#111111',
-      pom: '#FBF9F5',
-      shade: '#C4BEB2',
+      body: "#EDEAE4",
+      muzzle: "#D8D2C8",
+      eye: "#111111",
+      nose: "#111111",
+      pom: "#FBF9F5",
+      shade: "#C4BEB2",
     },
     geo: { muzzle: [27, 8, 4, 2] }, // shaved slim muzzle
     drawTail(cv, p, c) {
@@ -542,7 +552,7 @@ const BREEDS = {
 const BREED_KEYS = Object.keys(BREEDS);
 
 let breed;
-if (BREED_ARG === 'random') {
+if (BREED_ARG === "random") {
   breed = BREEDS[BREED_KEYS[Math.floor(rng() * BREED_KEYS.length)]];
 } else {
   breed = BREEDS[BREED_ARG];
@@ -560,13 +570,13 @@ drawDog(canvas, breed);
 const svg = canvas.toSVG();
 
 if (OUTPUT) {
-  fs.writeFileSync(OUTPUT, svg, 'utf8');
+  fs.writeFileSync(OUTPUT, svg, "utf8");
   process.stderr.write(`✓ ${breed.name} · ${SIZE}×${SIZE}px → ${OUTPUT}\n`);
 } else {
   process.stdout.write(svg);
 }
 
 if (PREVIEW || OUTPUT) {
-  process.stderr.write('\n' + breed.name + '\n');
+  process.stderr.write("\n" + breed.name + "\n");
   process.stderr.write(canvas.toTerminal());
 }
