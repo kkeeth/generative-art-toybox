@@ -56,3 +56,5 @@ typings/
 WORKS/tmp/
 free_playground
 .serena/
+
+**/*.svg
