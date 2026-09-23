@@ -92,15 +92,14 @@ const FOAM_PROFILE = [
   { x: 205, r: 46 }, // plain rounded nose
 ];
 
-// The boom is three pivots, all round, linked by bare rails. The last one
-// is the hub the yoke hangs from.
+// The boom is round pivots linked by bare rails. The last one is the hub
+// the yoke hangs from.
 const JOINTS = [
-  { x: -330, y: -300, r: 30 },
-  { x: -185, y: -255, r: 26 },
+  { x: -300, y: -290, r: 30 },
   { x: -60, y: -205, r: 28 },
 ];
 const ARM_ENTRY = { x: -480, y: -120 };
-const HUB = JOINTS[2];
+const HUB = JOINTS[JOINTS.length - 1];
 
 const CLAMP_X = -85; // where the yoke grips, along the mic axis
 const YOKE_SPLAY = 75; // projected gap between the two arms
@@ -157,15 +156,18 @@ function draw() {
 // them touching — the disc floats in the gap the two tubes leave.
 function drawArm() {
   const nodes = [ARM_ENTRY, ...JOINTS];
-  const width = [19, 17, 15];
 
   // segments are bare rails — no end caps, and each one stops clear of the
   // pivot's radius rather than of its centre
-  for (let i = 0; i < 3; i++) {
-    const a = nodes[i];
-    const b = nodes[i + 1];
+  for (let i = 0; i < JOINTS.length; i++) {
     const head = i === 0 ? GAP : JOINTS[i - 1].r + GAP;
-    rails([a, b], width[i], pal(i), head, JOINTS[i].r + GAP);
+    rails(
+      [nodes[i], nodes[i + 1]],
+      19 - i * 3,
+      pal(i),
+      head,
+      JOINTS[i].r + GAP,
+    );
   }
 
   // every pivot is a pair of rings, their openings set apart so the two
@@ -189,43 +191,11 @@ function drawYoke() {
   // read as a bracket straddling the barrel rather than a loop
   const toe = GAP * 0.55; // tighter gap where an arm meets the barrel
 
-  // drawn as brackets with real width, not single lines — this is a part
-  // the mic is clamped inside, not a wire pinching it
-  rails(
-    smoothPath(
-      [
-        nearStem,
-        { x: nearStem.x + 17, y: nearStem.y + 64 },
-        { x: nearEnd.x + 4, y: nearEnd.y - 50 },
-        nearEnd,
-      ],
-      44,
-    ),
-    10,
-    pal(2),
-    0,
-    toe,
-    true,
-    true,
-  );
-
-  rails(
-    smoothPath(
-      [
-        farStem,
-        { x: farStem.x - 15, y: farStem.y + 64 },
-        { x: farEnd.x - 8, y: farEnd.y - 46 },
-        farEnd,
-      ],
-      44,
-    ),
-    10,
-    pal(4),
-    0,
-    toe,
-    true,
-    true,
-  );
+  // brackets with real width, not single lines — this is a part the mic is
+  // clamped inside. Kept dead straight: the true shape kinks at this angle
+  // and reads as a mistake, so it is deformed to two plain legs.
+  rails([nearStem, nearEnd], 10, pal(2), 0, toe, true, true);
+  rails([farStem, farEnd], 10, pal(4), 0, toe, true, true);
 
   // clamp screw, sitting on the barrel right under the near arm
   const screw = micToWorld(CLAMP_X + YOKE_SPLAY / 2, -34);
@@ -302,10 +272,10 @@ function drawCable() {
       jack,
       { x: -158, y: 180 }, // short sag
       { x: -228, y: 80 }, // climbs just clear of the tail
-      { x: -252, y: -85 },
-      { x: -268, y: -218 }, // picks up the arm below the middle pivot
-      { x: -358, y: -210 },
-      { x: -505, y: -20 }, // runs out clear of the last rail
+      { x: -252, y: -75 },
+      { x: -268, y: -200 }, // picks up the arm below the pivot
+      { x: -368, y: -170 },
+      { x: -505, y: 45 }, // runs out clear of the last rail
     ],
     90,
   );
