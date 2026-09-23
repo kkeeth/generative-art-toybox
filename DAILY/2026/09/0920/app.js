@@ -76,12 +76,13 @@ const FS = 0.32; // cross-section foreshortening: 0 = side-on, 1 = head-on
 // seam between them stays a hard edge. On a real SM7B the windscreen and
 // the body run at nearly the same diameter and nearly the same length —
 // the foam is not a fat guard bolted on the front.
+// The body runs at one diameter straight into the windscreen — there is no
+// waist pinched in between them.
 const BODY_PROFILE = [
   { x: -205, r: 58 }, // flat closed back — no connector here
   { x: -196, r: 66 },
-  { x: -50, r: 66 },
-  { x: -28, r: 56 }, // waist where the label band sits
-  { x: -6, r: 56 },
+  { x: -50, r: 67 },
+  { x: -6, r: 68 },
 ];
 // The windscreen tapers gently all the way to the tip — it never bulges.
 const FOAM_PROFILE = [
@@ -91,8 +92,16 @@ const FOAM_PROFILE = [
   { x: 205, r: 46 }, // plain rounded nose
 ];
 
-const MOUNT = { x: -60, y: -210, w: 34, h: 36 };
-const ELBOW = { x: -300, y: -340, r: 34 }; // boom pivot disc
+// The boom is three pivots, all round, linked by bare rails. The last one
+// is the hub the yoke hangs from.
+const JOINTS = [
+  { x: -330, y: -300, r: 30 },
+  { x: -185, y: -255, r: 26 },
+  { x: -60, y: -205, r: 28 },
+];
+const ARM_ENTRY = { x: -480, y: -120 };
+const HUB = JOINTS[2];
+
 const CLAMP_X = -85; // where the yoke grips, along the mic axis
 const YOKE_SPLAY = 75; // projected gap between the two arms
 const JACK_X = -110; // where the XLR spigot leaves the underside
@@ -131,7 +140,6 @@ function draw() {
   jSeed = 0;
 
   drawArm();
-  drawMount();
   drawYoke();
   drawMicBody();
   drawSwitches();
@@ -148,38 +156,32 @@ function draw() {
 // Boom arm: two tubes and a pivot disc, each a separate colour, none of
 // them touching — the disc floats in the gap the two tubes leave.
 function drawArm() {
-  // both tubes stop clear of the disc's radius, not just of its centre —
-  // otherwise their end caps land inside it
-  const clear = ELBOW.r + GAP;
+  const nodes = [ARM_ENTRY, ...JOINTS];
+  const width = [19, 17, 15];
 
-  tube([{ x: -540, y: -255 }, ELBOW], 19, pal(0), GAP, clear);
-  tube([ELBOW, { x: MOUNT.x, y: MOUNT.y - MOUNT.h }], 17, pal(1), clear, GAP * 2);
-  circlePart(ELBOW.x, ELBOW.y, ELBOW.r, pal(5));
-  circlePart(ELBOW.x, ELBOW.y, 12, pal(8));
-}
-
-// Mount collar: four sides drawn as four separate strokes, so the corners
-// open up instead of closing into a box.
-function drawMount() {
-  const { x, y, w, h } = MOUNT;
-  const edge = pal(6);
-  part([{ x: x - w, y: y - h }, { x: x + w, y: y - h }], edge);
-  part([{ x: x + w, y: y - h }, { x: x + w, y: y + h }], edge);
-  part([{ x: x + w, y: y + h }, { x: x - w, y: y + h }], edge);
-  part([{ x: x - w, y: y + h }, { x: x - w, y: y - h }], edge);
-
-  for (let i = 1; i <= 2; i++) {
-    const t = y - h + ((2 * h) / 3) * i;
-    part([{ x: x - w, y: t }, { x: x + w, y: t }], pal(9));
+  // segments are bare rails — no end caps, and each one stops clear of the
+  // pivot's radius rather than of its centre
+  for (let i = 0; i < 3; i++) {
+    const a = nodes[i];
+    const b = nodes[i + 1];
+    const head = i === 0 ? GAP : JOINTS[i - 1].r + GAP;
+    rails([a, b], width[i], pal(i), head, JOINTS[i].r + GAP);
   }
+
+  // every pivot is a pair of rings, their openings set apart so the two
+  // never line up into a letter
+  JOINTS.forEach((j, i) => {
+    circlePart(j.x, j.y, j.r, pal(5 + i), PI * 0.15);
+    circlePart(j.x, j.y, j.r * 0.38, pal(8 + i), PI * 1.1, j.r * 0.1);
+  });
 }
 
 // Yoke: two arms bowing out of the mount and stopping just short of the
 // barrel. The clamp screw sits on the barrel in the gap they leave.
 function drawYoke() {
-  const bottom = MOUNT.y + MOUNT.h;
-  const nearStem = { x: MOUNT.x + 13, y: bottom };
-  const farStem = { x: MOUNT.x - 13, y: bottom };
+  const bottom = HUB.y + HUB.r + GAP;
+  const nearStem = { x: HUB.x + 15, y: bottom };
+  const farStem = { x: HUB.x - 15, y: bottom };
   const nearEnd = micToWorld(CLAMP_X + YOKE_SPLAY / 2, -70);
   const farEnd = micToWorld(CLAMP_X - YOKE_SPLAY / 2, -70);
 
@@ -187,7 +189,9 @@ function drawYoke() {
   // read as a bracket straddling the barrel rather than a loop
   const toe = GAP * 0.55; // tighter gap where an arm meets the barrel
 
-  part(
+  // drawn as brackets with real width, not single lines — this is a part
+  // the mic is clamped inside, not a wire pinching it
+  rails(
     smoothPath(
       [
         nearStem,
@@ -197,12 +201,15 @@ function drawYoke() {
       ],
       44,
     ),
+    10,
     pal(2),
-    GAP,
+    0,
     toe,
+    true,
+    true,
   );
 
-  part(
+  rails(
     smoothPath(
       [
         farStem,
@@ -212,9 +219,12 @@ function drawYoke() {
       ],
       44,
     ),
+    10,
     pal(4),
-    GAP,
+    0,
     toe,
+    true,
+    true,
   );
 
   // clamp screw, sitting on the barrel right under the near arm
@@ -292,9 +302,10 @@ function drawCable() {
       jack,
       { x: -158, y: 180 }, // short sag
       { x: -228, y: 80 }, // climbs just clear of the tail
-      { x: -240, y: -80 },
-      { x: ELBOW.x - 18, y: ELBOW.y + 72 }, // rounds the pivot from below
-      { x: -545, y: -198 }, // runs out parallel to the upper tube
+      { x: -252, y: -85 },
+      { x: -268, y: -218 }, // picks up the arm below the middle pivot
+      { x: -358, y: -210 },
+      { x: -505, y: -20 }, // runs out clear of the last rail
     ],
     90,
   );
@@ -349,20 +360,29 @@ function ringPoints(x, r, a0, a1) {
   return pts;
 }
 
-// A face-on circle (bolts, discs — no foreshortening), left open.
-function circlePart(cx, cy, r, col) {
+// A face-on circle (pivots, screws — no foreshortening), left open. `phase`
+// moves where the opening sits so concentric rings don't share one.
+function circlePart(cx, cy, r, col, phase = 0, g = GAP * 0.5) {
   const pts = [];
-  for (let i = 0; i <= 32; i++) {
-    const a = (i / 32) * TWO_PI;
+  for (let i = 0; i <= 40; i++) {
+    const a = phase + (i / 40) * TWO_PI;
     pts.push({ x: cx + r * cos(a), y: cy + r * sin(a) });
   }
-  part(pts, col, GAP * 0.5, GAP * 0.5);
+  part(pts, col, g, g);
 }
 
-// Two parallel contours plus end caps — how a tube reads when you only
-// have outlines. The centreline is trimmed first, so the caps land inside
-// the gap rather than on top of the neighbouring part.
-function tube(ctrl, hw, col, head = GAP, tail = GAP) {
+// Two parallel contours. Caps are optional: an arm segment is just its two
+// rails, a bracket is closed off at the ends. The centreline is trimmed
+// first, so anything drawn lands inside the gap, never on a neighbour.
+function rails(
+  ctrl,
+  hw,
+  col,
+  head = GAP,
+  tail = GAP,
+  capHead = false,
+  capTail = false,
+) {
   const pts = trimPath(
     ctrl.length > 2 ? ctrl : smoothPath(ctrl, 24),
     head,
@@ -386,8 +406,8 @@ function tube(ctrl, hw, col, head = GAP, tail = GAP) {
   render(a);
   render(b);
   const n = pts.length - 1;
-  render([a[0], b[0]]);
-  render([a[n], b[n]]);
+  if (capHead) render([a[0], b[0]]);
+  if (capTail) render([a[n], b[n]]);
 }
 
 // ═══════════════════════════════════════════════════════════════════
