@@ -83,17 +83,19 @@ const BODY_PROFILE = [
   { x: -28, r: 56 }, // waist where the label band sits
   { x: -6, r: 56 },
 ];
+// The windscreen tapers gently all the way to the tip — it never bulges.
 const FOAM_PROFILE = [
-  { x: 2, r: 70 },
-  { x: 130, r: 72 },
-  { x: 185, r: 68 },
-  { x: 205, r: 50 }, // plain rounded nose
+  { x: 2, r: 72 },
+  { x: 90, r: 69 },
+  { x: 170, r: 62 },
+  { x: 205, r: 46 }, // plain rounded nose
 ];
 
 const MOUNT = { x: -60, y: -210, w: 34, h: 36 };
+const ELBOW = { x: -300, y: -340, r: 34 }; // boom pivot disc
 const CLAMP_X = -85; // where the yoke grips, along the mic axis
 const YOKE_SPLAY = 75; // projected gap between the two arms
-const JACK_X = -150; // where the XLR spigot leaves the underside
+const JACK_X = -110; // where the XLR spigot leaves the underside
 
 let exportTransparent = false;
 let jSeed = 0;
@@ -146,12 +148,14 @@ function draw() {
 // Boom arm: two tubes and a pivot disc, each a separate colour, none of
 // them touching — the disc floats in the gap the two tubes leave.
 function drawArm() {
-  const elbow = { x: -300, y: -340 };
+  // both tubes stop clear of the disc's radius, not just of its centre —
+  // otherwise their end caps land inside it
+  const clear = ELBOW.r + GAP;
 
-  tube([{ x: -540, y: -255 }, elbow], 19, pal(0));
-  tube([elbow, { x: MOUNT.x, y: MOUNT.y - MOUNT.h }], 17, pal(1));
-  circlePart(elbow.x, elbow.y, 34, pal(5));
-  circlePart(elbow.x, elbow.y, 12, pal(8));
+  tube([{ x: -540, y: -255 }, ELBOW], 19, pal(0), GAP, clear);
+  tube([ELBOW, { x: MOUNT.x, y: MOUNT.y - MOUNT.h }], 17, pal(1), clear, GAP * 2);
+  circlePart(ELBOW.x, ELBOW.y, ELBOW.r, pal(5));
+  circlePart(ELBOW.x, ELBOW.y, 12, pal(8));
 }
 
 // Mount collar: four sides drawn as four separate strokes, so the corners
@@ -278,22 +282,25 @@ function drawJack() {
   pop();
 }
 
-// XLR lead: two single strokes running off the bottom edge, with a gap
-// between them — drawn as lines, not tubes, so it stays a cable.
+// XLR lead: drops out of the jack, sags into a loop, then climbs and runs
+// alongside the boom off the top-left. Drawn as single strokes, not tubes,
+// so it stays a cable, and broken into runs so the gaps keep reading.
 function drawCable() {
   const jack = micToWorld(JACK_X, 100);
   const pts = smoothPath(
     [
       jack,
-      { x: jack.x - 60, y: jack.y + 120 },
-      { x: jack.x - 80, y: jack.y + 250 },
-      { x: jack.x + 20, y: jack.y + 360 },
-      { x: jack.x - 10, y: jack.y + 470 },
+      { x: -158, y: 180 }, // short sag
+      { x: -228, y: 80 }, // climbs just clear of the tail
+      { x: -240, y: -80 },
+      { x: ELBOW.x - 18, y: ELBOW.y + 72 }, // rounds the pivot from below
+      { x: -545, y: -198 }, // runs out parallel to the upper tube
     ],
-    60,
+    90,
   );
   part(pts.slice(0, 30), pal(3));
-  part(pts.slice(30), pal(7));
+  part(pts.slice(30, 60), pal(7));
+  part(pts.slice(60), pal(3));
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -355,11 +362,11 @@ function circlePart(cx, cy, r, col) {
 // Two parallel contours plus end caps — how a tube reads when you only
 // have outlines. The centreline is trimmed first, so the caps land inside
 // the gap rather than on top of the neighbouring part.
-function tube(ctrl, hw, col) {
+function tube(ctrl, hw, col, head = GAP, tail = GAP) {
   const pts = trimPath(
     ctrl.length > 2 ? ctrl : smoothPath(ctrl, 24),
-    GAP,
-    GAP,
+    head,
+    tail,
   );
   const a = [];
   const b = [];
