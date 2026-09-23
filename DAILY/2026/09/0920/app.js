@@ -6,8 +6,6 @@
 // ═══════════════════════════════════════════════════════════════════
 
 // ── Tunables ───────────────────────────────────────────────────────
-const CANVAS_SIZE = 1080;
-
 let STROKE_W = 5; // one weight for every stroke in the piece
 let BG_COLOR = "#F2EFE6";
 let LINE_COLOR = "#141414";
@@ -50,7 +48,7 @@ let jSeed = 0;
 // ═══════════════════════════════════════════════════════════════════
 
 function setup() {
-  createCanvas(CANVAS_SIZE, CANVAS_SIZE);
+  createCanvas(w = windowHeight - 50, w);
   noLoop();
 }
 
