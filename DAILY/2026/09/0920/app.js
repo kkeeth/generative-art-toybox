@@ -181,26 +181,23 @@ function drawArm() {
 // Yoke: two arms bowing out of the mount and stopping just short of the
 // barrel. The clamp screw sits on the barrel in the gap they leave.
 function drawYoke() {
+  const screwR = 20;
   const bottom = HUB.y + HUB.r + GAP;
   const nearStem = { x: HUB.x + 15, y: bottom };
   const farStem = { x: HUB.x - 15, y: bottom };
-  const nearEnd = micToWorld(CLAMP_X + YOKE_SPLAY / 2, -70);
+
+  // the near leg runs all the way down onto the clamp screw, so the bracket
+  // reads as bolted to the body rather than floating above it
+  const screw = micToWorld(CLAMP_X + YOKE_SPLAY / 2, -34);
   const farEnd = micToWorld(CLAMP_X - YOKE_SPLAY / 2, -70);
 
-  // the arms drop almost straight and only bow out on the way, so they
-  // read as a bracket straddling the barrel rather than a loop
-  const toe = GAP * 0.55; // tighter gap where an arm meets the barrel
+  // bare rails, same as the boom — deformed dead straight, because the true
+  // shape kinks at this angle and reads as a mistake
+  rails([nearStem, screw], 10, pal(2), 0, screwR + GAP * 0.45);
+  rails([farStem, farEnd], 10, pal(4), 0, GAP * 0.55);
 
-  // brackets with real width, not single lines — this is a part the mic is
-  // clamped inside. Kept dead straight: the true shape kinks at this angle
-  // and reads as a mistake, so it is deformed to two plain legs.
-  rails([nearStem, nearEnd], 10, pal(2), 0, toe, true, true);
-  rails([farStem, farEnd], 10, pal(4), 0, toe, true, true);
-
-  // clamp screw, sitting on the barrel right under the near arm
-  const screw = micToWorld(CLAMP_X + YOKE_SPLAY / 2, -34);
-  circlePart(screw.x, screw.y, 20, pal(5));
-  circlePart(screw.x, screw.y, 7, pal(8));
+  circlePart(screw.x, screw.y, screwR, pal(5));
+  circlePart(screw.x, screw.y, 7, pal(8), PI * 0.9, 2);
 }
 
 // Barrel: top and bottom contours of each profile run, the seam where the
@@ -213,23 +210,16 @@ function drawMicBody() {
   silhouette(BODY_PROFILE, pal(1), pal(0));
   silhouette(FOAM_PROFILE, pal(2), pal(4));
 
-  // the small step from the body waist out to the windscreen
-  part([{ x: -6, y: -56 }, { x: 2, y: -70 }], pal(9));
-  part([{ x: -6, y: 56 }, { x: 2, y: 70 }], pal(9));
-
   // back rim — only the far arc clears the barrel
   ringPart(-205, 58, HALF_PI, PI + HALF_PI, pal(6), GAP * 0.5);
 
   // nose cap — near arc only, a plain rounded end
   ringPart(205, 50, -HALF_PI, HALF_PI, pal(8), GAP * 0.5);
 
-  // seam rings — near arc only, bulging toward the nose
-  ringPart(-196, 66, -HALF_PI, HALF_PI, pal(3), GAP * 0.6);
-  ringPart(-50, 66, -HALF_PI, HALF_PI, pal(7), GAP * 0.6);
-  ringPart(2, 70, -HALF_PI, HALF_PI, pal(7), GAP * 0.6);
-
-  // label band around the waist
-  ringPart(-17, 56, -HALF_PI, HALF_PI, pal(4), GAP * 0.6);
+  // seam rings — near arc only, bulging toward the nose. The rear one is
+  // the cap band the real mic carries across its butt.
+  ringPart(-192, 66, -HALF_PI, HALF_PI, pal(3), GAP * 0.6);
+  ringPart(2, 71, -HALF_PI, HALF_PI, pal(7), GAP * 0.6);
 
   pop();
 }
@@ -240,9 +230,8 @@ function drawSwitches() {
   translate(MIC.cx, MIC.cy);
   rotate(radians(MIC.tilt));
 
-  part([{ x: -178, y: -40 }, { x: -178, y: 30 }], pal(7));
-  part([{ x: -164, y: -28 }, { x: -130, y: -28 }], pal(0));
-  part([{ x: -164, y: 2 }, { x: -130, y: 2 }], pal(0));
+  part([{ x: -168, y: -28 }, { x: -132, y: -28 }], pal(0));
+  part([{ x: -168, y: 2 }, { x: -132, y: 2 }], pal(0));
 
   pop();
 }
@@ -270,12 +259,12 @@ function drawCable() {
   const pts = smoothPath(
     [
       jack,
-      { x: -158, y: 180 }, // short sag
-      { x: -228, y: 80 }, // climbs just clear of the tail
-      { x: -252, y: -75 },
-      { x: -268, y: -200 }, // picks up the arm below the pivot
+      { x: -152, y: 163 }, // leaves the jack and turns straight back up
+      { x: -218, y: 88 }, // rounds the tail
+      { x: -255, y: -45 },
+      { x: -268, y: -190 }, // picks up the arm below the pivot
       { x: -368, y: -170 },
-      { x: -505, y: 45 }, // runs out clear of the last rail
+      { x: -505, y: 45 }, // runs out alongside the last rail
     ],
     90,
   );
