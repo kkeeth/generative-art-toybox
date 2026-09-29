@@ -464,27 +464,39 @@ function drawRuff(c, ink) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  Crown Clown — a bell of cloth under a crown of blades
-//  The whole figure is one teardrop: a narrow masked head ringed by torn
-//  frills, swelling into a skirt that spreads out on the ground. Almost
-//  all of the drawing is that silhouette; the face is a small part of it.
+//  Crown Clown — a bell of cloth under a crown
+//  The whole figure is one teardrop: a small masked face ringed by a
+//  ruff, a crown rising out of it, and a skirt that swells to the ground.
+//  An arm crosses the body and ends in the great clawed hand.
 // ═══════════════════════════════════════════════════════════════════
 
-const NECK_Y = -44;
-const HEM_Y = 330;
+const NECK_Y = -24;
+const HEM_Y = 410;
+const HEAD = { x: 0, y: -88 };
+const SHADE = "#D8D2C5";
 
 // Half-width of the skirt down its height, 0 at the neck, 1 at the hem.
-// The swell low down is what gives the figure its pear.
+// The width arrives early and the belly stays full almost to the floor,
+// then tucks back in — a bulb, not a cone.
 const CLOAK = [
-  [0.0, 48],
-  [0.08, 130],
-  [0.2, 184],
-  [0.38, 226],
-  [0.58, 256],
-  [0.78, 284],
-  [0.92, 300],
-  [1.0, 304],
+  [0.0, 50],
+  [0.07, 96],
+  [0.17, 150],
+  [0.32, 208],
+  [0.52, 256],
+  [0.72, 282],
+  [0.86, 286],
+  [0.95, 272],
+  [1.0, 246],
 ];
+
+function curvePath(pts) {
+  beginShape();
+  curveVertex(...pts[0]);
+  for (const p of pts) curveVertex(...p);
+  curveVertex(...pts[pts.length - 1]);
+  endShape();
+}
 
 function cloakHW(t) {
   t = constrain(t, 0, 1);
@@ -502,209 +514,359 @@ function cloakY(t) {
   return lerp(NECK_Y, HEM_Y, t);
 }
 
+// a point on the skirt: u runs -1 (left edge) … 1 (right edge)
+function onCloak(u, t) {
+  return [u * cloakHW(t), cloakY(t)];
+}
+
 function drawCrownClown() {
   const pal = random(PALETTES);
   const cloth = "#FBF8F2";
   const ink = pal.ink;
   const accent = random(pal.a);
+  const side = random([1, -1]);
 
   background(pal.bg);
   push();
-  translate(width / 2, height / 2 + 62);
-  scale(1.18);
+  translate(width / 2, height / 2 + 20);
+  scale(1.1);
   strokeJoin(ROUND);
   strokeCap(ROUND);
 
-  drawCrownBlades(floor(random(5, 8)), cloth, ink);
   drawSkirt(cloth, ink);
-  drawFolds(floor(random(6, 9)), ink);
-  drawClaws(floor(random(4, 7)), cloth, ink);
-  drawFrill(floor(random(12, 16)), cloth, ink);
-  drawMask(cloth, ink, accent);
-  drawScythe(random([1, -1]), cloth, ink);
+  drawHemStrokes(floor(random(4, 7)), ink);
+  drawArm(side, cloth, ink);
+  drawCrownRuff(makeCrownRuff(), cloth, ink);
+  drawCrown(cloth, ink, accent);
+  drawFace(cloth, ink, accent);
 
   pop();
 }
 
-// The crown: thin blades fanning up out of the head, tallest at the centre.
-function drawCrownBlades(n, cloth, ink) {
-  push();
-  stroke(ink);
-  strokeWeight(5);
-  fill(cloth);
-  for (let i = 0; i < n; i++) {
-    const spread = n === 1 ? 0 : (i / (n - 1) - 0.5) * 2; // -1 … 1
-    const baseX = spread * 58;
-    const tipX = spread * 104;
-    const h = 252 * (1 - abs(spread) * 0.44) * random(0.86, 1.14);
-    const w = 15 - abs(spread) * 4;
-    triangle(baseX - w, -142, baseX + w, -142, tipX, -142 - h);
-  }
-  pop();
-}
+// ── Skirt ──────────────────────────────────────────────────────────
 
-// The skirt: the profile mirrored either side, closed off by a hem that
-// crumples where it meets the ground.
+// One smooth teardrop, closed along the floor by a shallow curve, with a
+// few tucks where the cloth folds under.
 function drawSkirt(cloth, ink) {
-  const steps = 26;
-  const hem = 9;
+  const steps = 28;
   const pts = [];
-
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    pts.push([cloakHW(t), cloakY(t)]);
+  for (let i = 0; i <= steps; i++) pts.push(onCloak(1, i / steps));
+  for (let i = 1; i < 10; i++) {
+    const u = i / 10;
+    pts.push([lerp(cloakHW(1), -cloakHW(1), u), HEM_Y + 16 * sin(PI * u)]);
   }
-  for (let i = 0; i <= hem; i++) {
-    const x = lerp(cloakHW(1), -cloakHW(1), i / hem);
-    pts.push([x, HEM_Y + (i % 2 ? 30 : -2) + random(-7, 7)]);
-  }
-  for (let i = steps; i >= 0; i--) {
-    const t = i / steps;
-    pts.push([-cloakHW(t), cloakY(t)]);
-  }
+  for (let i = steps; i >= 0; i--) pts.push(onCloak(-1, i / steps));
 
   push();
   stroke(ink);
   strokeWeight(6);
   fill(cloth);
   blob(pts);
-  pop();
-}
 
-// Folds run the height of the skirt, spreading with it — that is what
-// stops the silhouette reading as a flat blob.
-function drawFolds(n, ink) {
-  push();
   noFill();
-  stroke(ink);
   strokeWeight(4);
-  for (let i = 0; i < n; i++) {
-    const u = random(-0.84, 0.84);
-    const k = random(0.86, 1.04);
-    const top = random(0.05, 0.22);
-    const pts = [];
-    for (let j = 0; j <= 12; j++) {
-      const t = lerp(top, 0.96, j / 12);
-      pts.push([u * cloakHW(t) * k, cloakY(t)]);
-    }
-    curvePath(pts);
+  for (let i = 0; i < 3; i++) {
+    const u = random(-0.6, 0.6);
+    const [x0, y0] = onCloak(u, 0.9);
+    curvePath([
+      [x0, y0],
+      [x0 - 14, y0 + 20],
+      [x0 - 20, HEM_Y + 12 * sin(PI * (0.5 - u / 2))],
+    ]);
   }
   pop();
 }
 
-function curvePath(pts) {
-  beginShape();
-  curveVertex(...pts[0]);
-  for (const p of pts) curveVertex(...p);
-  curveVertex(...pts[pts.length - 1]);
-  endShape();
-}
-
-// Blades pushing out through the cloth.
-function drawClaws(n, cloth, ink) {
+// Sweeping strokes on the lower skirt only, each led by a dark flick,
+// running down and across with the swell of the cloth.
+function drawHemStrokes(n, ink) {
   push();
-  stroke(ink);
-  strokeWeight(4);
-  fill(cloth);
   for (let i = 0; i < n; i++) {
-    const t = random(0.36, 0.8);
-    const u = random(-0.74, 0.74);
-    const len = random(96, 168);
-    push();
-    translate(u * cloakHW(t), cloakY(t));
-    rotate(u * 0.55 + random(-0.14, 0.14));
-    beginShape();
-    vertex(0, 0);
-    vertex(11, -len * 0.34);
-    vertex(0, -len);
-    vertex(-11, -len * 0.34);
-    endShape(CLOSE);
+    const t0 = random(0.46, 0.76);
+    const t1 = min(0.95, t0 + random(0.13, 0.2));
+    const u0 = random(-0.25, 0.8);
+    const u1 = u0 - random(0.35, 0.6);
+
+    const pts = [];
+    for (let j = 0; j <= 10; j++) {
+      const s = j / 10;
+      pts.push(onCloak(lerp(u0, u1, s) - 0.07 * sin(PI * s), lerp(t0, t1, s)));
+    }
+    noFill();
+    stroke(ink);
+    strokeWeight(4);
+    curvePath(pts);
+
+    // a brush dab at the head of the stroke: blunt end, tapering into the
+    // line — pointing it away from the line made every stroke an arrow
+    const [ax, ay] = pts[0];
+    const [bx, by] = pts[1];
+    const d = createVector(bx - ax, by - ay).normalize();
     noStroke();
     fill(ink);
-    triangle(0, 0, 10, -len * 0.34, -10, -len * 0.34);
-    stroke(ink);
-    fill(cloth);
-    pop();
+    circle(ax, ay, 12);
+    triangle(
+      ax - d.y * 6,
+      ay + d.x * 6,
+      ax + d.y * 6,
+      ay - d.x * 6,
+      ax + d.x * 30,
+      ay + d.y * 30,
+    );
   }
   pop();
 }
 
-// The ruff: torn petals fanned round the head, each one a different
-// length so the ring never closes into a tidy flower.
-function drawFrill(n, cloth, ink) {
+// ── Ruff ───────────────────────────────────────────────────────────
+// Built like the clown ruff in view 1 — shapes laid round an arc — but
+// every lobe has its own shape, set by three numbers:
+//   round  0 pointed … 1 blunt       (leaf ↔ ruffle)
+//   lean   sideways drift of the tip  (a curl, like a flame)
+//   rise   pull of the tip upward     (fire climbs)
+// One style is rolled per figure, and each lobe wanders around it.
+
+function makeCrownRuff() {
+  const style = {
+    round: random(),
+    lean: random(0.1, 1),
+    rise: random() < 0.5 ? random(0.3, 0.9) : 0,
+  };
+  const lobes = [];
+  for (const layer of [0, 1]) {
+    const n = floor(random(12, 17));
+    const a0 = radians(-38);
+    const a1 = radians(218);
+    for (let i = 0; i < n; i++) {
+      const f = (i + (layer ? 0.5 : 0)) / (n - (layer ? 0 : 1));
+      if (f > 1) continue;
+      const a = lerp(a0, a1, f) + random(-0.05, 0.05);
+      lobes.push({
+        layer,
+        a,
+        len: layer ? random(42, 78) : random(72, 128),
+        hw: (layer ? 0.55 : 0.7) * ((a1 - a0) / n) * 88,
+        round: constrain(style.round + random(-0.3, 0.3), 0, 1),
+        lean: random(-1, 1) * style.lean,
+        rise: style.rise * random(0.6, 1.2),
+      });
+    }
+  }
+  return lobes;
+}
+
+function drawCrownRuff(lobes, cloth, ink) {
   push();
-  translate(0, -40);
   stroke(ink);
   strokeWeight(5);
   fill(cloth);
+  circle(HEAD.x, HEAD.y, 124); // backing, so the face never sits in a hole
+  for (const layer of [0, 1]) {
+    for (const L of lobes) if (L.layer === layer) drawLobe(L, cloth, ink);
+  }
+  pop();
+}
+
+function drawLobe(L, cloth, ink) {
+  const rIn = 56;
+  const dx = cos(L.a);
+  const dy = -sin(L.a);
+  const px = -dy; // perpendicular to the lobe
+  const py = dx;
+
+  const bx = HEAD.x + dx * rIn;
+  const by = HEAD.y + dy * rIn;
+  const tx = HEAD.x + dx * (rIn + L.len) + px * L.lean * L.hw * 1.3;
+  const ty = HEAD.y + dy * (rIn + L.len) + py * L.lean * L.hw * 1.3 - L.rise * L.len * 0.35;
+
+  const bulge = lerp(0.95, 1.6, L.round) * L.hw;
+  const tipW = lerp(0.04, 0.95, L.round) * L.hw;
+  const mid = L.len * 0.45;
+
+  fill(cloth);
+  beginShape();
+  vertex(bx + px * L.hw, by + py * L.hw);
+  bezierVertex(
+    bx + dx * mid + px * bulge,
+    by + dy * mid + py * bulge,
+    tx - dx * L.len * 0.08 + px * tipW,
+    ty - dy * L.len * 0.08 + py * tipW,
+    tx,
+    ty,
+  );
+  bezierVertex(
+    tx - dx * L.len * 0.08 - px * tipW,
+    ty - dy * L.len * 0.08 - py * tipW,
+    bx + dx * mid - px * bulge,
+    by + dy * mid - py * bulge,
+    bx - px * L.hw,
+    by - py * L.hw,
+  );
+  endShape(CLOSE);
+
+  // a crease from the root toward the tip, as in a pleated ruff
+  line(bx, by, lerp(bx, tx, 0.55), lerp(by, ty, 0.55));
+}
+
+// ── Crown ──────────────────────────────────────────────────────────
+// One piece: a band round the head whose top edge runs up into the
+// spikes, so every spike grows out of the same crown. Each spike is split
+// down a ridge and one face is shaded, which is what turns the flat
+// zigzag into something that stands in space.
+
+function drawCrown(cloth, ink, accent) {
+  const n = random([5, 5, 7]);
+  const bandTop = -186;
+  const baseY = -146;
+  const spikes = [];
+
   for (let i = 0; i < n; i++) {
-    const a = lerp(PI * 0.99, PI * 0.01, i / (n - 1));
-    const r = random(118, 176);
-    const w = random(0.15, 0.24);
-    const squash = 0.78; // wider than it is tall, so it frames the face
-    const inner = 44;
-    const P = (ang, rad) => [cos(ang) * rad, -sin(ang) * rad * squash];
-
-    beginShape();
-    vertex(...P(a + w, inner));
-    bezierVertex(
-      ...P(a + w * 1.5, r * 0.66),
-      ...P(a + w * 0.7, r * 0.95),
-      ...P(a, r),
-    );
-    bezierVertex(
-      ...P(a - w * 0.7, r * 0.95),
-      ...P(a - w * 1.5, r * 0.66),
-      ...P(a - w, inner),
-    );
-    endShape(CLOSE);
+    const s = (i / (n - 1) - 0.5) * 2; // -1 … 1
+    const h = 230 * (1 - abs(s) * 0.4) * random(0.88, 1.1);
+    spikes.push({
+      tip: [s * 118 + random(-6, 6), bandTop - h],
+      left: [(s - 1 / (n - 1)) * 70, bandTop + abs(s) * 6],
+      right: [(s + 1 / (n - 1)) * 70, bandTop + abs(s) * 6],
+    });
   }
-  pop();
-}
 
-// The face is small: a narrow plate with a banded visor across the eyes.
-function drawMask(cloth, ink, accent) {
+  const outline = [[64, baseY]];
+  for (let i = n - 1; i >= 0; i--) {
+    outline.push(spikes[i].right, spikes[i].tip);
+  }
+  outline.push(spikes[0].left, [-64, baseY], [0, baseY + 30]);
+
   push();
   stroke(ink);
   strokeWeight(5);
   fill(cloth);
-  blob([
-    [0, -146],
-    [42, -112],
-    [46, -34],
-    [24, 26],
-    [0, 44],
-    [-24, 26],
-    [-46, -34],
-    [-42, -112],
+  beginShape();
+  for (const p of outline) vertex(...p);
+  endShape(CLOSE);
+
+  // shaded face and ridge on every spike
+  for (const S of spikes) {
+    const root = [lerp(S.left[0], S.right[0], 0.5), bandTop + 16];
+    noStroke();
+    fill(SHADE);
+    triangle(...S.left, ...S.tip, ...root);
+    stroke(ink);
+    strokeWeight(3);
+    line(...root, ...S.tip);
+  }
+
+  // the band, curving round the front of the head
+  noFill();
+  strokeWeight(4);
+  curvePath([
+    [-68, bandTop + 10],
+    [0, bandTop + 22],
+    [68, bandTop + 10],
+  ]);
+  curvePath([
+    [-66, baseY - 8],
+    [0, baseY + 6],
+    [66, baseY - 8],
   ]);
 
-  noStroke();
-  fill(ink);
-  rectMode(CENTER);
-  rect(0, -88, 86, 30, 4);
-  stroke(cloth);
+  // stones on the band
+  fill(accent);
   strokeWeight(3);
-  for (let x = -30; x <= 30; x += 12) line(x, -100, x, -76);
-
-  stroke(accent);
-  strokeWeight(5);
-  line(18, -58, 18, 24);
+  for (const x of [-40, 0, 40]) {
+    const y = bandTop + 17 + (x === 0 ? 6 : 1);
+    quad(x, y - 8, x + 6, y, x, y + 8, x - 6, y);
+  }
   pop();
 }
 
-// One arm out of the cloth, gripping a banded haft with a clawed head.
-function drawScythe(side, cloth, ink) {
-  const a = { x: 132, y: -96 };
-  const b = { x: -286, y: 126 };
+// ── Face ───────────────────────────────────────────────────────────
+// A narrow face under a half-mask. The mask covers brow and eyes and
+// drops to a point over the nose; the eyes look out through it.
+
+function drawFace(cloth, ink, accent) {
+  push();
+  translate(HEAD.x, HEAD.y);
+  stroke(ink);
+  strokeWeight(5);
+
+  // face
+  fill(cloth);
+  blob([
+    [0, -62],
+    [34, -50],
+    [42, -8],
+    [34, 36],
+    [16, 60],
+    [0, 66],
+    [-16, 60],
+    [-34, 36],
+    [-42, -8],
+    [-34, -50],
+  ]);
+
+  // half-mask
+  fill(SHADE);
+  blob([
+    [0, -58],
+    [38, -44],
+    [50, -10],
+    [40, 12],
+    [16, 20],
+    [0, 40],
+    [-16, 20],
+    [-40, 12],
+    [-50, -10],
+    [-38, -44],
+  ]);
+
+  // band of studs across the brow
+  fill(ink);
+  noStroke();
+  for (let i = -3; i <= 3; i++) circle(i * 9, -34 + abs(i) * 1.5, 5);
+
+  // eyes: almond, outer corners lifted, pupils set in
+  stroke(ink);
+  strokeWeight(4);
+  for (const s of [1, -1]) {
+    fill(cloth);
+    beginShape();
+    vertex(s * 8, -8);
+    bezierVertex(s * 14, -18, s * 28, -20, s * 36, -16);
+    bezierVertex(s * 28, -4, s * 16, -2, s * 8, -8);
+    endShape(CLOSE);
+    fill(ink);
+    noStroke();
+    circle(s * 22, -11, 7);
+    stroke(ink);
+  }
+
+  // nose: the mask's ridge running down to its point
+  strokeWeight(4);
+  line(0, -14, 0, 32);
+  line(-6, 30, 0, 38);
+  line(6, 30, 0, 38);
+
+  // mouth, and a single mark of colour down one cheek
+  line(-9, 52, 9, 52);
+  stroke(accent);
+  strokeWeight(4);
+  line(30, 16, 26, 42);
+  pop();
+}
+
+// ── Arm and the clawed hand ────────────────────────────────────────
+// The banded arm crosses the body from the far shoulder; at the wrist it
+// opens into the great hand, fingers drawn out into long blades.
+
+function drawArm(side, cloth, ink) {
+  const a = { x: 108, y: -28 };
+  const b = { x: -196, y: 150 };
   const ang = atan2(b.y - a.y, b.x - a.x);
   const len = dist(a.x, a.y, b.x, b.y);
 
   push();
   scale(side, 1);
-  strokeJoin(ROUND);
 
-  // haft: a light band with alternating dark segments
+  // banded sleeve
   push();
   translate(a.x, a.y);
   rotate(ang);
@@ -712,43 +874,59 @@ function drawScythe(side, cloth, ink) {
   stroke(ink);
   strokeWeight(5);
   fill(cloth);
-  rect(0, -9, len, 18, 9);
+  rect(0, -11, len, 22, 11);
   noStroke();
   fill(ink);
-  const segs = 16;
-  for (let i = 1; i < segs; i += 2) rect((len / segs) * i, -9, len / segs, 18);
+  const segs = 14;
+  for (let i = 1; i < segs; i += 2) rect((len / segs) * i, -11, len / segs, 22);
   pop();
 
-  // clawed head
+  // the smaller hand, holding the arm where it crosses the chest
+  push();
+  translate(lerp(a.x, b.x, 0.36), lerp(a.y, b.y, 0.36) + 6);
+  stroke(ink);
+  strokeWeight(5);
+  fill(cloth);
+  ellipse(0, 0, 38, 30);
+  strokeWeight(7);
+  for (let i = 0; i < 4; i++) {
+    const t = 0.35 + i * 0.3;
+    line(cos(t) * 12, sin(t) * 10, cos(t) * 30, sin(t) * 26);
+  }
+  pop();
+
+  // clawed hand at the wrist
   push();
   translate(b.x, b.y);
   rotate(ang);
   stroke(ink);
   strokeWeight(5);
   fill(cloth);
-  for (let i = 0; i < 4; i++) {
-    const s = 1 - i * 0.13;
-    push();
-    rotate(-0.78 + i * 0.36);
-    beginShape();
-    vertex(0, 0);
-    bezierVertex(40 * s, -12 * s, 86 * s, -20 * s, 128 * s, -4 * s);
-    bezierVertex(84 * s, 10 * s, 40 * s, 18 * s, 0, 22 * s);
-    endShape(CLOSE);
-    pop();
-  }
-  pop();
 
-  // gloved hand on the haft
-  push();
-  translate(lerp(a.x, b.x, 0.44), lerp(a.y, b.y, 0.44));
-  stroke(ink);
-  strokeWeight(5);
-  fill(cloth);
-  ellipse(0, 0, 56, 46);
-  for (let i = 0; i < 4; i++) {
-    const t = -0.55 + i * 0.34;
-    line(cos(t) * 20, sin(t) * 16, cos(t) * 44, sin(t) * 36);
+  // cuff and palm
+  rect(-6, -16, 16, 32, 4);
+  ellipse(30, 0, 50, 44);
+
+  const fingers = [
+    { a: -0.62, l: random(96, 128) },
+    { a: -0.22, l: random(120, 150) },
+    { a: 0.16, l: random(118, 148) },
+    { a: 0.54, l: random(96, 126) },
+    { a: -1.3, l: random(56, 72) }, // thumb
+  ];
+  for (const F of fingers) {
+    push();
+    translate(40, 0);
+    rotate(F.a);
+    fill(cloth);
+    beginShape();
+    vertex(0, -8);
+    bezierVertex(F.l * 0.4, -12, F.l * 0.8, -8, F.l, 4);
+    bezierVertex(F.l * 0.78, 4, F.l * 0.4, 10, 0, 8);
+    endShape(CLOSE);
+    strokeWeight(3);
+    line(4, 0, F.l * 0.72, 1);
+    pop();
   }
   pop();
 
