@@ -464,168 +464,294 @@ function drawRuff(c, ink) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  Crown Clown — mask and mantle read as one piece
+//  Crown Clown — a bell of cloth under a crown of blades
+//  The whole figure is one teardrop: a narrow masked head ringed by torn
+//  frills, swelling into a skirt that spreads out on the ground. Almost
+//  all of the drawing is that silhouette; the face is a small part of it.
 // ═══════════════════════════════════════════════════════════════════
+
+const NECK_Y = -44;
+const HEM_Y = 330;
+
+// Half-width of the skirt down its height, 0 at the neck, 1 at the hem.
+// The swell low down is what gives the figure its pear.
+const CLOAK = [
+  [0.0, 48],
+  [0.08, 130],
+  [0.2, 184],
+  [0.38, 226],
+  [0.58, 256],
+  [0.78, 284],
+  [0.92, 300],
+  [1.0, 304],
+];
+
+function cloakHW(t) {
+  t = constrain(t, 0, 1);
+  for (let i = 1; i < CLOAK.length; i++) {
+    if (t <= CLOAK[i][0]) {
+      const [t0, w0] = CLOAK[i - 1];
+      const [t1, w1] = CLOAK[i];
+      return lerp(w0, w1, (t - t0) / (t1 - t0));
+    }
+  }
+  return CLOAK[CLOAK.length - 1][1];
+}
+
+function cloakY(t) {
+  return lerp(NECK_Y, HEM_Y, t);
+}
 
 function drawCrownClown() {
   const pal = random(PALETTES);
-  background(pal.ink);
+  const cloth = "#FBF8F2";
+  const ink = pal.ink;
+  const accent = random(pal.a);
 
+  background(pal.bg);
   push();
-  translate(width / 2, height / 2 + 40);
-
-  const cloth = "#F2EEE4";
-  const shade = "#BFB9AC";
-  const scar = random(pal.a);
-  const side = random([1, -1]); // which eye the scar crosses
-
+  translate(width / 2, height / 2 + 62);
+  scale(1.18);
   strokeJoin(ROUND);
   strokeCap(ROUND);
 
-  drawMantle(cloth, shade, pal.ink);
-  drawCrownSpikes(cloth, pal.ink, scar);
-  drawHoodOpening(shade, pal.ink);
-  drawCrownMask(cloth, pal.ink, scar, side);
-  drawRibbons(cloth, pal.ink);
+  drawCrownBlades(floor(random(5, 8)), cloth, ink);
+  drawSkirt(cloth, ink);
+  drawFolds(floor(random(6, 9)), ink);
+  drawClaws(floor(random(4, 7)), cloth, ink);
+  drawFrill(floor(random(12, 16)), cloth, ink);
+  drawMask(cloth, ink, accent);
+  drawScythe(random([1, -1]), cloth, ink);
 
   pop();
 }
 
-// The cloak: shoulders flaring into a hem torn into uneven teeth.
-function drawMantle(cloth, shade, ink) {
-  const teeth = 11;
+// The crown: thin blades fanning up out of the head, tallest at the centre.
+function drawCrownBlades(n, cloth, ink) {
+  push();
+  stroke(ink);
+  strokeWeight(5);
+  fill(cloth);
+  for (let i = 0; i < n; i++) {
+    const spread = n === 1 ? 0 : (i / (n - 1) - 0.5) * 2; // -1 … 1
+    const baseX = spread * 58;
+    const tipX = spread * 104;
+    const h = 252 * (1 - abs(spread) * 0.44) * random(0.86, 1.14);
+    const w = 15 - abs(spread) * 4;
+    triangle(baseX - w, -142, baseX + w, -142, tipX, -142 - h);
+  }
+  pop();
+}
+
+// The skirt: the profile mirrored either side, closed off by a hem that
+// crumples where it meets the ground.
+function drawSkirt(cloth, ink) {
+  const steps = 26;
+  const hem = 9;
   const pts = [];
 
-  pts.push([0, -300], [150, -236], [212, -110], [246, 40]);
-  for (let i = 0; i <= teeth; i++) {
-    const t = i / teeth;
-    const x = lerp(246, -246, t);
-    const deep = i % 2 === 0;
-    pts.push([x, deep ? 300 + random(-24, 24) : 212 + random(-18, 18)]);
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    pts.push([cloakHW(t), cloakY(t)]);
   }
-  pts.push([-246, 40], [-212, -110], [-150, -236]);
+  for (let i = 0; i <= hem; i++) {
+    const x = lerp(cloakHW(1), -cloakHW(1), i / hem);
+    pts.push([x, HEM_Y + (i % 2 ? 30 : -2) + random(-7, 7)]);
+  }
+  for (let i = steps; i >= 0; i--) {
+    const t = i / steps;
+    pts.push([-cloakHW(t), cloakY(t)]);
+  }
 
   push();
   stroke(ink);
   strokeWeight(6);
   fill(cloth);
   blob(pts);
+  pop();
+}
 
-  // a fold down each side, so the cloth has a front and a flank
-  stroke(shade);
-  strokeWeight(5);
+// Folds run the height of the skirt, spreading with it — that is what
+// stops the silhouette reading as a flat blob.
+function drawFolds(n, ink) {
+  push();
   noFill();
-  for (const s of [1, -1]) {
-    beginShape();
-    curveVertex(s * 150, -30);
-    curveVertex(s * 162, 60);
-    curveVertex(s * 158, 150);
-    curveVertex(s * 146, 226);
-    endShape();
-  }
-  pop();
-}
-
-// The crown the mask is named for: blades rising out of the hood.
-function drawCrownSpikes(cloth, ink, accent) {
-  const n = floor(random(3, 6));
-  push();
   stroke(ink);
-  strokeWeight(6);
+  strokeWeight(4);
   for (let i = 0; i < n; i++) {
-    const t = n === 1 ? 0.5 : i / (n - 1);
-    const x = lerp(-104, 104, t);
-    const h = 96 + 70 * (1 - abs(t - 0.5) * 2) + random(-14, 14);
-    fill(i % 2 ? accent : cloth);
-    triangle(x - 30, -244, x + 30, -244, x, -244 - h);
+    const u = random(-0.84, 0.84);
+    const k = random(0.86, 1.04);
+    const top = random(0.05, 0.22);
+    const pts = [];
+    for (let j = 0; j <= 12; j++) {
+      const t = lerp(top, 0.96, j / 12);
+      pts.push([u * cloakHW(t) * k, cloakY(t)]);
+    }
+    curvePath(pts);
   }
   pop();
 }
 
-function drawHoodOpening(shade, ink) {
+function curvePath(pts) {
+  beginShape();
+  curveVertex(...pts[0]);
+  for (const p of pts) curveVertex(...p);
+  curveVertex(...pts[pts.length - 1]);
+  endShape();
+}
+
+// Blades pushing out through the cloth.
+function drawClaws(n, cloth, ink) {
   push();
   stroke(ink);
-  strokeWeight(6);
-  fill(shade);
-  blob([
-    [0, -262],
-    [124, -176],
-    [136, -30],
-    [70, 96],
-    [0, 130],
-    [-70, 96],
-    [-136, -30],
-    [-124, -176],
-  ]);
+  strokeWeight(4);
+  fill(cloth);
+  for (let i = 0; i < n; i++) {
+    const t = random(0.36, 0.8);
+    const u = random(-0.74, 0.74);
+    const len = random(96, 168);
+    push();
+    translate(u * cloakHW(t), cloakY(t));
+    rotate(u * 0.55 + random(-0.14, 0.14));
+    beginShape();
+    vertex(0, 0);
+    vertex(11, -len * 0.34);
+    vertex(0, -len);
+    vertex(-11, -len * 0.34);
+    endShape(CLOSE);
+    noStroke();
+    fill(ink);
+    triangle(0, 0, 10, -len * 0.34, -10, -len * 0.34);
+    stroke(ink);
+    fill(cloth);
+    pop();
+  }
   pop();
 }
 
-// The mask: an angular plate, seamed down the middle, with a scar
-// running the full height of one side.
-function drawCrownMask(cloth, ink, scar, side) {
+// The ruff: torn petals fanned round the head, each one a different
+// length so the ring never closes into a tidy flower.
+function drawFrill(n, cloth, ink) {
   push();
+  translate(0, -40);
   stroke(ink);
-  strokeWeight(6);
+  strokeWeight(5);
   fill(cloth);
-  blob([
-    [0, -244],
-    [112, -162],
-    [122, -24],
-    [62, 86],
-    [0, 118],
-    [-62, 86],
-    [-122, -24],
-    [-112, -162],
-  ]);
+  for (let i = 0; i < n; i++) {
+    const a = lerp(PI * 0.99, PI * 0.01, i / (n - 1));
+    const r = random(118, 176);
+    const w = random(0.15, 0.24);
+    const squash = 0.78; // wider than it is tall, so it frames the face
+    const inner = 44;
+    const P = (ang, rad) => [cos(ang) * rad, -sin(ang) * rad * squash];
 
-  // eye slits
-  fill(ink);
-  noStroke();
-  for (const s of [1, -1]) {
     beginShape();
-    vertex(s * 26, -78);
-    vertex(s * 88, -60);
-    vertex(s * 84, -22);
-    vertex(s * 30, -40);
+    vertex(...P(a + w, inner));
+    bezierVertex(
+      ...P(a + w * 1.5, r * 0.66),
+      ...P(a + w * 0.7, r * 0.95),
+      ...P(a, r),
+    );
+    bezierVertex(
+      ...P(a - w * 0.7, r * 0.95),
+      ...P(a - w * 1.5, r * 0.66),
+      ...P(a - w, inner),
+    );
     endShape(CLOSE);
   }
-
-  // centre seam and cheek plates
-  stroke(ink);
-  strokeWeight(5);
-  noFill();
-  line(0, -206, 0, 92);
-  for (const s of [1, -1]) {
-    line(s * 34, 6, s * 84, -8);
-    line(s * 30, 44, s * 66, 30);
-  }
-
-  // the scar: a vertical run with a cross bar, over one eye
-  stroke(scar);
-  strokeWeight(7);
-  line(side * 56, -196, side * 56, 60);
-  line(side * 24, -140, side * 92, -140);
   pop();
 }
 
-// Torn ribbons trailing off the hem.
-function drawRibbons(cloth, ink) {
+// The face is small: a narrow plate with a banded visor across the eyes.
+function drawMask(cloth, ink, accent) {
   push();
+  stroke(ink);
+  strokeWeight(5);
+  fill(cloth);
+  blob([
+    [0, -146],
+    [42, -112],
+    [46, -34],
+    [24, 26],
+    [0, 44],
+    [-24, 26],
+    [-46, -34],
+    [-42, -112],
+  ]);
+
+  noStroke();
+  fill(ink);
+  rectMode(CENTER);
+  rect(0, -88, 86, 30, 4);
+  stroke(cloth);
+  strokeWeight(3);
+  for (let x = -30; x <= 30; x += 12) line(x, -100, x, -76);
+
+  stroke(accent);
+  strokeWeight(5);
+  line(18, -58, 18, 24);
+  pop();
+}
+
+// One arm out of the cloth, gripping a banded haft with a clawed head.
+function drawScythe(side, cloth, ink) {
+  const a = { x: 132, y: -96 };
+  const b = { x: -286, y: 126 };
+  const ang = atan2(b.y - a.y, b.x - a.x);
+  const len = dist(a.x, a.y, b.x, b.y);
+
+  push();
+  scale(side, 1);
+  strokeJoin(ROUND);
+
+  // haft: a light band with alternating dark segments
+  push();
+  translate(a.x, a.y);
+  rotate(ang);
+  rectMode(CORNER);
+  stroke(ink);
+  strokeWeight(5);
+  fill(cloth);
+  rect(0, -9, len, 18, 9);
+  noStroke();
+  fill(ink);
+  const segs = 16;
+  for (let i = 1; i < segs; i += 2) rect((len / segs) * i, -9, len / segs, 18);
+  pop();
+
+  // clawed head
+  push();
+  translate(b.x, b.y);
+  rotate(ang);
   stroke(ink);
   strokeWeight(5);
   fill(cloth);
   for (let i = 0; i < 4; i++) {
-    const x = random(-220, 220);
-    const w = random(16, 30);
-    const h = random(70, 150);
-    const y = random(240, 300);
-    blob([
-      [x, y],
-      [x + w, y + h * 0.4],
-      [x + w * 0.4, y + h],
-      [x - w * 0.5, y + h * 0.55],
-    ]);
+    const s = 1 - i * 0.13;
+    push();
+    rotate(-0.78 + i * 0.36);
+    beginShape();
+    vertex(0, 0);
+    bezierVertex(40 * s, -12 * s, 86 * s, -20 * s, 128 * s, -4 * s);
+    bezierVertex(84 * s, 10 * s, 40 * s, 18 * s, 0, 22 * s);
+    endShape(CLOSE);
+    pop();
   }
+  pop();
+
+  // gloved hand on the haft
+  push();
+  translate(lerp(a.x, b.x, 0.44), lerp(a.y, b.y, 0.44));
+  stroke(ink);
+  strokeWeight(5);
+  fill(cloth);
+  ellipse(0, 0, 56, 46);
+  for (let i = 0; i < 4; i++) {
+    const t = -0.55 + i * 0.34;
+    line(cos(t) * 20, sin(t) * 16, cos(t) * 44, sin(t) * 36);
+  }
+  pop();
+
   pop();
 }
 
